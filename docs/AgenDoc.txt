@@ -1,0 +1,80 @@
+Roadmap
+
+1. Product Vision y definición del MVP (qué resolverá AgenDoc y cuál es su alcance).        v 1.0
+2. Modelo de dominio, identificando entidades, relaciones y reglas del negocio.             v 1.1
+3. Modelo de datos (ERD) optimizado para el MVP.                                            v 1.2
+4. Arquitectura de producto software, frontend, app móvil, backend, database y deploy.      v 1.3
+5. UX / UI.                                                                                 v 1.4
+6. Product Backlog, con épicas, funcionalidades e historias de usuario priorizadas.         v 1.5
+7. Sprint 1, iniciando el desarrollo con autenticación, roles y la gestión inicial de usuarios.
+
+-------------------------------------------------------------------------------------
+Metodología de trabajo para AgenDoc
+
+Cada sesión seguirá siempre la misma estructura:
+1. Objetivo de la sesión.
+2. Análisis funcional.
+3. Decisiones de arquitectura y diseño.
+4. Entregable concreto de la sesión.
+5. Validación antes de continuar.
+6. Definición de la siguiente sesión.
+
+-------------------------------------------------------------------------------------
+El nuevo ciclo de trabajo
+
+Ahora cada Sprint tendrá un ciclo repetitivo.
+
+1. Sprint Planning
+Solo una vez por Sprint.
+Aquí definiremos:
+- Objetivo del Sprint.
+- Historias comprometidas.
+- Riesgos.
+- Dependencias.
+- Criterios de aceptación.
+- Definición del incremento.
+
+No escribiremos código.
+
+2. Desarrollo Historia por Historia
+Cada historia se desarrollará completamente antes de iniciar la siguiente.
+Para cada HU seguiremos siempre el mismo flujo:
+
+Paso 1
+- Revisar la historia.
+- Validar criterios de aceptación.
+- Validar UX.
+- Validar reglas de negocio.
+
+Paso 2
+Diseñar la solución.
+Aquí sí podremos definir:
+- APIs
+- DTOs
+- Servicios
+- Componentes React
+- Navegación
+- Seguridad
+- Persistencia
+
+Paso 3
+Implementación guiada.
+Tú desarrollarás.
+Yo revisaré continuamente.
+
+Paso 4
+QA funcional.
+Verificaremos:
+- criterios de aceptación
+- Definition of Done
+- UX
+- errores
+- casos límite
+
+Paso 5
+Cierre de la historia.
+La historia se marca Done.
+Actualizamos el Blueprint solo si hubo una decisión importante.
+
+
+
