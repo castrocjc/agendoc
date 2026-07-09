@@ -283,6 +283,63 @@ El Playbook no define estándares específicos de código.
 
 ---
 
+## 7.1 Configuración por Tecnología
+
+Cada componente del proyecto deberá utilizar el mecanismo de configuración nativo de la tecnología correspondiente.
+
+### Backend (Spring Boot)
+
+La configuración se gestionará mediante perfiles de Spring Boot.
+
+Archivos oficiales:
+
+```text
+application.yml
+application-local.yml
+application-dev.yml
+application-prod.yml
+```
+
+Reglas:
+
+- `application.yml` contendrá únicamente la configuración común.
+- Cada perfil contendrá exclusivamente la configuración específica de su ambiente.
+- No se utilizarán archivos `.env` para la configuración del Backend.
+- No se incorporarán librerías adicionales para interpretar archivos `.env`.
+- La configuración de los ambientes de integración y producción utilizará variables de entorno estándar de Spring Boot cuando corresponda.
+
+### Frontend Web (React + Vite)
+
+La configuración seguirá las convenciones oficiales de Vite mediante archivos `.env`.
+
+Ejemplos:
+
+```text
+.env.local
+.env.development
+.env.production
+```
+
+### Aplicación Mobile (React Native + Expo)
+
+La configuración seguirá las convenciones oficiales de Expo mediante archivos `.env`.
+
+### Principio
+
+Cada tecnología utilizará su mecanismo oficial de configuración.
+
+Se evitará adaptar una tecnología para seguir las convenciones de otra cuando ello agregue complejidad innecesaria.
+
+### Uso de Docker
+
+Durante el desarrollo del MVP no se utilizará Docker como parte del entorno local de desarrollo.
+
+El proyecto utilizará PostgreSQL instalado localmente y la ejecución nativa de las tecnologías seleccionadas.
+
+La estructura del repositorio conservará la carpeta `docker/` para facilitar una futura incorporación de contenedores cuando el proyecto lo requiera.
+
+---
+
 # 8. Estrategia de Versionado
 
 ## Git Flow Simplificado
@@ -521,7 +578,7 @@ Incluye como mínimo:
 - Mobile React Native + Expo
 - PostgreSQL
 - Flyway
-- Docker
+- carpeta `docker/` reservada para futuras configuraciones
 - GitHub Actions
 - variables de entorno
 - configuración inicial de JWT
@@ -593,8 +650,8 @@ Todo el proyecto deberá construirse siguiendo el siguiente orden:
 4. Inicializar el Backend Spring Boot.
 5. Inicializar el Frontend React + TypeScript.
 6. Inicializar la aplicación Mobile con React Native y Expo.
-7. Configurar Docker.
-8. Configurar PostgreSQL.
+7. Reservar carpeta `docker/` para futuras configuraciones.
+8. Configurar PostgreSQL local.
 9. Configurar Flyway.
 10. Configurar variables de entorno.
 11. Configurar logging.

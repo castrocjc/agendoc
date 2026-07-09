@@ -1170,9 +1170,10 @@ Ambientes iniciales:
 
 Contenedores:
 
-- El backend deberá estar preparado para ejecutarse en Docker.
-- La base de datos podrá ejecutarse en contenedor para ambiente local.
-- El frontend y mobile deberán poder configurarse por ambiente.
+- Durante el MVP no se utilizará Docker como parte del entorno local de desarrollo.
+- El entorno local utilizará PostgreSQL instalado directamente en el equipo del desarrollador.
+- La carpeta `docker/` quedará reservada para futuras configuraciones de contenedores.
+- El uso de Docker será evaluado cuando el producto requiera ambientes reproducibles, integración compartida o despliegues mediante contenedores.
 
 Despliegue:
 
@@ -1273,6 +1274,9 @@ Aplicación Mobile
 - La autorización será basada en roles.
 - El backend será la fuente oficial de reglas de negocio.
 - Las integraciones futuras no serán implementadas en el MVP, pero la arquitectura quedará preparada para incorporarlas.
+- Durante el MVP no se utilizará Docker en el entorno local de desarrollo.
+- PostgreSQL se ejecutará localmente durante el MVP.
+- Docker quedará reservado para una futura etapa de integración, pruebas o despliegue.
 
 ---
 

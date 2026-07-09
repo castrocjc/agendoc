@@ -1,0 +1,13 @@
+spring:
+  config:
+    activate:
+      on-profile: local
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/agendoc
+    username: jc.castroc
+    password:
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    show-sql: true
