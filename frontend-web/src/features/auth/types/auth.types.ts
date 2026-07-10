@@ -1,7 +1,7 @@
 export type UserRole = "PACIENTE" | "RECEPCIONISTA" | "MEDICO";
 
 export interface LoginRequest {
-  username: string;
+  identifier: string;
   password: string;
 }
 

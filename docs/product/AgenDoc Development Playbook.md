@@ -403,6 +403,19 @@ El proyecto utilizará PostgreSQL instalado localmente y la ejecución nativa de
 
 La estructura del repositorio conservará la carpeta `docker/` para facilitar una futura incorporación de contenedores cuando el proyecto lo requiera.
 
+### Configuración CORS
+
+Toda API expuesta por AgenDoc para consumo desde Frontend Web o Mobile deberá incluir configuración CORS desde la fase Foundation.
+
+La configuración deberá:
+
+- habilitar únicamente los orígenes autorizados para el ambiente correspondiente;
+- permitir los métodos HTTP requeridos por la API;
+- permitir los encabezados necesarios para la autenticación;
+- mantenerse centralizada dentro de la configuración de seguridad.
+
+Esto evita problemas de integración durante el desarrollo y mantiene una política consistente entre ambientes.
+
 ---
 
 ## 7.3 Puertos oficiales para desarrollo local
@@ -532,6 +545,44 @@ Toda Historia deberá validar como mínimo:
 - consistencia visual
 - comportamiento Web y Mobile cuando aplique
 
+## Git Workflow
+
+AgenDoc seguirá un modelo Git Flow simplificado.
+
+### Ramas
+
+- `main`
+  - Contiene únicamente versiones estables del producto.
+  - Solo recibe cambios provenientes de `develop` durante un release.
+
+- `develop`
+  - Rama principal de integración del Sprint.
+  - Todas las Historias de Usuario aprobadas se integran aquí.
+
+- `feature/*`
+  - Cada Historia de Usuario se desarrolla en una rama independiente.
+  - Ejemplo:
+    - `feature/hu-01-login`
+    - `feature/hu-02-dashboard`
+
+### Flujo de trabajo
+
+Para cada Historia de Usuario:
+
+1. Crear la rama desde `develop`.
+2. Implementar la HU completa.
+3. Validar compilación.
+4. Ejecutar pruebas.
+5. Validar funcionalmente.
+6. Realizar commit(s).
+7. Publicar la rama remota.
+8. Abrir Pull Request hacia `develop`.
+9. Revisar el Pull Request.
+10. Aprobar el merge.
+11. Eliminar la rama de feature cuando ya no sea necesaria.
+
+No se realizarán commits directamente sobre `main`.
+
 ---
 
 ## 9.1 Definition of Ready para una nueva rama
@@ -563,6 +614,33 @@ Una sesión podrá cerrarse cuando:
 - APIs integradas con el Frontend cuando corresponda.
 - No existen dependencias de datos simulados (mocks) para el funcionamiento normal.
 - La funcionalidad fue validada de extremo a extremo.
+
+---
+
+## 9.3 Definition of Done para una Historia con Backend
+
+Cuando una Historia de Usuario incluya implementación en el Backend, deberá validarse como mínimo lo siguiente antes de considerarla técnicamente estable:
+
+- Migraciones Flyway implementadas y validadas cuando corresponda.
+- Entidades persistentes implementadas cuando corresponda.
+- Repositorios implementados y validados.
+- Servicios de aplicación y reglas de negocio implementados.
+- Controlador REST implementado.
+- Contrato de entrada y salida definido mediante DTOs.
+- Bean Validation implementada para los datos de entrada.
+- Configuración de Spring Security actualizada cuando corresponda.
+- Manejo global de excepciones actualizado cuando corresponda.
+- Respuestas HTTP y estructura de errores consistentes.
+- Caso funcional exitoso validado.
+- Casos negativos relevantes validados.
+- El proyecto compila correctamente.
+- Las pruebas automatizadas pasan correctamente.
+- La API fue validada antes de integrarse con el Frontend.
+- No existen excepciones temporales, código de prueba ni utilitarios innecesarios.
+- No se exponen contraseñas, hashes, tokens, trazas internas ni información sensible.
+- El incremento quedó versionado mediante Conventional Commits.
+
+Esta validación complementa la Definition of Done general y no reemplaza la validación funcional de extremo a extremo de la Historia.
 
 ---
 
