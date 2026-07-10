@@ -8,9 +8,9 @@
 | Tipo                 | Plataforma Web + Mobile                        |
 | Metodología          | Scrum                                          |
 | Blueprint Version    | v1.5                                           |
-| Sprint Actual        | Sprint 0 — Descubrimiento y Diseño             |
-| Estado               | En construcción                                |
-| Última actualización | Sesión 6 — Product Backlog                     |
+| Sprint Actual        | Sprint 1 — Desarrollo                          |
+| Estado               | Foundation completada                          |
+| Última actualización | Sprint 1 — Fase A Foundation                   |
 
 ---
 
@@ -3588,5 +3588,29 @@ Construir la plataforma base.
 - Se identificaron dependencias funcionales entre historias.
 - Se propuso el alcance inicial del Sprint 1.
 - Se confirmó que el backlog mantiene trazabilidad con Product Vision, MVP Scope, Modelo de Dominio, Modelo de Datos, Arquitectura del Producto y UX/UI.
+
+---
+
+## Sprint 1
+
+### Fase A — Foundation
+
+**Estado**
+
+✅ Completada
+
+### Decisiones tomadas
+
+- Se inicializó la estructura oficial del repositorio.
+- Se configuró Backend con Spring Boot.
+- Se configuró Frontend Web con React, TypeScript y Vite.
+- Se configuró Mobile con React Native y Expo.
+- Se configuró PostgreSQL local para el MVP.
+- Se configuró Flyway para migraciones versionadas.
+- Se decidió no utilizar Docker durante el desarrollo local del MVP.
+- Se reservó la carpeta `docker/` para futuras configuraciones.
+- Se configuró GitHub Actions para validar Backend y Frontend Web.
+- Se adoptó GitHub CLI como herramienta de autenticación e interacción con GitHub.
+- Se alineó la documentación oficial dentro de `docs/product`.
 
 ---

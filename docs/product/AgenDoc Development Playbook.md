@@ -206,11 +206,35 @@ Historia seleccionada
 
 ↓
 
-Análisis
+Refinamiento funcional
 
 ↓
 
-Desarrollo
+Diseño UX/UI mínimo
+
+↓
+
+Contrato API
+
+↓
+
+Modelo de datos (si aplica)
+
+↓
+
+Backend
+
+↓
+
+Pruebas Backend
+
+↓
+
+Frontend
+
+↓
+
+Pruebas Integradas
 
 ↓
 
@@ -283,7 +307,48 @@ El Playbook no define estándares específicos de código.
 
 ---
 
-## 7.1 Configuración por Tecnología
+# 7.1 Estrategia de Implementación de Historias de Usuario
+
+AgenDoc adopta oficialmente una estrategia de desarrollo basada en Vertical Slice.
+
+Cada Historia de Usuario deberá entregar valor funcional completo y potencialmente desplegable.
+
+Sin embargo, la implementación técnica de cada Historia seguirá una construcción progresiva desde las capas inferiores hacia las superiores.
+
+Esta estrategia permite mantener una arquitectura sólida sin perder la entrega incremental de valor.
+
+## Principios
+
+- La Historia de Usuario es la unidad oficial de entrega.
+- No se implementarán capas completas del sistema de forma aislada.
+- Cada Historia incorporará únicamente los cambios técnicos necesarios para cumplir su objetivo.
+- El Backend continuará siendo la fuente oficial de reglas de negocio.
+- El Frontend consumirá siempre contratos definidos por el Backend.
+- Ninguna Historia será considerada terminada utilizando datos simulados (mocks) permanentes.
+
+## Flujo Oficial de Implementación
+
+Cada Historia seguirá preferentemente el siguiente orden técnico:
+
+1. Refinamiento funcional.
+2. Diseño UX/UI mínimo necesario.
+3. Definición del contrato API.
+4. Modelo de datos y migraciones mínimas.
+5. Implementación del Backend.
+6. Pruebas unitarias e integración del Backend.
+7. Validación de APIs.
+8. Implementación del Frontend Web.
+9. Implementación Mobile cuando aplique.
+10. Pruebas funcionales integradas.
+11. Code Review.
+12. QA.
+13. Done.
+
+Este flujo busca reducir retrabajo, mantener consistencia técnica y validar cada incremento de extremo a extremo.
+
+---
+
+## 7.2 Configuración por Tecnología
 
 Cada componente del proyecto deberá utilizar el mecanismo de configuración nativo de la tecnología correspondiente.
 
@@ -337,6 +402,28 @@ Durante el desarrollo del MVP no se utilizará Docker como parte del entorno loc
 El proyecto utilizará PostgreSQL instalado localmente y la ejecución nativa de las tecnologías seleccionadas.
 
 La estructura del repositorio conservará la carpeta `docker/` para facilitar una futura incorporación de contenedores cuando el proyecto lo requiera.
+
+---
+
+## 7.3 Puertos oficiales para desarrollo local
+
+Durante el desarrollo local del MVP se utilizarán los siguientes puertos oficiales:
+
+| Componente      | Puerto | URL local             |
+|-----------------|-------:|-----------------------|
+| Frontend Web    | 5173   | http://localhost:5173 |
+| Backend API     | 8081   | http://localhost:8081 |
+| PostgreSQL      | 5432   | localhost:5432        |
+| Mobile Expo Web | 8082   | http://localhost:8082 |
+
+Reglas:
+
+- El Backend API se ejecutará en el puerto 8081.
+- El Frontend Web utilizará el puerto 5173 por defecto de Vite.
+- PostgreSQL utilizará el puerto 5432.
+- Mobile con Expo Web utilizará el puerto 8082 cuando aplique.
+- No se utilizará el puerto 8080 para el Frontend Web porque puede generar conflictos en entornos locales.
+- El Frontend Web consumirá el Backend mediante la variable `VITE_API_BASE_URL`.
 
 ---
 
@@ -473,6 +560,9 @@ Una sesión podrá cerrarse cuando:
 - Blueprint actualizado si corresponde.
 - Playbook actualizado si corresponde.
 - Prompt preparado para la siguiente sesión cuando aplique.
+- APIs integradas con el Frontend cuando corresponda.
+- No existen dependencias de datos simulados (mocks) para el funcionamiento normal.
+- La funcionalidad fue validada de extremo a extremo.
 
 ---
 
@@ -545,6 +635,10 @@ El equipo deberá respetar permanentemente las siguientes reglas.
 # 13. Estrategia Oficial de Inicio del Desarrollo
 
 A partir del Sprint 1, el desarrollo del producto seguirá una estrategia única de construcción.
+
+Una vez completada la Foundation, todas las Historias de Usuario se implementarán siguiendo la Estrategia de Implementación de Historias de Usuario definida en este Playbook.
+
+La construcción técnica de cada Historia seguirá un enfoque progresivo desde el modelo de datos mínimo requerido hasta la integración completa con Frontend Web y Mobile, manteniendo el principio de Vertical Slice.
 
 El objetivo es establecer una base técnica sólida antes de implementar funcionalidades de negocio, reduciendo deuda técnica y garantizando consistencia durante todo el MVP.
 
@@ -777,14 +871,38 @@ Todos los Sprints futuros deberán seguir este Playbook.
 
 # Próxima Sesión
 
-Sprint 1 Planning
+Sprint 1 — Fase B
 
-Objetivos:
+Objetivo:
 
-- Revisar Blueprint y Playbook.
-- Confirmar capacidad del Sprint.
-- Refinar las Historias seleccionadas.
-- Validar dependencias.
-- Confirmar objetivos del Sprint.
-- Elaborar Sprint Backlog.
-- Definir estrategia de implementación del primer Vertical Slice.
+Iniciar el desarrollo funcional del Sprint 1 con la primera Historia de Usuario aprobada.
+
+Historia objetivo:
+
+HU-01 — Iniciar sesión
+
+Antes de iniciar:
+
+- Validar rama `develop` actualizada.
+- Crear rama `feature/sprint1-authentication` desde `develop`.
+- Confirmar que Backend y Frontend Web compilan.
+- Confirmar que la Foundation quedó integrada correctamente.
+- Mantener el desarrollo dentro del alcance aprobado para Sprint 1.
+
+---
+
+# 14. Reglas de Ejecución de Historias
+
+Durante todo el desarrollo del MVP deberán respetarse las siguientes reglas:
+
+- La Historia de Usuario constituye la unidad oficial de entrega.
+- No se desarrollarán módulos completos de Base de Datos, Backend o Frontend de forma aislada.
+- Cada Historia incorporará únicamente los cambios mínimos necesarios en el modelo de datos.
+- Toda API deberá validarse antes de integrarse con el Frontend.
+- El Frontend consumirá contratos reales definidos por el Backend.
+- Los datos simulados (mocks) solo podrán utilizarse temporalmente durante el desarrollo y deberán eliminarse antes de declarar una Historia como Done.
+- Ninguna Historia será considerada terminada hasta validar correctamente el flujo completo de extremo a extremo.
+- Las mejoras visuales deberán mantenerse dentro del alcance de la Historia y no deberán retrasar indefinidamente la implementación funcional.
+- Cualquier excepción a estas reglas deberá justificarse y documentarse mediante una decisión aprobada.
+
+---
