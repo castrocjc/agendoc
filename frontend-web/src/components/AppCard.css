@@ -1,0 +1,22 @@
+.app-card {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.app-card--none {
+  box-shadow: none;
+}
+
+.app-card--low {
+  box-shadow: var(--shadow-low);
+}
+
+.app-card--medium {
+  box-shadow: var(--shadow-medium);
+}
+
+.app-card--high {
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08);
+}

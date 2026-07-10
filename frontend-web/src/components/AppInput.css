@@ -1,0 +1,108 @@
+.app-input {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.app-input__label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.app-input__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.app-input__control input {
+  width: 100%;
+  min-height: 50px;
+  box-sizing: border-box;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-input);
+  padding: 0 var(--space-4);
+  color: var(--color-text-primary);
+  background: var(--color-white);
+  font-family: var(--font-family);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  outline: none;
+  transition:
+    border-color var(--motion-normal) var(--motion-ease),
+    box-shadow var(--motion-normal) var(--motion-ease),
+    background-color var(--motion-normal) var(--motion-ease);
+}
+
+.app-input__control input::placeholder {
+  color: var(--color-gray-400);
+}
+
+.app-input__control input:hover:not(:disabled):not(:read-only) {
+  border-color: var(--color-gray-400);
+}
+
+.app-input__control input:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: var(--shadow-focus);
+}
+
+.app-input__control input:disabled {
+  color: var(--color-gray-500);
+  background: var(--color-gray-100);
+  cursor: not-allowed;
+}
+
+.app-input__control input:read-only {
+  background: var(--color-gray-50);
+}
+
+.app-input__control--error input,
+.app-input__control--error input:focus {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.12);
+}
+
+.app-input__control--with-left-icon input {
+  padding-left: 42px;
+}
+
+.app-input__control--with-right-icon input {
+  padding-right: 42px;
+}
+
+.app-input__icon {
+  position: absolute;
+  z-index: 1;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-gray-500);
+  pointer-events: none;
+}
+
+.app-input__icon--left {
+  left: var(--space-4);
+}
+
+.app-input__icon--right {
+  right: var(--space-4);
+}
+
+.app-input__helper,
+.app-input__error {
+  margin: 0;
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+}
+
+.app-input__helper {
+  color: var(--color-text-muted);
+}
+
+.app-input__error {
+  color: var(--color-danger);
+}
