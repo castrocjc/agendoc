@@ -566,6 +566,33 @@ Una sesión podrá cerrarse cuando:
 
 ---
 
+## 9.3 Definition of Done para una Historia con Backend
+
+Cuando una Historia de Usuario incluya implementación en el Backend, deberá validarse como mínimo lo siguiente antes de considerarla técnicamente estable:
+
+- Migraciones Flyway implementadas y validadas cuando corresponda.
+- Entidades persistentes implementadas cuando corresponda.
+- Repositorios implementados y validados.
+- Servicios de aplicación y reglas de negocio implementados.
+- Controlador REST implementado.
+- Contrato de entrada y salida definido mediante DTOs.
+- Bean Validation implementada para los datos de entrada.
+- Configuración de Spring Security actualizada cuando corresponda.
+- Manejo global de excepciones actualizado cuando corresponda.
+- Respuestas HTTP y estructura de errores consistentes.
+- Caso funcional exitoso validado.
+- Casos negativos relevantes validados.
+- El proyecto compila correctamente.
+- Las pruebas automatizadas pasan correctamente.
+- La API fue validada antes de integrarse con el Frontend.
+- No existen excepciones temporales, código de prueba ni utilitarios innecesarios.
+- No se exponen contraseñas, hashes, tokens, trazas internas ni información sensible.
+- El incremento quedó versionado mediante Conventional Commits.
+
+Esta validación complementa la Definition of Done general y no reemplaza la validación funcional de extremo a extremo de la Historia.
+
+---
+
 # 10. Gestión del Blueprint
 
 El Blueprint únicamente se actualizará cuando exista una decisión aprobada que modifique:

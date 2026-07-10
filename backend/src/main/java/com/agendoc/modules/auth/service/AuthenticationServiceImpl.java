@@ -3,6 +3,7 @@ package com.agendoc.modules.auth.service;
 import com.agendoc.modules.auth.dto.AuthenticatedUser;
 import com.agendoc.modules.auth.dto.LoginRequest;
 import com.agendoc.modules.auth.dto.LoginResponse;
+import com.agendoc.modules.auth.exception.InvalidCredentialsException;
 import com.agendoc.modules.user.entity.UserEntity;
 import com.agendoc.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,37 +33,51 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private UserEntity findUser(String identifier) {
-        throw new UnsupportedOperationException(
-                "User lookup is not implemented yet."
-        );
+
+        return userRepository
+                .findByUsernameIgnoreCaseOrEmailIgnoreCase(
+                        identifier,
+                        identifier
+                )
+                .orElseThrow(InvalidCredentialsException::new);
+
     }
 
     private void validateUserStatus(UserEntity user) {
-        throw new UnsupportedOperationException(
-                "User status validation is not implemented yet."
-        );
+        if (!user.isActive()) {
+            throw new InvalidCredentialsException();
+        }
     }
 
     private void validatePassword(
             String rawPassword,
             String passwordHash
     ) {
-        throw new UnsupportedOperationException(
-                "Password validation is not implemented yet."
-        );
+        if (!passwordEncoder.matches(rawPassword, passwordHash)) {
+            throw new InvalidCredentialsException();
+        }
     }
 
     private AuthenticatedUser createAuthenticatedUser(UserEntity user) {
-        throw new UnsupportedOperationException(
-                "Authenticated user mapping is not implemented yet."
+
+        return new AuthenticatedUser(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole().getCode(),
+                user.getClinic().getId()
         );
+
     }
 
     private LoginResponse createResponse(
             AuthenticatedUser authenticatedUser
     ) {
-        throw new UnsupportedOperationException(
-                "Login response creation is not implemented yet."
+        return new LoginResponse(
+                null,
+                null,
+                0L,
+                authenticatedUser
         );
     }
 }
