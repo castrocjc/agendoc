@@ -1,22 +1,87 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  CalendarDays,
+  LockKeyhole,
+  Mail,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
+
 import AppButton from "../../../components/AppButton";
 import AppCard from "../../../components/AppCard";
 import AppInput from "../../../components/AppInput";
-import "./LoginPage.css";
 import {
-  CalendarDays,
-  Users,
-  ShieldCheck
-} from "lucide-react";
+  AuthenticationError,
+  login,
+} from "../services/authService";
+import { saveSession } from "../services/sessionService";
+
+import "./LoginPage.css";
 
 function LoginPage() {
+  const navigate = useNavigate();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const isFormValid = username.trim().length > 0 && password.trim().length > 0;
+  const isFormValid =
+    username.trim().length > 0 &&
+    password.trim().length > 0;
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> {
     event.preventDefault();
+
+    if (!isFormValid || isSubmitting) {
+      return;
+    }
+
+    setSubmitError(null);
+    setIsSubmitting(true);
+
+    try {
+      const response = await login({
+        identifier: username.trim(),
+        password,
+      });
+
+      saveSession(response);
+      navigate("/dashboard");
+    } catch (error: unknown) {
+      if (error instanceof AuthenticationError) {
+        setSubmitError(error.message);
+      } else {
+        setSubmitError(
+          "Ocurrió un error inesperado. Inténtalo nuevamente.",
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  function handleUsernameChange(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void {
+    setUsername(event.target.value);
+
+    if (submitError) {
+      setSubmitError(null);
+    }
+  }
+
+  function handlePasswordChange(
+    event: React.ChangeEvent<HTMLInputElement>,
+  ): void {
+    setPassword(event.target.value);
+
+    if (submitError) {
+      setSubmitError(null);
+    }
   }
 
   return (
@@ -34,15 +99,21 @@ function LoginPage() {
           </div>
 
           <div className="login-hero__content">
-            <h1>La plataforma que conecta pacientes, médicos y consultorios.</h1>
-            <p>La plataforma diseñada para gestionar citas médicas de forma simple, rápida y segura.</p>
+            <h1>
+              La plataforma que conecta pacientes, médicos y consultorios.
+            </h1>
+
+            <p>
+              La plataforma diseñada para gestionar citas médicas de forma
+              simple, rápida y segura.
+            </p>
 
             <div className="login-benefits">
-
               <div>
                 <span>
                   <CalendarDays size={24} strokeWidth={2.2} />
                 </span>
+
                 <strong>Agenda inteligente</strong>
                 <p>Gestiona tu tiempo de manera eficiente.</p>
               </div>
@@ -51,6 +122,7 @@ function LoginPage() {
                 <span>
                   <Users size={24} strokeWidth={2.2} />
                 </span>
+
                 <strong>Atención centrada en el paciente</strong>
                 <p>Mejora la experiencia en cada cita.</p>
               </div>
@@ -59,14 +131,16 @@ function LoginPage() {
                 <span>
                   <ShieldCheck size={24} strokeWidth={2.2} />
                 </span>
+
                 <strong>Seguridad y privacidad</strong>
                 <p>Protegemos tu información siempre.</p>
               </div>
-
             </div>
           </div>
 
-          <p className="login-security">Cumplimos con estándares de seguridad y privacidad de datos.</p>
+          <p className="login-security">
+            Cumplimos con estándares de seguridad y privacidad de datos.
+          </p>
         </section>
 
         <section className="login-panel">
@@ -81,13 +155,14 @@ function LoginPage() {
               <AppInput
                 id="username"
                 name="username"
-                label="Correo electrónico"
+                label="Usuario o correo electrónico"
                 type="text"
-                placeholder="ejemplo@agendoc.com"
+                placeholder="usuario o ejemplo@agendoc.com"
                 value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                onChange={handleUsernameChange}
                 autoComplete="username"
-                leftIcon="✉"
+                leftIcon={<Mail size={18} />}
+                disabled={isSubmitting}
               />
 
               <AppInput
@@ -97,38 +172,50 @@ function LoginPage() {
                 type="password"
                 placeholder="••••••••••••"
                 value={password}
-                onChange={(event) => setPassword(event.target.value)}
+                onChange={handlePasswordChange}
                 autoComplete="current-password"
-                leftIcon="⌑"
-                rightIcon="◉"
+                leftIcon={<LockKeyhole size={18} />}
+                disabled={isSubmitting}
               />
 
-              <div className="login-options">
-                <label>
-                  <input type="checkbox" />
-                  Recordarme
-                </label>
-
-                <button type="button">¿Olvidaste tu contraseña?</button>
+              <div className="login-options login-options--end">
+                <button
+                  type="button"
+                  disabled={isSubmitting}
+                >
+                  ¿Olvidaste tu contraseña?
+                </button>
               </div>
 
-              <AppButton type="submit" size="lg" disabled={!isFormValid}>
+              {submitError && (
+                <div
+                  className="login-error"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  <span className="login-error__icon" aria-hidden="true">
+                    !
+                  </span>
+
+                  <p>{submitError}</p>
+                </div>
+              )}
+
+              <AppButton
+                type="submit"
+                size="lg"
+                disabled={!isFormValid || isSubmitting}
+                isLoading={isSubmitting}
+              >
                 Iniciar sesión
-              </AppButton>
-
-              <div className="login-divider">
-                <span />
-                <p>o continúa con</p>
-                <span />
-              </div>
-
-              <AppButton type="button" variant="outline" size="lg">
-                Continuar con Google
               </AppButton>
             </form>
 
             <p className="login-footer">
-              ¿No tienes una cuenta? <button type="button">Contacta al administrador</button>
+              ¿No tienes una cuenta?{" "}
+              <button type="button" disabled={isSubmitting}>
+                Contacta al administrador
+              </button>
             </p>
           </AppCard>
         </section>
