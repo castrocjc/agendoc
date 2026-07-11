@@ -2,6 +2,7 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import LoginPage from "./features/auth/pages/LoginPage";
 import ProtectedRoute from "./features/auth/components/ProtectedRoute";
 import DashboardPage from "./features/dashboard/pages/DashboardPage";
+import RegisterDoctorPage from "./features/doctor/pages/RegisterDoctorPage";
 
 function App() {
   return (
@@ -14,6 +15,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/doctors/new"
+          element={
+            <ProtectedRoute>
+              <RegisterDoctorPage />
             </ProtectedRoute>
           }
         />

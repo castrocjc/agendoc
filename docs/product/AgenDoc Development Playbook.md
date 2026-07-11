@@ -346,6 +346,10 @@ Cada Historia seguirá preferentemente el siguiente orden técnico:
 
 Este flujo busca reducir retrabajo, mantener consistencia técnica y validar cada incremento de extremo a extremo.
 
+Las Technical Stories podrán ejecutarse cuando soporten directamente una Historia de Usuario del Sprint o constituyan trabajo habilitador previamente aprobado.
+
+Las Technical Stories no representan funcionalidades visibles para el usuario final y no sustituyen Historias de Usuario del Product Backlog.
+
 ---
 
 ## 7.2 Configuración por Tecnología

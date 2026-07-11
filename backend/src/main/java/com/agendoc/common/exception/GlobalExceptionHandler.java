@@ -16,64 +16,90 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(InvalidCredentialsException.class)
-    public ResponseEntity<ApiError> handleInvalidCredentials(
-            InvalidCredentialsException exception,
-            HttpServletRequest request
-    ) {
+        @ExceptionHandler(InvalidCredentialsException.class)
+        public ResponseEntity<ApiError> handleInvalidCredentials(
+                        InvalidCredentialsException exception,
+                        HttpServletRequest request) {
 
-        ApiError error = new ApiError(
-                Instant.now(),
-                HttpStatus.UNAUTHORIZED.value(),
-                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
-                exception.getMessage(),
-                request.getRequestURI()
-        );
+                ApiError error = new ApiError(
+                                Instant.now(),
+                                HttpStatus.UNAUTHORIZED.value(),
+                                HttpStatus.UNAUTHORIZED.getReasonPhrase(),
+                                exception.getMessage(),
+                                request.getRequestURI());
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(error);
-    }
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                                .body(error);
+        }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiError> handleValidationException(
-            MethodArgumentNotValidException exception,
-            HttpServletRequest request
-    ) {
+        @ExceptionHandler(MethodArgumentNotValidException.class)
+        public ResponseEntity<ApiError> handleValidationException(
+                        MethodArgumentNotValidException exception,
+                        HttpServletRequest request) {
 
-        String message = exception.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(fieldError -> fieldError.getDefaultMessage())
-                .distinct()
-                .collect(Collectors.joining(" "));
+                String message = exception.getBindingResult()
+                                .getFieldErrors()
+                                .stream()
+                                .map(fieldError -> fieldError.getDefaultMessage())
+                                .distinct()
+                                .collect(Collectors.joining(" "));
 
-        ApiError error = new ApiError(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                message,
-                request.getRequestURI()
-        );
+                ApiError error = new ApiError(
+                                Instant.now(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                message,
+                                request.getRequestURI());
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(error);
-    }
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                                .body(error);
+        }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleUnexpectedException(
-            Exception exception,
-            HttpServletRequest request
-    ) {
+        @ExceptionHandler(ResourceNotFoundException.class)
+        public ResponseEntity<ApiError> handleResourceNotFound(
+                        ResourceNotFoundException exception,
+                        HttpServletRequest request) {
 
-        ApiError error = new ApiError(
-                Instant.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                "An unexpected error occurred.",
-                request.getRequestURI()
-        );
+                ApiError error = new ApiError(
+                                Instant.now(),
+                                HttpStatus.NOT_FOUND.value(),
+                                HttpStatus.NOT_FOUND.getReasonPhrase(),
+                                exception.getMessage(),
+                                request.getRequestURI());
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(error);
-    }
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                                .body(error);
+        }
+
+        @ExceptionHandler(ConflictException.class)
+        public ResponseEntity<ApiError> handleConflict(
+                        ConflictException exception,
+                        HttpServletRequest request) {
+
+                ApiError error = new ApiError(
+                                Instant.now(),
+                                HttpStatus.CONFLICT.value(),
+                                HttpStatus.CONFLICT.getReasonPhrase(),
+                                exception.getMessage(),
+                                request.getRequestURI());
+
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                                .body(error);
+        }
+
+        @ExceptionHandler(Exception.class)
+        public ResponseEntity<ApiError> handleUnexpectedException(
+                        Exception exception,
+                        HttpServletRequest request) {
+
+                ApiError error = new ApiError(
+                                Instant.now(),
+                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
+                                "An unexpected error occurred.",
+                                request.getRequestURI());
+
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                .body(error);
+        }
 }

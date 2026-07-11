@@ -1,0 +1,96 @@
+.app-select {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.app-select__label {
+    color: var(--color-neutral-700, #334155);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 20px;
+}
+
+.app-select__control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid var(--color-neutral-300, #cbd5e1);
+    border-radius: 10px;
+    background: #ffffff;
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        background-color 180ms ease;
+}
+
+.app-select__control:hover {
+    border-color: var(--color-neutral-400, #94a3b8);
+}
+
+.app-select__control:focus-within {
+    border-color: var(--color-primary-600, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.app-select__control--error {
+    border-color: var(--color-danger, #ef4444);
+}
+
+.app-select__control--error:focus-within {
+    border-color: var(--color-danger, #ef4444);
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.12);
+}
+
+.app-select__control select {
+    width: 100%;
+    min-height: 46px;
+    padding: 11px 44px 11px 14px;
+    border: 0;
+    outline: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--color-neutral-900, #0f172a);
+    font-family: inherit;
+    font-size: 15px;
+    line-height: 22px;
+    appearance: none;
+    cursor: pointer;
+}
+
+.app-select__control select:disabled {
+    cursor: not-allowed;
+    color: var(--color-neutral-400, #94a3b8);
+    background: var(--color-neutral-100, #f1f5f9);
+}
+
+.app-select__control select:invalid {
+    color: var(--color-neutral-500, #64748b);
+}
+
+.app-select__arrow {
+    position: absolute;
+    right: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-neutral-500, #64748b);
+    pointer-events: none;
+}
+
+.app-select__helper,
+.app-select__error {
+    margin: 0;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.app-select__helper {
+    color: var(--color-neutral-500, #64748b);
+}
+
+.app-select__error {
+    color: var(--color-danger, #ef4444);
+}

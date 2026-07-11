@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * Configures HTTP security rules for the AgenDoc API.
@@ -19,6 +20,17 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
         private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
+        private static final String DOCTORS_ENDPOINT = "/api/v1/doctors";
+        private static final String MEDICAL_SPECIALTIES_ENDPOINT = "/api/v1/medical-specialties";
+
+        private final boolean permitDoctorEndpoints;
+
+        public SecurityConfiguration(
+                @Value("${agendoc.security.permit-doctor-endpoints:false}")
+                boolean permitDoctorEndpoints
+        ) {
+        this.permitDoctorEndpoints = permitDoctorEndpoints;
+        }
 
         @Bean
         public SecurityFilterChain securityFilterChain(
@@ -30,12 +42,31 @@ public class SecurityConfiguration {
                                 .sessionManagement(session -> session
                                                 .sessionCreationPolicy(
                                                                 SessionCreationPolicy.STATELESS))
-                                .authorizeHttpRequests(authorize -> authorize
+                                .authorizeHttpRequests(authorize -> {
+
+                                authorize
+                                        .requestMatchers(
+                                                HttpMethod.POST,
+                                                LOGIN_ENDPOINT
+                                        )
+                                        .permitAll();
+
+                                if (permitDoctorEndpoints) {
+                                        authorize
                                                 .requestMatchers(
-                                                                HttpMethod.POST,
-                                                                LOGIN_ENDPOINT)
+                                                        HttpMethod.GET,
+                                                        MEDICAL_SPECIALTIES_ENDPOINT
+                                                )
                                                 .permitAll()
-                                                .anyRequest().authenticated())
+                                                .requestMatchers(
+                                                        HttpMethod.POST,
+                                                        DOCTORS_ENDPOINT
+                                                )
+                                                .permitAll();
+                                }
+
+                                authorize.anyRequest().authenticated();
+                                })
                                 .formLogin(form -> form.disable())
                                 .httpBasic(basic -> basic.disable());
 

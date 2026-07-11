@@ -51,14 +51,17 @@ El objetivo es mantener una terminología consistente en toda la documentación 
 
 Con el fin de mantener una nomenclatura uniforme durante todo el proyecto, se adoptan los siguientes prefijos:
 
-| Prefijo  | Significado                  |
-|----------|------------------------------|
-| EP       | Épica                        |
-| FE       | Feature                      |
-| HU       | Historia de Usuario          |
-| ADR      | Architecture Decision Record |
+| Prefijo | Significado                  |
+|---------|------------------------------|
+| EP      | Épica                        |
+| FE      | Feature                      |
+| HU      | Historia de Usuario          |
+| TS      | Technical Story              |
+| ADR     | Architecture Decision Record |
 
 Estos identificadores deberán mantenerse consistentes en toda la documentación y durante la ejecución de los Sprints.
+
+Las Technical Stories representan trabajo técnico habilitador necesario para soportar la seguridad, configuración, mantenibilidad, arquitectura o evolución del producto. No sustituyen Historias de Usuario ni representan funcionalidad directa para el usuario final.
 
 ---
 
@@ -2929,7 +2932,63 @@ Definition of Done:
 
 ---
 
-## 7.6 Priorización MoSCoW
+## 7.6 Technical Stories
+
+Las Technical Stories representan trabajo técnico que habilita o fortalece la plataforma sin incorporar funcionalidad visible para el usuario final.
+
+Podrán ejecutarse dentro de un Sprint cuando soporten directamente una Historia de Usuario aprobada o una decisión arquitectónica registrada mediante ADR.
+
+---
+
+### TS-01 — Externalizar configuración CORS
+
+Objetivo
+
+Externalizar la configuración CORS para que los orígenes permitidos dependan del ambiente de ejecución y no del código fuente.
+
+Motivación
+
+- Facilitar despliegues entre ambientes.
+- Reducir cambios manuales.
+- Mejorar mantenibilidad.
+- Mantener una configuración consistente entre Web y Mobile.
+
+Dependencias
+
+- Spring Security.
+- Configuración por perfiles.
+
+Estado
+
+Pendiente.
+
+---
+
+### TS-02 — Implementar autenticación JWT y contexto del usuario autenticado
+
+Objetivo
+
+Implementar autenticación completa basada en JWT incorporando el contexto del usuario autenticado para soportar autorización por rol y por consultorio.
+
+Motivación
+
+- Eliminar autenticación temporal.
+- Preparar autorización por consultorio.
+- Compartir el mismo modelo de autenticación entre Web y Mobile.
+- Soportar las siguientes Historias del MVP.
+
+Dependencias
+
+- HU-01.
+- Spring Security.
+
+Estado
+
+Pendiente.
+
+---
+
+## 7.7 Priorización MoSCoW
 
 ### Must Have
 
@@ -2983,7 +3042,7 @@ Definition of Done:
 
 ---
 
-## 7.7 Dependencias funcionales
+## 7.8 Dependencias funcionales
 
 Secuencia lógica de implementación:
 
@@ -3026,7 +3085,7 @@ Dependencias principales:
 
 ---
 
-## 7.8 Propuesta de Sprint 1
+## 7.9 Propuesta de Sprint 1
 
 ### Objetivo del Sprint 1
 
@@ -3063,7 +3122,7 @@ Este incremento constituye el primer Vertical Slice del producto y prepara el ca
 
 ---
 
-## 7.9 Validación de consistencia
+## 7.10 Validación de consistencia
 
 | Artefacto                 | Validación                                                                                                                  |
 |---------------------------|-----------------------------------------------------------------------------------------------------------------------------|
@@ -3082,7 +3141,7 @@ El Sprint 1 evita sobrecarga funcional y permite iniciar desarrollo inmediatamen
 
 ---
 
-## 7.9.1 Matriz de Trazabilidad
+## 7.10.1 Matriz de Trazabilidad
 
 La siguiente matriz resume la relación entre la visión del producto y los elementos del Product Backlog.
 
@@ -3099,7 +3158,7 @@ Esta matriz permitirá mantener la trazabilidad entre la estrategia del producto
 
 ---
 
-## 7.10 Decisión de la Sesión 6
+## 7.11 Decisión de la Sesión 6
 
 Se aprueba el Product Backlog oficial del MVP de AgenDoc como base para la planificación del Sprint 1.
 
@@ -3107,7 +3166,7 @@ El backlog podrá ser refinado durante la ejecución del proyecto, pero cualquie
 
 ---
 
-## 7.11 Definition of Ready
+## 7.12 Definition of Ready
 
 Una Historia de Usuario podrá incorporarse a un Sprint únicamente cuando cumpla los siguientes criterios:
 
@@ -3458,6 +3517,11 @@ Construir la plataforma base.
 - CI/CD
 - Primer incremento funcional
 
+### Technical Stories habilitadoras
+
+- TS-01 — Externalizar configuración CORS.
+- TS-02 — Implementar autenticación JWT y contexto del usuario autenticado.
+
 ---
 
 # 10. Historial de Sesiones
@@ -3612,5 +3676,20 @@ Construir la plataforma base.
 - Se configuró GitHub Actions para validar Backend y Frontend Web.
 - Se adoptó GitHub CLI como herramienta de autenticación e interacción con GitHub.
 - Se alineó la documentación oficial dentro de `docs/product`.
+
+---
+
+### Actualización de Arquitectura y Backlog Técnico
+
+**Estado**
+
+✅ Aprobada
+
+**Decisiones tomadas**
+
+- Se formaliza el uso de Technical Stories (TS) dentro del Product Backlog.
+- Se incorpora TS-01 para externalizar la configuración CORS.
+- Se incorpora TS-02 para implementar autenticación JWT y el contexto del usuario autenticado.
+- Se establece que las Technical Stories representan trabajo técnico habilitador y no funcionalidad visible para el usuario final.
 
 ---
