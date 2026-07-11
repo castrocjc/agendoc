@@ -1,19 +1,33 @@
 import type { LoginResponse } from "../types/auth.types";
 
-let currentSession: LoginResponse | null = null;
+const SESSION_STORAGE_KEY = "agendoc.auth.session";
 
 export function saveSession(session: LoginResponse): void {
-  currentSession = session;
+  sessionStorage.setItem(
+    SESSION_STORAGE_KEY,
+    JSON.stringify(session),
+  );
 }
 
 export function getSession(): LoginResponse | null {
-  return currentSession;
+  const storedSession = sessionStorage.getItem(SESSION_STORAGE_KEY);
+
+  if (!storedSession) {
+    return null;
+  }
+
+  try {
+    return JSON.parse(storedSession) as LoginResponse;
+  } catch {
+    clearSession();
+    return null;
+  }
 }
 
 export function clearSession(): void {
-  currentSession = null;
+  sessionStorage.removeItem(SESSION_STORAGE_KEY);
 }
 
 export function isAuthenticated(): boolean {
-  return currentSession !== null;
+  return getSession() !== null;
 }
