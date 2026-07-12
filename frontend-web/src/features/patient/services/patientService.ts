@@ -1,5 +1,6 @@
 import {
   ApiClientError,
+  apiGet,
   apiPost,
 } from "../../../shared/api/apiClient";
 import type {
@@ -66,6 +67,22 @@ export async function createPatient(
     >(
       "/api/v1/patients",
       request,
+    );
+  } catch (error) {
+    throw mapServiceError(error);
+  }
+}
+
+export async function searchPatients(
+  query: string,
+): Promise<PatientResponse[]> {
+  try {
+    const normalizedQuery = query.trim();
+
+    return await apiGet<PatientResponse[]>(
+      `/api/v1/patients/search?query=${encodeURIComponent(
+        normalizedQuery,
+      )}`,
     );
   } catch (error) {
     throw mapServiceError(error);

@@ -22,6 +22,7 @@ public class SecurityConfiguration {
         private static final String DOCTORS_ENDPOINT = "/api/v1/doctors";
         private static final String MEDICAL_SPECIALTIES_ENDPOINT = "/api/v1/medical-specialties";
         private static final String PATIENTS_ENDPOINT = "/api/v1/patients";
+        private static final String PATIENT_SEARCH_ENDPOINT = "/api/v1/patients/search";
         private final boolean permitDevelopmentEndpoints;
 
         public SecurityConfiguration(
@@ -58,9 +59,12 @@ public class SecurityConfiguration {
                                                                 .requestMatchers(
                                                                                 HttpMethod.POST,
                                                                                 PATIENTS_ENDPOINT)
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                                HttpMethod.GET,
+                                                                                PATIENT_SEARCH_ENDPOINT)
                                                                 .permitAll();
                                         }
-
                                         authorize
                                                         .anyRequest()
                                                         .authenticated();

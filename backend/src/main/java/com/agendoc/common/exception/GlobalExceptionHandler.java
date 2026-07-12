@@ -55,6 +55,25 @@ public class GlobalExceptionHandler {
                                 .body(error);
         }
 
+        @ExceptionHandler(BadRequestException.class)
+        public ResponseEntity<ApiError> handleBadRequest(
+                BadRequestException exception,
+                HttpServletRequest request
+        ) {
+
+        ApiError error = new ApiError(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                exception.getMessage(),
+                request.getRequestURI()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(error);
+        }
+
         @ExceptionHandler(ResourceNotFoundException.class)
         public ResponseEntity<ApiError> handleResourceNotFound(
                         ResourceNotFoundException exception,
