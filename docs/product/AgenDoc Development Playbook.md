@@ -7,7 +7,7 @@
 |-----------|----------------------|
 | Proyecto  | AgenDoc              |
 | Documento | Development Playbook |
-| Versión   | v1.2                 |
+| Versión   | v1.3                 |
 | Estado    | Aprobado             |
 | Vigencia  | Desde Sprint 1       |
 
@@ -517,9 +517,9 @@ docs: update development playbook
 
 ## 8.2 Herramienta Oficial de Git
 
-GitHub CLI (gh) será la herramienta oficial para interactuar con GitHub durante el desarrollo del proyecto.
+Todas las operaciones habituales de GitHub deberán ejecutarse mediante GitHub CLI (gh).
 
-No será necesario utilizar la interfaz web para operaciones rutinarias de versionado.
+La interfaz web de GitHub se reservará únicamente para actividades excepcionales, como administración del repositorio o configuración de permisos.
 
 Las operaciones oficiales incluyen:
 
@@ -534,22 +534,36 @@ Las operaciones oficiales incluyen:
 
 ## 8.3 Flujo Oficial de Versionado
 
-1. git status
-2. git diff
-3. Ejecutar build
-4. Ejecutar pruebas
-5. git add
-6. git commit
-7. git push
-8. gh pr create
-9. gh pr checks
-10. gh pr view
-11. Revisar cambios
-12. gh pr merge --delete-branch
-13. git checkout develop
-14. git pull
-15. git fetch --prune
-16. Validar ramas locales y remotas
+Preparación
+
+1. git checkout develop
+2. git pull origin develop
+3. git fetch --prune
+4. git status
+5. git branch
+6. git branch -r
+7. git checkout -b feature/<nombre>
+
+Durante el desarrollo
+
+8. Build
+9. Pruebas
+10. git add
+11. git commit
+12. git push
+13. gh pr create
+14. gh pr checks
+15. gh pr view
+16. gh pr merge --delete-branch
+
+Después del merge
+
+17. git checkout develop
+18. git pull origin develop
+19. git fetch --prune
+20. git status
+21. git branch
+22. git branch -r
 
 ---
 
@@ -586,6 +600,15 @@ La creación y gestión de Pull Requests se realizará utilizando GitHub CLI (`g
 
 ---
 
+## 8.6 Estrategia de Merge
+
+- Todo Pull Request deberá aprobar todos los GitHub Actions antes del merge.
+- El merge oficial será mediante GitHub CLI.
+- Se eliminará automáticamente la rama remota utilizando --delete-branch.
+- Finalizado el merge, el desarrollador sincronizará develop y limpiará las referencias remotas con git fetch --prune.
+
+---
+
 # 9. Calidad
 
 ## Definition of Ready
@@ -605,7 +628,12 @@ Una Historia estará terminada cuando:
 - cumple criterios de aceptación
 - código revisado
 - pruebas ejecutadas
+- Pull Request aprobado
+- todos los GitHub Actions finalizan exitosamente
 - integrada en develop
+- ramas feature eliminadas local y remotamente
+- develop sincronizada con origin/develop
+- working tree limpio
 - sin defectos críticos
 - documentación oficial actualizada cuando corresponda
 
@@ -619,44 +647,6 @@ Toda Historia deberá validar como mínimo:
 - validaciones
 - consistencia visual
 - comportamiento Web y Mobile cuando aplique
-
-## Git Workflow
-
-AgenDoc seguirá un modelo Git Flow simplificado.
-
-### Ramas
-
-- `main`
-  - Contiene únicamente versiones estables del producto.
-  - Solo recibe cambios provenientes de `develop` durante un release.
-
-- `develop`
-  - Rama principal de integración del Sprint.
-  - Todas las Historias de Usuario aprobadas se integran aquí.
-
-- `feature/*`
-  - Cada Historia de Usuario se desarrolla en una rama independiente.
-  - Ejemplo:
-    - `feature/hu-01-login`
-    - `feature/hu-02-dashboard`
-
-### Flujo de trabajo
-
-Para cada Historia de Usuario:
-
-1. Crear la rama desde `develop`.
-2. Implementar la HU completa.
-3. Validar compilación.
-4. Ejecutar pruebas.
-5. Validar funcionalmente.
-6. Realizar commit(s).
-7. Publicar la rama remota.
-8. Abrir Pull Request hacia `develop`.
-9. Revisar el Pull Request.
-10. Aprobar el merge.
-11. Eliminar la rama de feature cuando ya no sea necesaria.
-
-No se realizarán commits directamente sobre `main`.
 
 ---
 
@@ -725,6 +715,8 @@ Esta validación complementa la Definition of Done general y no reemplaza la val
 
 ## 9.4 Checklist Operacional
 
+## Antes del Pull Request
+
 □ Build Backend exitoso
 □ Build Frontend exitoso
 □ QA funcional completado
@@ -734,11 +726,18 @@ Esta validación complementa la Definition of Done general y no reemplaza la val
 □ Push ejecutado
 □ Pull Request creado
 □ Checks aprobados
+
+## Después del Merge
+
 □ Merge realizado
 □ Rama remota eliminada
 □ Rama local eliminada
+□ git checkout develop ejecutado
+□ git pull origin develop ejecutado
 □ git fetch --prune ejecutado
-□ develop sincronizado
+□ git branch validado
+□ git branch -r validado
+□ Working tree limpio verificado mediante git status
 □ Documentación revisada
 □ Prompt preparado para la siguiente sesión
 
