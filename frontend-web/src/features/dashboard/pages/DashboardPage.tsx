@@ -35,6 +35,10 @@ function DashboardPage() {
     navigate("/doctors/new");
   }
 
+  function handleRegisterPatient(): void {
+    navigate("/patients/new");
+  }
+
   return (
     <main className="dashboard-page">
       <header className="dashboard-page__header">
@@ -101,7 +105,7 @@ function DashboardPage() {
             </AppButton>
           </article>
 
-          <article className="dashboard-page__card dashboard-page__card--disabled">
+          <article className="dashboard-page__card">
             <div
               className="dashboard-page__card-icon"
               aria-hidden="true"
@@ -117,9 +121,13 @@ function DashboardPage() {
               </p>
             </div>
 
-            <span className="dashboard-page__status">
-              Próximamente
-            </span>
+            <AppButton
+              type="button"
+              fullWidth={false}
+              onClick={handleRegisterPatient}
+            >
+              Registrar paciente
+            </AppButton>
           </article>
 
           <article className="dashboard-page__card dashboard-page__card--disabled">

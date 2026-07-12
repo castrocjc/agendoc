@@ -2,70 +2,68 @@ package com.agendoc.security.config;
 
 import java.util.List;
 
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Configures HTTP security rules for the AgenDoc API.
  */
 @Configuration
 public class SecurityConfiguration {
-
         private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
         private static final String DOCTORS_ENDPOINT = "/api/v1/doctors";
         private static final String MEDICAL_SPECIALTIES_ENDPOINT = "/api/v1/medical-specialties";
-
-        private final boolean permitDoctorEndpoints;
+        private static final String PATIENTS_ENDPOINT = "/api/v1/patients";
+        private final boolean permitDevelopmentEndpoints;
 
         public SecurityConfiguration(
-                @Value("${agendoc.security.permit-doctor-endpoints:false}")
-                boolean permitDoctorEndpoints
-        ) {
-        this.permitDoctorEndpoints = permitDoctorEndpoints;
+                        @Value("${agendoc.security.permit-development-endpoints:false}") boolean permitDevelopmentEndpoints) {
+                this.permitDevelopmentEndpoints = permitDevelopmentEndpoints;
         }
 
         @Bean
         public SecurityFilterChain securityFilterChain(
                         HttpSecurity http) throws Exception {
-
                 http
-                                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                                .cors(cors -> cors.configurationSource(
+                                                corsConfigurationSource()))
                                 .csrf(csrf -> csrf.disable())
-                                .sessionManagement(session -> session
-                                                .sessionCreationPolicy(
-                                                                SessionCreationPolicy.STATELESS))
+                                .sessionManagement(session -> session.sessionCreationPolicy(
+                                                SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests(authorize -> {
-
-                                authorize
-                                        .requestMatchers(
-                                                HttpMethod.POST,
-                                                LOGIN_ENDPOINT
-                                        )
-                                        .permitAll();
-
-                                if (permitDoctorEndpoints) {
                                         authorize
-                                                .requestMatchers(
-                                                        HttpMethod.GET,
-                                                        MEDICAL_SPECIALTIES_ENDPOINT
-                                                )
-                                                .permitAll()
-                                                .requestMatchers(
-                                                        HttpMethod.POST,
-                                                        DOCTORS_ENDPOINT
-                                                )
-                                                .permitAll();
-                                }
+                                                        .requestMatchers(
+                                                                        HttpMethod.POST,
+                                                                        LOGIN_ENDPOINT)
+                                                        .permitAll();
 
-                                authorize.anyRequest().authenticated();
+                                        if (permitDevelopmentEndpoints) {
+                                                authorize
+                                                                .requestMatchers(
+                                                                                HttpMethod.GET,
+                                                                                MEDICAL_SPECIALTIES_ENDPOINT)
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                                HttpMethod.POST,
+                                                                                DOCTORS_ENDPOINT)
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                                HttpMethod.POST,
+                                                                                PATIENTS_ENDPOINT)
+                                                                .permitAll();
+                                        }
+
+                                        authorize
+                                                        .anyRequest()
+                                                        .authenticated();
                                 })
                                 .formLogin(form -> form.disable())
                                 .httpBasic(basic -> basic.disable());
@@ -91,12 +89,13 @@ public class SecurityConfiguration {
                                 "OPTIONS"));
 
                 configuration.setAllowedHeaders(List.of("*"));
-
                 configuration.setAllowCredentials(true);
 
                 UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-                source.registerCorsConfiguration("/**", configuration);
+                source.registerCorsConfiguration(
+                                "/**",
+                                configuration);
 
                 return source;
         }
