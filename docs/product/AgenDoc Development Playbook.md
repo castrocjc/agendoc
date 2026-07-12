@@ -515,6 +515,77 @@ docs: update development playbook
 
 ---
 
+## 8.2 Herramienta Oficial de Git
+
+GitHub CLI (gh) será la herramienta oficial para interactuar con GitHub durante el desarrollo del proyecto.
+
+No será necesario utilizar la interfaz web para operaciones rutinarias de versionado.
+
+Las operaciones oficiales incluyen:
+
+- autenticación
+- creación de Pull Requests
+- revisión de Pull Requests
+- consulta de checks
+- merge
+- eliminación de ramas
+
+---
+
+## 8.3 Flujo Oficial de Versionado
+
+1. git status
+2. git diff
+3. Ejecutar build
+4. Ejecutar pruebas
+5. git add
+6. git commit
+7. git push
+8. gh pr create
+9. gh pr checks
+10. gh pr view
+11. Revisar cambios
+12. gh pr merge --delete-branch
+13. git checkout develop
+14. git pull
+15. git fetch --prune
+16. Validar ramas locales y remotas
+
+---
+
+## 8.4 Política de Gestión de Ramas
+
+Con el fin de mantener el repositorio limpio y facilitar la colaboración, se adoptan las siguientes reglas:
+
+- Toda Historia de Usuario se desarrollará en una rama `feature/*`.
+- Toda rama `feature/*` deberá eliminarse inmediatamente después de completar el merge hacia `develop`.
+- Las ramas locales también deberán eliminarse una vez sincronizado `develop`.
+- No deberán mantenerse ramas cerradas o sin uso en el repositorio remoto.
+- Después de eliminar ramas remotas deberá ejecutarse:
+
+git fetch --prune
+
+para sincronizar las referencias locales.
+
+---
+
+## 8.5 Estándar de Pull Request
+
+Todo Pull Request deberá seguir una estructura uniforme para facilitar la revisión y mantener la trazabilidad de las Historias de Usuario.
+
+Como mínimo deberá incluir:
+
+- Resumen de la implementación.
+- Cambios realizados en Backend.
+- Cambios realizados en Frontend.
+- Validaciones y pruebas ejecutadas.
+- Historia de Usuario asociada.
+- Confirmación del cumplimiento de los criterios de aceptación.
+
+La creación y gestión de Pull Requests se realizará utilizando GitHub CLI (`gh`) como herramienta oficial del proyecto.
+
+---
+
 # 9. Calidad
 
 ## Definition of Ready
@@ -601,6 +672,10 @@ Antes de comenzar cualquier desarrollo en una nueva rama:
 - Frontend Web inicia cuando aplique.
 - Mobile inicia cuando aplique.
 - `git status` limpio.
+- Ejecutar `git fetch --prune` para limpiar referencias remotas obsoletas.
+- Verificar las ramas locales mediante `git branch`.
+- Verificar las ramas remotas mediante `git branch -r`.
+- Confirmar que `develop` se encuentra sincronizada con el repositorio remoto antes de crear una nueva rama `feature/*`.
 
 ## 9.2 Definition of Done para cerrar una sesión
 
@@ -645,6 +720,27 @@ Cuando una Historia de Usuario incluya implementación en el Backend, deberá va
 - El incremento quedó versionado mediante Conventional Commits.
 
 Esta validación complementa la Definition of Done general y no reemplaza la validación funcional de extremo a extremo de la Historia.
+
+---
+
+## 9.4 Checklist Operacional
+
+□ Build Backend exitoso
+□ Build Frontend exitoso
+□ QA funcional completado
+□ git status limpio
+□ git diff revisado
+□ Conventional Commit realizado
+□ Push ejecutado
+□ Pull Request creado
+□ Checks aprobados
+□ Merge realizado
+□ Rama remota eliminada
+□ Rama local eliminada
+□ git fetch --prune ejecutado
+□ develop sincronizado
+□ Documentación revisada
+□ Prompt preparado para la siguiente sesión
 
 ---
 
