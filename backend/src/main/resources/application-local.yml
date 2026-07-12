@@ -1,6 +1,6 @@
 agendoc:
   security:
-    permit-doctor-endpoints: true
+    permit-development-endpoints: true
 
 spring:
   config:
