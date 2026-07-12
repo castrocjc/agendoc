@@ -1,0 +1,100 @@
+.patient-search-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px;
+    border: 1px solid var(--color-neutral-200, #e2e8f0);
+    border-radius: 16px;
+    background: #ffffff;
+    transition:
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        transform 180ms ease;
+}
+
+.patient-search-card:hover {
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+}
+
+.patient-search-card__avatar {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary-600, #2563eb);
+}
+
+.patient-search-card__content {
+    min-width: 0;
+    flex: 1;
+}
+
+.patient-search-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.patient-search-card__header h3 {
+    margin: 0 0 4px;
+    color: var(--color-neutral-900, #0f172a);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+}
+
+.patient-search-card__document {
+    margin: 0;
+    color: var(--color-neutral-600, #475569);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.patient-search-card__details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+}
+
+.patient-search-card__detail {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    color: var(--color-neutral-600, #475569);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.patient-search-card__detail svg {
+    flex: 0 0 auto;
+    color: var(--color-neutral-500, #64748b);
+}
+
+.patient-search-card__detail span {
+    overflow-wrap: anywhere;
+}
+
+@media (max-width: 767px) {
+    .patient-search-card {
+        gap: 12px;
+        padding: 16px;
+    }
+
+    .patient-search-card__avatar {
+        width: 44px;
+        height: 44px;
+    }
+
+    .patient-search-card__details {
+        flex-direction: column;
+        gap: 10px;
+    }
+}

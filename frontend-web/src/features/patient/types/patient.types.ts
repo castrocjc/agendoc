@@ -12,7 +12,6 @@ export interface CreatePatientRequest {
 export interface PatientResponse {
   id: number;
   clinicId: number;
-  userId: number | null;
   firstName: string;
   lastName: string;
   documentType: string;
