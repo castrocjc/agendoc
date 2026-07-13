@@ -23,6 +23,7 @@ public class SecurityConfiguration {
         private static final String MEDICAL_SPECIALTIES_ENDPOINT = "/api/v1/medical-specialties";
         private static final String PATIENTS_ENDPOINT = "/api/v1/patients";
         private static final String PATIENT_SEARCH_ENDPOINT = "/api/v1/patients/search";
+        private static final String AGENDA_BLOCKS_ENDPOINT = "/api/v1/doctors/*/agenda-blocks";
         private final boolean permitDevelopmentEndpoints;
 
         public SecurityConfiguration(
@@ -53,6 +54,10 @@ public class SecurityConfiguration {
                                                                                 MEDICAL_SPECIALTIES_ENDPOINT)
                                                                 .permitAll()
                                                                 .requestMatchers(
+                                                                        HttpMethod.GET,
+                                                                        DOCTORS_ENDPOINT)
+                                                                .permitAll()
+                                                                .requestMatchers(
                                                                                 HttpMethod.POST,
                                                                                 DOCTORS_ENDPOINT)
                                                                 .permitAll()
@@ -63,6 +68,14 @@ public class SecurityConfiguration {
                                                                 .requestMatchers(
                                                                                 HttpMethod.GET,
                                                                                 PATIENT_SEARCH_ENDPOINT)
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                        HttpMethod.POST,
+                                                                        AGENDA_BLOCKS_ENDPOINT)
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                        HttpMethod.GET,
+                                                                        AGENDA_BLOCKS_ENDPOINT)
                                                                 .permitAll();
                                         }
                                         authorize

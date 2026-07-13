@@ -1,5 +1,7 @@
 package com.agendoc.modules.doctor.controller;
 
+import java.util.List;
+
 import com.agendoc.modules.doctor.dto.CreateDoctorRequest;
 import com.agendoc.modules.doctor.dto.DoctorResponse;
 import com.agendoc.modules.doctor.service.DoctorService;
@@ -7,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,18 +23,24 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class DoctorController {
 
-    private final DoctorService doctorService;
+        private final DoctorService doctorService;
 
-    @PostMapping
-    public ResponseEntity<DoctorResponse> createDoctor(
-            @Valid @RequestBody CreateDoctorRequest request
-    ) {
+        @GetMapping
+        public ResponseEntity<List<DoctorResponse>> findDoctors() {
 
-        DoctorResponse response =
-                doctorService.createDoctor(request);
+        return ResponseEntity.ok(
+                doctorService.findDoctors()
+        );
+        }
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
+        @PostMapping
+        public ResponseEntity<DoctorResponse> createDoctor(
+                        @Valid @RequestBody CreateDoctorRequest request) {
+
+                DoctorResponse response = doctorService.createDoctor(request);
+
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(response);
+        }
 }
