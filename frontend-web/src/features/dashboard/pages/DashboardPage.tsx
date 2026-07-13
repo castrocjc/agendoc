@@ -1,5 +1,5 @@
 import {
-  CalendarDays,
+  Calendar,
   LogOut,
   Stethoscope,
   UserPlus,
@@ -41,6 +41,10 @@ function DashboardPage() {
 
   function handleSearchPatient(): void {
     navigate("/patients/search");
+  }
+
+  function handleMedicalAgenda(): void {
+    navigate("/agenda");
   }
 
   return (
@@ -159,12 +163,12 @@ function DashboardPage() {
             </AppButton>
           </article>
 
-          <article className="dashboard-page__card dashboard-page__card--disabled">
+          <article className="dashboard-page__card">
             <div
               className="dashboard-page__card-icon"
               aria-hidden="true"
             >
-              <CalendarDays size={24} />
+              <Calendar size={24} />
             </div>
 
             <div className="dashboard-page__card-content">
@@ -175,9 +179,13 @@ function DashboardPage() {
               </p>
             </div>
 
-            <span className="dashboard-page__status">
-              Próximamente
-            </span>
+            <AppButton
+              type="button"
+              fullWidth={false}
+              onClick={handleMedicalAgenda}
+            >
+              Gestionar agenda
+            </AppButton>
           </article>
         </section>
       </section>

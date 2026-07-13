@@ -82,3 +82,13 @@ export async function createDoctor(
     throw mapServiceError(error);
   }
 }
+
+export async function getDoctors(): Promise<DoctorResponse[]> {
+  try {
+    return await apiGet<DoctorResponse[]>(
+      "/api/v1/doctors",
+    );
+  } catch (error) {
+    throw mapServiceError(error);
+  }
+}
