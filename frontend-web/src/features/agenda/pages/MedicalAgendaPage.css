@@ -1,0 +1,376 @@
+.medical-agenda-page {
+  min-height: 100vh;
+  background: var(--color-neutral-50, #f8fafc);
+}
+
+.medical-agenda-page__header {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--color-neutral-200, #e2e8f0);
+  background: #ffffff;
+}
+
+.medical-agenda-page__logo {
+  display: block;
+  width: 140px;
+  height: auto;
+}
+
+.medical-agenda-page__content {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.medical-agenda-page__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.medical-agenda-page__icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary-600, #2563eb);
+}
+
+.medical-agenda-page__heading h1 {
+  margin: 0 0 8px;
+  color: var(--color-neutral-900, #0f172a);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.medical-agenda-page__heading p {
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.medical-agenda-page__card {
+  padding: 24px;
+  border: 1px solid var(--color-neutral-200, #e2e8f0);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.medical-agenda-page__doctor-card {
+  padding-top: 18px;
+  padding-bottom: 16px;
+}
+
+.medical-agenda-page__doctor-card .medical-agenda-page__section-heading {
+  margin-bottom: 16px;
+}
+
+.medical-agenda-page__section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.medical-agenda-page__section-heading h2 {
+  margin: 0 0 4px;
+  color: var(--color-neutral-900, #0f172a);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.medical-agenda-page__section-heading p {
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.medical-agenda-page__doctor-selection {
+  max-width: 560px;
+}
+
+.medical-agenda-page__workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.medical-agenda-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.medical-agenda-page__time-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.medical-agenda-page__form-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.medical-agenda-page__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 170px;
+  padding: 32px 24px;
+  border: 1px dashed var(--color-neutral-300, #cbd5e1);
+  border-radius: 12px;
+  background: var(--color-neutral-50, #f8fafc);
+  color: var(--color-neutral-500, #64748b);
+  text-align: center;
+}
+
+.medical-agenda-page__state svg {
+  margin-bottom: 16px;
+}
+
+.medical-agenda-page__state h3 {
+  margin: 0 0 8px;
+  color: var(--color-neutral-800, #1e293b);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.medical-agenda-page__state p {
+  max-width: 440px;
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.medical-agenda-page__state--error {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.05);
+  color: var(--color-danger-500, #ef4444);
+}
+
+.medical-agenda-page__state--error h3 {
+  color: var(--color-danger-500, #ef4444);
+}
+
+.medical-agenda-page__spinner {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 16px;
+  border: 3px solid var(--color-neutral-200, #e2e8f0);
+  border-top-color: var(--color-primary-600, #2563eb);
+  border-radius: 50%;
+  animation: medical-agenda-spin 800ms linear infinite;
+}
+
+.medical-agenda-page__count {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary-600, #2563eb);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.medical-agenda-page__block-list,
+.medical-agenda-page__existing-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.medical-agenda-page__existing-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.medical-agenda-page__block,
+.medical-agenda-page__existing-block {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--color-neutral-200, #e2e8f0);
+  border-radius: 12px;
+  background: var(--color-neutral-50, #f8fafc);
+}
+
+.medical-agenda-page__block-date {
+  margin: 0 0 4px;
+  color: var(--color-neutral-900, #0f172a);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.medical-agenda-page__block-time {
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.medical-agenda-page__save-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-neutral-200, #e2e8f0);
+}
+
+.medical-agenda-page__existing-agenda {
+  margin-top: 24px;
+}
+
+.medical-agenda-page__message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.medical-agenda-page__message--success {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
+}
+
+.medical-agenda-page__message--error {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.06);
+  color: #b91c1c;
+}
+
+.medical-agenda-page__availability {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.medical-agenda-page__availability--available {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+.medical-agenda-page__availability--unavailable {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--color-neutral-600, #475569);
+}
+
+@keyframes medical-agenda-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 767px) {
+  .medical-agenda-page__header {
+    padding: 12px 16px;
+  }
+
+  .medical-agenda-page__logo {
+    width: 120px;
+  }
+
+  .medical-agenda-page__content {
+    width: min(100% - 24px, 1120px);
+    padding: 32px 0 48px;
+  }
+
+  .medical-agenda-page__heading {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .medical-agenda-page__icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .medical-agenda-page__heading h1 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .medical-agenda-page__card {
+    padding: 20px;
+  }
+
+  .medical-agenda-page__workspace,
+  .medical-agenda-page__existing-list {
+    grid-template-columns: 1fr;
+  }
+
+  .medical-agenda-page__workspace {
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .medical-agenda-page__time-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .medical-agenda-page__form-actions,
+  .medical-agenda-page__save-actions {
+    display: block;
+  }
+
+  .medical-agenda-page__form-actions .app-button,
+  .medical-agenda-page__save-actions .app-button {
+    width: 100%;
+  }
+
+  .medical-agenda-page__section-heading {
+    gap: 12px;
+  }
+
+  .medical-agenda-page__block,
+  .medical-agenda-page__existing-block {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .medical-agenda-page__block .app-button {
+    width: 100%;
+  }
+
+  .medical-agenda-page__existing-agenda {
+    margin-top: 16px;
+  }
+}

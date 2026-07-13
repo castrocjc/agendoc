@@ -11,6 +11,7 @@ import DashboardPage from "./features/dashboard/pages/DashboardPage";
 import RegisterDoctorPage from "./features/doctor/pages/RegisterDoctorPage";
 import RegisterPatientPage from "./features/patient/pages/RegisterPatientPage";
 import SearchPatientPage from "./features/patient/pages/SearchPatientPage";
+import MedicalAgendaPage from "./features/agenda/pages/MedicalAgendaPage";
 
 function App() {
   return (
@@ -58,6 +59,15 @@ function App() {
           element={
             <ProtectedRoute>
               <SearchPatientPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/agenda"
+          element={
+            <ProtectedRoute>
+              <MedicalAgendaPage />
             </ProtectedRoute>
           }
         />
