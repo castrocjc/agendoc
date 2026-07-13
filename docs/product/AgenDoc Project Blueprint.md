@@ -2,15 +2,15 @@
 
 > Documento vivo del proyecto. Toda decisión funcional o técnica aprobada deberá quedar registrada en este documento antes de considerarse oficial.
 
-| Campo                | Valor                                          |
-|----------------------|------------------------------------------------|
-| Proyecto             | AgenDoc                                        |
-| Tipo                 | Plataforma Web + Mobile                        |
-| Metodología          | Scrum                                          |
-| Blueprint Version    | v1.5                                           |
-| Sprint Actual        | Sprint 1 — Desarrollo                          |
-| Estado               | Foundation completada                          |
-| Última actualización | Sprint 1 — Fase A Foundation                   |
+| Campo                | Valor                                             |
+|----------------------|---------------------------------------------------|
+| Proyecto             | AgenDoc                                           |
+| Tipo                 | Plataforma Web + Mobile                           |
+| Metodología          | Scrum                                             |
+| Blueprint Version    | v1.6                                              |
+| Sprint Actual        | Preparación del Sprint 2                          |
+| Estado               | Product Backlog refinado                          |
+| Última actualización | Post Sprint 1 — Product Backlog Refinement        |
 
 ---
 
@@ -184,7 +184,7 @@ El MVP se centrará en la gestión de citas médicas.
 - Crear citas
 - Reprogramar citas
 - Cancelar citas
-- Confirmar asistencia
+- Registrar asistencia o inasistencia del paciente
 - Visualizar agenda del consultorio
 
 ---
@@ -353,7 +353,8 @@ Responsabilidades:
 - Crear citas.
 - Reprogramar citas.
 - Cancelar citas.
-- Confirmar asistencia.
+- Confirmar la llegada del paciente.
+- Registrar la inasistencia del paciente.
 - Visualizar la agenda del consultorio.
 
 Relaciones:
@@ -400,16 +401,28 @@ Relaciones:
 - Tiene un médico.
 - Ocurre dentro de una agenda médica.
 
-Estados iniciales:
+Estados oficiales del MVP:
 
-- Solicitada
 - Programada
-- Reprogramada
-- Cancelada
 - Confirmada
-- En atención
 - Atendida
+- Cancelada
 - No asistió
+
+Interpretación de los estados:
+
+- Programada: la cita fue creada con paciente, médico, fecha y horario asignados.
+- Confirmada: la recepcionista registró que el paciente llegó al consultorio.
+- Atendida: el médico completó la atención y registró la observación médica básica.
+- Cancelada: la cita no se realizará y el motivo de cancelación quedó registrado.
+- No asistió: la recepcionista registró explícitamente que el paciente no se presentó.
+- Para las reglas de disponibilidad, se consideran citas activas aquellas que se encuentran en estado Programada o Confirmada.
+
+En el MVP:
+
+- Solicitada no se utilizará porque las reservas no requieren aprobación posterior.
+- Reprogramada representa una acción sobre una cita Programada, no un estado permanente.
+- En atención no se utilizará para evitar una transición operativa que no aporta valor suficiente al MVP.
 
 ---
 
@@ -428,6 +441,51 @@ Relaciones:
 - Es registrada por un médico.
 
 La Observación Médica Básica no representa una historia clínica completa.
+
+---
+
+## Ciclo de Vida de la Cita Médica
+
+El ciclo de vida oficial de una cita médica dentro del MVP será:
+
+```text
+Creación o reserva
+        │
+        ▼
+   Programada
+        │
+        ├───────────────► Cancelada
+        │
+        ├───────────────► No asistió
+        │
+        ▼
+   Confirmada
+        │
+        ├───────────────► Cancelada
+        │
+        ▼
+    Atendida
+```
+
+Transiciones permitidas:
+
+| Estado actual | Acción | Nuevo estado | Actor autorizado |
+|---|---|---|---|
+| Sin cita | Crear o reservar cita | Programada | Paciente o recepcionista |
+| Programada | Reprogramar | Programada | Recepcionista |
+| Programada | Cancelar | Cancelada | Paciente o recepcionista |
+| Programada | Confirmar llegada | Confirmada | Recepcionista |
+| Programada | Registrar inasistencia | No asistió | Recepcionista |
+| Confirmada | Cancelar excepcionalmente | Cancelada | Recepcionista |
+| Confirmada | Marcar como atendida | Atendida | Médico |
+
+Estados finales:
+
+- Atendida.
+- Cancelada.
+- No asistió.
+
+Una cita ubicada en un estado final no podrá cambiar posteriormente de estado dentro del MVP.
 
 ---
 
@@ -467,19 +525,72 @@ Consultorio
 
 ## Reglas de negocio
 
+### Reglas generales
+
 - Toda cita médica debe pertenecer a un consultorio.
 - Toda cita médica debe tener un paciente asignado.
 - Toda cita médica debe tener un médico asignado.
-- Toda cita médica debe tener una fecha y una hora definidas.
-- No puede existir más de una cita activa para el mismo médico en el mismo horario.
-- Una cita cancelada no puede ser atendida.
-- Una cita atendida no puede ser reprogramada.
-- Una cita atendida no puede ser cancelada.
-- Solo el médico puede marcar una cita como atendida.
-- Solo el médico puede registrar observaciones médicas básicas.
-- La recepcionista puede crear, reprogramar, cancelar y confirmar citas del consultorio.
-- El paciente solo puede gestionar sus propias citas.
-- El médico solo puede visualizar las citas que le fueron asignadas.
+- Toda cita médica debe tener una fecha, hora de inicio y hora de fin definidas.
+- Toda cita médica debe asociarse a un bloque de agenda válido.
+- Los usuarios únicamente podrán ejecutar acciones permitidas por su rol y consultorio.
+
+### Disponibilidad médica
+
+- La disponibilidad médica es información derivada de los bloques de agenda y de las citas activas.
+- No se persistirá una entidad independiente denominada Disponibilidad.
+- Solo podrán mostrarse bloques activos, disponibles y pertenecientes al consultorio del usuario autenticado.
+- No deberán mostrarse horarios anteriores a la hora actual cuando se consulte la fecha del día.
+- Los horarios disponibles deberán mostrarse ordenados cronológicamente.
+- Un bloque de agenda podrá asociarse como máximo a una cita activa.
+- Un horario ocupado no deberá aparecer como disponible.
+- Cuando una cita se cancela, el bloque podrá volver a considerarse disponible siempre que su fecha y hora no hayan transcurrido y no exista otra cita activa asociada.
+
+### Creación de citas
+
+- Toda cita deberá crearse inicialmente en estado Programada.
+- Una cita solo podrá crearse sobre un bloque de agenda disponible.
+- La creación de una cita deberá impedir dobles reservas, incluso ante solicitudes concurrentes.
+- La cita creada por el paciente utilizará al paciente autenticado.
+- La cita creada por recepción utilizará al paciente seleccionado y al consultorio de la recepcionista autenticada.
+- El consultorio no deberá confiar en identificadores enviados libremente por el Frontend cuando pueda obtenerlos del contexto autenticado.
+
+### Reprogramación
+
+- Solo una cita Programada podrá reprogramarse.
+- La reprogramación deberá utilizar un nuevo bloque disponible.
+- La cita conservará el mismo identificador después de ser reprogramada.
+- Después de reprogramarse, la cita permanecerá en estado Programada.
+- La fecha, hora y bloque anteriores deberán conservar trazabilidad básica mediante auditoría.
+
+### Cancelación
+
+- Una cita Programada podrá cancelarse por el paciente propietario o por la recepcionista del consultorio.
+- Una cita Confirmada podrá cancelarse excepcionalmente por la recepcionista.
+- La cancelación de una cita Confirmada requerirá un motivo obligatorio.
+- Una cita Atendida no podrá cancelarse.
+- Una cita Cancelada no podrá ser atendida ni reprogramada.
+
+### Asistencia e inasistencia
+
+- Solo la recepcionista podrá confirmar la llegada del paciente.
+- La confirmación de llegada cambiará la cita de Programada a Confirmada.
+- Solo la recepcionista podrá marcar una cita como No asistió.
+- La inasistencia deberá registrarse mediante una acción explícita.
+- Una cita solo podrá marcarse como No asistió cuando su hora de inicio haya comenzado o transcurrido.
+- El registro de inasistencia deberá conservar la fecha, hora, usuario responsable y comentario cuando exista.
+- La política de tolerancia por tardanza será gestionada operativamente por el consultorio y no será configurable durante el MVP.
+
+### Atención médica
+
+- El médico solo podrá visualizar las citas asignadas a él.
+- Solo el médico asignado podrá registrar la observación médica básica.
+- Una observación médica solo podrá registrarse sobre una cita Confirmada.
+- En el MVP solo existirá una observación médica básica por cita.
+- La observación podrá editarse mientras la cita permanezca Confirmada.
+- Después de marcar la cita como Atendida, la observación quedará bloqueada.
+- Una cita solo podrá pasar de Confirmada a Atendida.
+- Una cita deberá tener una observación médica básica antes de marcarse como Atendida.
+- El historial básico mostrará únicamente observaciones correspondientes a citas Atendidas.
 
 ---
 
@@ -513,17 +624,15 @@ Centraliza la interacción entre paciente, médico, agenda y observaciones.
 ## Eventos relevantes del dominio
 
 - PacienteRegistrado
-- CitaSolicitada
 - CitaProgramada
 - CitaReprogramada
 - CitaCancelada
-- CitaConfirmada
+- LlegadaPacienteConfirmada
 - PacienteNoAsistio
-- CitaAtendida
 - ObservacionMedicaRegistrada
+- CitaAtendida
 
 ---
-
 
 # 4. Modelo de Datos
 
@@ -742,7 +851,7 @@ Atributos principales:
 
 Relaciones:
 - Pertenece a una agenda médica.
-- Puede utilizarse para programar como máximo una cita médica activa.
+- Puede relacionarse históricamente con múltiples citas, pero solo con una cita activa a la vez.
 
 ### Cita Médica
 
@@ -761,6 +870,11 @@ Atributos principales:
 - motivo
 - fecha_cancelacion
 - motivo_cancelacion
+- fecha_confirmacion
+- usuario_confirmacion
+- fecha_inasistencia
+- usuario_inasistencia
+- comentario_inasistencia
 - estado_registro
 
 Relaciones:
@@ -776,13 +890,10 @@ Relaciones:
 Catálogo de estados de la cita médica.
 
 Valores iniciales:
-- Solicitada
 - Programada
-- Reprogramada
-- Cancelada
 - Confirmada
-- En atención
 - Atendida
+- Cancelada
 - No asistió
 
 Atributos principales:
@@ -832,7 +943,7 @@ Relaciones:
 | Especialidad Médica → Médico            | 1:N          |
 | Médico → Agenda Médica                  | 1:1          |
 | Agenda Médica → Bloque de Agenda        | 1:N          |
-| Bloque de Agenda → Cita Médica          | 1:0..1       |
+| Bloque de Agenda → Cita Médica          | 1:0..N       |
 | Paciente → Cita Médica                  | 1:N          |
 | Médico → Cita Médica                    | 1:N          |
 | Estado de Cita → Cita Médica            | 1:N          |
@@ -852,13 +963,10 @@ Valores iniciales:
 Estado de Cita
 
 Valores iniciales:
-- Solicitada
 - Programada
-- Reprogramada
-- Cancelada
 - Confirmada
-- En atención
 - Atendida
+- Cancelada
 - No asistió
 
 Especialidad Médica
@@ -892,6 +1000,15 @@ El catálogo podrá ampliarse sin modificar el modelo de datos.
 - Los estados de cita deben ser gestionados como catálogo.
 - Los catálogos no deben ser eliminados físicamente si tienen información relacionada.
 - En el MVP, Paciente, Médico y Recepcionista podrán estar asociados a un Usuario cuando requieran autenticación en la plataforma.
+- Toda cita nueva deberá crearse en estado Programada.
+- Una cita Programada podrá cambiar a Confirmada, Cancelada o No asistió.
+- Una cita Confirmada podrá cambiar a Atendida o, excepcionalmente, a Cancelada.
+- Una cita Atendida, Cancelada o No asistió será considerada final.
+- Una cita Confirmada solo podrá cancelarse con un motivo obligatorio.
+- Una cita solo podrá marcarse como Atendida cuando tenga una observación médica básica.
+- El registro de inasistencia deberá identificar fecha, hora y usuario responsable.
+- La disponibilidad será derivada de bloques de agenda y citas activas; no será una entidad persistente.
+- Para el control de disponibilidad, una cita activa será aquella que se encuentre en estado Programada o Confirmada.
 
 ---
 
@@ -1335,7 +1452,7 @@ Especialmente:
 - reservar cita
 - registrar paciente
 - consultar agenda
-- confirmar asistencia
+- registrar asistencia o inasistencia
 - registrar observaciones
 
 ---
@@ -1810,12 +1927,10 @@ Ubicación:
 
 Los Badges se utilizarán principalmente para representar estados.
 
-Estados iniciales de cita:
+Estados oficiales de cita:
 
-- Solicitada
 - Programada
 - Confirmada
-- En atención
 - Atendida
 - Cancelada
 - No asistió
@@ -2006,7 +2121,7 @@ Reprogramar cita
 
 ↓
 
-Confirmar asistencia
+Registrar asistencia
 
 ↓
 
@@ -2020,7 +2135,7 @@ Las funcionalidades principales serán:
 - crear citas
 - reprogramar citas
 - cancelar citas
-- confirmar asistencia
+- confirmar llegada o registrar inasistencia
 
 ---
 
@@ -2112,7 +2227,7 @@ La versión Mobile utilizará Bottom Navigation y navegación jerárquica cuando
 | Pacientes              | Administración    | Registro y búsqueda            |
 | Nueva cita             | Registrar cita    | Asignación de médico y horario |
 | Reprogramar cita       | Modificar cita    | Cambio de fecha u hora         |
-| Confirmar asistencia   | Registrar llegada | Check-in del paciente          |
+| Registrar asistencia   | Gestionar llegada | Confirmar llegada o registrar inasistencia |
 
 ---
 
@@ -2306,7 +2421,7 @@ El estándar de UX/UI aprobado mantiene alineación con todos los artefactos def
 | Modelo de Datos           | ✅ Alineado |
 | Arquitectura del Producto | ✅ Alineado |
 
-No se introducen nuevas entidades, reglas de negocio ni cambios arquitectónicos.
+Los ajustes realizados en UX/UI no introducen entidades adicionales ni modifican la arquitectura aprobada. La representación visual queda alineada con el ciclo de vida refinado de la cita médica.
 
 ---
 
@@ -2316,7 +2431,7 @@ No se introducen nuevas entidades, reglas de negocio ni cambios arquitectónicos
 
 Definir el Product Backlog oficial del MVP de AgenDoc, manteniendo trazabilidad con la Product Vision, MVP Scope, Modelo de Dominio, Modelo de Datos, Arquitectura del Producto y UX/UI.
 
-El backlog prioriza la gestión de citas médicas como núcleo del negocio y permite iniciar el Sprint 1 con un primer incremento funcional, pequeño y entregable.
+El backlog prioriza la gestión de citas médicas como núcleo del negocio y organiza la evolución incremental del MVP a través de los Sprints definidos en el Roadmap.
 
 ---
 
@@ -2333,7 +2448,7 @@ El Product Backlog se construye bajo los siguientes criterios:
 - Backend como fuente oficial de reglas de negocio.
 - Web y Mobile consumiendo la misma lógica funcional.
 
-El backlog no incluye tareas técnicas detalladas, diseño de APIs, diseño de base de datos ni código.
+El backlog no incluye tareas de implementación detalladas, diseño de APIs, diseño de base de datos ni código fuente. El trabajo técnico habilitador se gestiona mediante Technical Stories.
 
 ---
 
@@ -2352,27 +2467,27 @@ El backlog no incluye tareas técnicas detalladas, diseño de APIs, diseño de b
 
 ## 7.4 Features
 
-| ID    | Épica | Feature                            | Descripción                                             | Dependencias    | Prioridad   |
-|-------|-------|------------------------------------|---------------------------------------------------------|-----------------|-------------|
-| FE-01 | EP-01 | Inicio de sesión                   | Autenticación de usuarios por credenciales              | Usuarios, roles | Must Have   |
-| FE-02 | EP-01 | Navegación por rol                 | Mostrar opciones según Paciente, Recepcionista o Médico | FE-01           | Must Have   |
-| FE-03 | EP-02 | Gestión inicial de consultorio     | Registrar datos mínimos del consultorio                 | Ninguna         | Must Have   |
-| FE-04 | EP-02 | Gestión inicial de médicos         | Registrar médicos asociados al consultorio              | FE-03           | Must Have   |
-| FE-05 | EP-02 | Gestión inicial de recepcionistas  | Registrar recepcionistas del consultorio                | FE-03           | Should Have |
-| FE-06 | EP-03 | Registro de pacientes              | Crear pacientes desde recepción o autogestión           | FE-01, FE-03    | Must Have   |
-| FE-07 | EP-03 | Búsqueda de pacientes              | Buscar pacientes por datos básicos                      | FE-06           | Must Have   |
-| FE-08 | EP-04 | Configuración de agenda médica     | Crear agenda y bloques de disponibilidad                | FE-04           | Must Have   |
-| FE-09 | EP-04 | Consulta de disponibilidad         | Visualizar horarios disponibles por médico              | FE-08           | Must Have   |
-| FE-10 | EP-05 | Reserva de cita por paciente       | Permitir que el paciente reserve una cita               | FE-06, FE-09    | Must Have   |
-| FE-11 | EP-05 | Creación de cita por recepcionista | Permitir que recepción cree citas para pacientes        | FE-06, FE-09    | Must Have   |
-| FE-12 | EP-05 | Consulta de citas                  | Visualizar citas según rol                              | FE-10, FE-11    | Must Have   |
-| FE-13 | EP-05 | Cancelación de cita                | Cancelar citas bajo reglas del dominio                  | FE-12           | Must Have   |
-| FE-14 | EP-05 | Reprogramación de cita             | Cambiar fecha y hora de una cita válida                 | FE-09, FE-12    | Should Have |
-| FE-15 | EP-05 | Confirmación de asistencia         | Registrar llegada del paciente                          | FE-12           | Should Have |
-| FE-16 | EP-06 | Agenda del médico                  | Mostrar citas asignadas al médico                       | FE-12           | Must Have   |
-| FE-17 | EP-06 | Registro de observación básica     | Registrar una nota simple de atención                   | FE-16           | Must Have   |
-| FE-18 | EP-06 | Marcar cita como atendida          | Cerrar la atención médica                               | FE-17           | Must Have   |
-| FE-19 | EP-06 | Historial básico                   | Consultar observaciones anteriores del paciente         | FE-17           | Should Have |
+| ID    | Épica | Feature                               | Descripción                                                   | Dependencias    | Prioridad   |
+|-------|-------|---------------------------------------|---------------------------------------------------------------|-----------------|-------------|
+| FE-01 | EP-01 | Inicio de sesión                      | Autenticación de usuarios por credenciales                    | Usuarios, roles | Must Have   |
+| FE-02 | EP-01 | Navegación por rol                    | Mostrar opciones según Paciente, Recepcionista o Médico       | FE-01           | Must Have   |
+| FE-03 | EP-02 | Configuración inicial del consultorio | Disponer de los datos mínimos del consultorio base            | Ninguna         | Must Have   |
+| FE-04 | EP-02 | Gestión inicial de médicos            | Registrar médicos asociados al consultorio                    | FE-03           | Must Have   |
+| FE-05 | EP-02 | Gestión inicial de recepcionistas     | Registrar recepcionistas del consultorio                      | FE-03           | Should Have |
+| FE-06 | EP-03 | Registro de pacientes                 | Crear pacientes desde recepción o autogestión                 | FE-01, FE-03    | Must Have   |
+| FE-07 | EP-03 | Búsqueda de pacientes                 | Buscar pacientes por datos básicos                            | FE-06           | Must Have   |
+| FE-08 | EP-04 | Configuración de agenda médica        | Crear agenda y bloques de disponibilidad                      | FE-04           | Must Have   |
+| FE-09 | EP-04 | Consulta de disponibilidad            | Visualizar horarios disponibles por médico                    | FE-08           | Must Have   |
+| FE-10 | EP-05 | Reserva de cita por paciente          | Permitir que el paciente reserve una cita                     | FE-06, FE-09    | Must Have   |
+| FE-11 | EP-05 | Creación de cita por recepcionista    | Permitir que recepción cree citas para pacientes              | FE-06, FE-09    | Must Have   |
+| FE-12 | EP-05 | Consulta de citas                     | Visualizar citas según rol                                    | FE-10, FE-11    | Must Have   |
+| FE-13 | EP-05 | Cancelación de cita                   | Cancelar citas bajo reglas del dominio                        | FE-12           | Must Have   |
+| FE-14 | EP-05 | Reprogramación de cita                | Cambiar fecha y hora de una cita válida                       | FE-09, FE-12    | Should Have |
+| FE-15 | EP-05 | Registro de asistencia                | Confirmar la llegada o registrar la inasistencia del paciente | FE-12           | Should Have |
+| FE-16 | EP-06 | Agenda del médico                     | Mostrar citas asignadas al médico                             | FE-12           | Must Have   |
+| FE-17 | EP-06 | Registro de observación básica        | Registrar una nota simple de atención                         | FE-16           | Must Have   |
+| FE-18 | EP-06 | Marcar cita como atendida             | Cerrar la atención médica                                     | FE-17           | Must Have   |
+| FE-19 | EP-06 | Historial básico                      | Consultar observaciones anteriores del paciente               | FE-17           | Should Have |
 
 ---
 
@@ -2447,31 +2562,42 @@ Definition of Done:
 
 ### EP-02 — Gestión base del consultorio
 
-#### HU-03 — Registrar consultorio inicial
+#### HU-03 — Disponer del consultorio inicial
 
-Como recepcionista o responsable del consultorio  
-Quiero registrar los datos básicos del consultorio  
-Para operar las citas dentro de una unidad organizacional.
+Como responsable del producto  
+Quiero contar con un consultorio base configurado  
+Para operar todas las funcionalidades dentro de una unidad organizacional.
 
 Criterios de aceptación:
 
-- Given datos válidos del consultorio  
-  When se registra la información  
-  Then el consultorio queda disponible para operar.
+- Given la inicialización del entorno del MVP  
+  When se aplican las migraciones y datos iniciales  
+  Then existe un consultorio base disponible para operar.
 
-- Given datos obligatorios incompletos  
-  When se intenta guardar  
-  Then el sistema muestra validaciones claras.
+- Given médicos, pacientes y usuarios registrados  
+  When se crean dentro del MVP  
+  Then quedan asociados al consultorio base correspondiente.
 
 Prioridad: Must Have  
 Dependencias: Ninguna  
 Estimación: 3 Story Points  
+
 Definition of Done:
 
-- Registra datos mínimos.
-- Aplica validaciones de formulario.
-- Usa componentes del Design System.
-- Mantiene el consultorio como contexto principal.
+- Existe un consultorio base persistido.
+- El consultorio funciona como contexto organizacional.
+- Los usuarios y perfiles de negocio pueden asociarse al consultorio.
+- La configuración fue validada durante la Foundation.
+
+Estado: Done
+
+Implementación:
+
+La necesidad funcional de contar con un consultorio inicial quedó satisfecha durante la Foundation mediante la creación y configuración del consultorio base del MVP.
+
+Decisión:
+
+Durante el MVP no se desarrollará una pantalla adicional para registrar consultorios. La historia se conserva para mantener la trazabilidad del Product Backlog y del contexto organizacional del sistema.
 
 ---
 
@@ -2587,6 +2713,7 @@ Definition of Done:
 - Bloques asociados a médico y consultorio.
 - Validación de fecha y hora.
 - Bloques disponibles para reserva.
+- Los bloques creados pueden ser consultados mediante HU-08.
 - Compatible con Web y Mobile.
 
 ---
@@ -2607,6 +2734,18 @@ Criterios de aceptación:
   When se consulta disponibilidad  
   Then ese horario no aparece como disponible.
 
+- Given una consulta para la fecha actual  
+  When existen bloques cuya hora ya transcurrió  
+  Then esos horarios no se muestran como disponibles.
+
+- Given múltiples bloques disponibles para una fecha  
+  When se consulta la disponibilidad  
+  Then los horarios se muestran ordenados cronológicamente.
+
+- Given un médico sin disponibilidad para la fecha seleccionada  
+  When se realiza la consulta  
+  Then el sistema muestra un estado vacío claro.
+
 Prioridad: Must Have  
 Dependencias: HU-07  
 Estimación: 5 Story Points  
@@ -2616,6 +2755,9 @@ Definition of Done:
 - Evita doble reserva desde la experiencia.
 - Usa calendario, cards o lista según plataforma.
 - Respeta reglas del backend.
+- Solo muestra bloques activos y disponibles.
+- No muestra horarios pasados para la fecha actual.
+- No muestra información de otros consultorios.
 
 ---
 
@@ -2629,9 +2771,13 @@ Para asegurar una atención médica en una fecha y hora.
 
 Criterios de aceptación:
 
-- Given un paciente autenticado y un horario disponible  
+- Given un paciente autenticado y un bloque disponible  
   When confirma la reserva  
-  Then se crea la cita médica.
+  Then se crea una cita en estado Programada asociada al paciente autenticado, médico, consultorio y bloque seleccionados.
+
+- Given un paciente autenticado  
+  When intenta reservar utilizando datos de otro paciente o consultorio  
+  Then el sistema impide la operación.
 
 - Given un horario no disponible  
   When intenta reservar  
@@ -2658,9 +2804,13 @@ Para gestionar la agenda del consultorio desde recepción.
 
 Criterios de aceptación:
 
-- Given un paciente registrado y un horario disponible  
+- Given un paciente registrado en el consultorio y un bloque disponible  
   When la recepcionista confirma la cita  
-  Then el sistema registra la cita.
+  Then se crea una cita en estado Programada asociada al paciente, médico, consultorio y bloque seleccionados.
+
+- Given una recepcionista autenticada  
+  When intenta crear una cita para un paciente o médico de otro consultorio  
+  Then el sistema impide la operación.
 
 - Given un horario ocupado  
   When intenta crear la cita  
@@ -2742,23 +2892,37 @@ Para liberar el horario cuando la atención no se realizará.
 
 Criterios de aceptación:
 
-- Given una cita cancelable  
-  When se confirma la cancelación  
+- Given una cita Programada  
+  When el paciente propietario o la recepcionista confirma la cancelación  
   Then la cita cambia a estado Cancelada.
 
-- Given una cita atendida  
+- Given una cita Confirmada  
+  When la recepcionista registra una cancelación excepcional con motivo  
+  Then la cita cambia a estado Cancelada.
+
+- Given una cita Confirmada  
+  When se intenta cancelar sin indicar el motivo  
+  Then el sistema impide la operación.
+
+- Given una cita Atendida, Cancelada o No asistió  
   When se intenta cancelar  
   Then el sistema impide la acción.
+
+- Given una cita cancelada cuyo bloque aún no ha transcurrido  
+  When finaliza la operación  
+  Then el bloque vuelve a estar disponible.
 
 Prioridad: Must Have  
 Dependencias: HU-11, HU-12  
 Estimación: 5 Story Points  
 Definition of Done:
 
-- Aplica reglas de estado.
-- Solicita confirmación.
-- Libera disponibilidad cuando corresponda.
-- Muestra mensaje claro.
+- Aplica las transiciones permitidas del estado.
+- Solicita confirmación antes de cancelar.
+- Exige motivo cuando la cita está Confirmada.
+- Libera el bloque cuando corresponde.
+- Restringe la operación por rol, consultorio y propietario.
+- Muestra un mensaje claro.
 
 ---
 
@@ -2772,10 +2936,10 @@ Criterios de aceptación:
 
 - Given una cita reprogramable y un nuevo horario disponible  
   When confirma el cambio  
-  Then la cita queda reprogramada.
+  Then la cita conserva su identificador, cambia al nuevo bloque y permanece en estado Programada.
 
-- Given una cita atendida o cancelada  
-  When intenta reprogramar  
+- Given una cita Confirmada, Atendida, Cancelada o No asistió
+  When se intenta reprogramar  
   Then el sistema impide la acción.
 
 Prioridad: Should Have  
@@ -2790,31 +2954,47 @@ Definition of Done:
 
 ---
 
-#### HU-15 — Confirmar asistencia
+#### HU-15 — Registrar resultado de asistencia
 
 Como recepcionista  
-Quiero confirmar la asistencia del paciente  
-Para indicar que llegó al consultorio.
+Quiero registrar si el paciente llegó o no asistió a su cita  
+Para mantener actualizado el estado operativo de la agenda.
 
 Criterios de aceptación:
 
-- Given una cita programada o confirmada  
-  When la recepcionista confirma asistencia  
-  Then la cita cambia al estado correspondiente.
+- Given una cita Programada y el paciente presente  
+  When la recepcionista confirma su llegada  
+  Then la cita cambia a estado Confirmada.
 
-- Given una cita cancelada  
-  When intenta confirmar asistencia  
+- Given una cita Programada cuya hora de inicio comenzó o transcurrió  
+  When la recepcionista registra la inasistencia  
+  Then la cita cambia a estado No asistió.
+
+- Given una cita cuya hora aún no comienza  
+  When se intenta marcar como No asistió  
   Then el sistema impide la acción.
+
+- Given una cita Confirmada, Atendida, Cancelada o No asistió  
+  When se intenta volver a registrar asistencia  
+  Then el sistema impide la acción.
+
+- Given una inasistencia registrada  
+  When finaliza la operación  
+  Then el sistema conserva la fecha, hora, usuario responsable y comentario cuando exista.
 
 Prioridad: Should Have  
 Dependencias: HU-12  
-Estimación: 3 Story Points  
+Estimación: 5 Story Points  
+
 Definition of Done:
 
-- Cambia estado de forma controlada.
-- Solo recepción puede ejecutar la acción.
+- Permite confirmar la llegada del paciente.
+- Permite registrar la inasistencia.
+- Solo recepción puede ejecutar las acciones.
+- Aplica las reglas temporales y de estado.
+- Conserva trazabilidad básica.
 - Muestra confirmación visual.
-- Respeta reglas del dominio.
+- Respeta las reglas del dominio.
 
 ---
 
@@ -2856,16 +3036,24 @@ Para dejar constancia simple de la atención realizada.
 
 Criterios de aceptación:
 
-- Given una cita asignada al médico  
-  When registra una observación  
-  Then la observación queda asociada a la cita.
-
 - Given un usuario que no es médico  
   When intenta registrar observación  
   Then el sistema impide la acción.
 
+- Given una cita Confirmada asignada al médico autenticado  
+  When registra una observación válida  
+  Then la observación queda asociada a la cita.
+
+- Given una cita que no se encuentra Confirmada  
+  When el médico intenta registrar una observación  
+  Then el sistema impide la acción.
+
+- Given una cita Atendida  
+  When se intenta modificar la observación  
+  Then el sistema impide la acción.
+
 Prioridad: Must Have  
-Dependencias: HU-16  
+Dependencias: HU-15, HU-16
 Estimación: 5 Story Points  
 Definition of Done:
 
@@ -2873,6 +3061,8 @@ Definition of Done:
 - La observación pertenece a una cita.
 - No representa historia clínica.
 - Valida contenido mínimo.
+- Solo se registra sobre citas Confirmadas.
+- La observación queda bloqueada cuando la cita se marca como Atendida.
 
 ---
 
@@ -2884,9 +3074,13 @@ Para cerrar el ciclo de atención médica.
 
 Criterios de aceptación:
 
-- Given una cita en atención con observación registrada  
-  When el médico marca como atendida  
+- Given una cita Confirmada con observación médica registrada  
+  When el médico asignado marca la cita como atendida  
   Then la cita cambia a estado Atendida.
+
+- Given una cita Confirmada sin observación médica  
+  When se intenta marcar como atendida  
+  Then el sistema impide la acción.
 
 - Given una cita cancelada  
   When intenta marcarla como atendida  
@@ -2920,6 +3114,10 @@ Criterios de aceptación:
   When consulta historial básico  
   Then visualiza un estado vacío.
 
+- Given un paciente con citas Canceladas, Programadas o No asistió  
+  When el médico consulta el historial básico  
+  Then esas citas no aportan observaciones al historial.
+
 Prioridad: Should Have  
 Dependencias: HU-17  
 Estimación: 5 Story Points  
@@ -2929,6 +3127,7 @@ Definition of Done:
 - No incorpora historia clínica completa.
 - Respeta seguridad por médico y consultorio.
 - Usa estado vacío cuando corresponde.
+- Solo muestra observaciones de citas Atendidas.
 
 ---
 
@@ -2940,42 +3139,57 @@ Podrán ejecutarse dentro de un Sprint cuando soporten directamente una Historia
 
 ---
 
-### TS-01 — Externalizar configuración CORS
+### TS-01 — Habilitar desarrollo y pruebas multidispositivo
 
 Objetivo
 
-Externalizar la configuración CORS para que los orígenes permitidos dependan del ambiente de ejecución y no del código fuente.
+Permitir ejecutar y validar AgenDoc desde dispositivos conectados a la misma red local del desarrollador.
 
-Motivación
+Alcance
 
-- Facilitar despliegues entre ambientes.
-- Reducir cambios manuales.
-- Mejorar mantenibilidad.
-- Mantener una configuración consistente entre Web y Mobile.
+- Backend accesible desde la red local.
+- Frontend Web accesible desde la red local.
+- Orígenes CORS configurables por ambiente.
+- Validación desde dispositivos móviles o tabletas.
 
 Dependencias
 
 - Spring Security.
 - Configuración por perfiles.
+- Frontend Web con Vite.
 
 Estado
 
-Pendiente.
+En progreso.
+
+Sprint previsto
+
+Sprint 2.
 
 ---
 
-### TS-02 — Implementar autenticación JWT y contexto del usuario autenticado
+### TS-02 — Completar autenticación JWT End-to-End
 
 Objetivo
 
-Implementar autenticación completa basada en JWT incorporando el contexto del usuario autenticado para soportar autorización por rol y por consultorio.
+Completar el flujo de autenticación para que el Backend genere un JWT y el Frontend lo utilice en todas las solicitudes protegidas.
 
-Motivación
+Alcance
 
-- Eliminar autenticación temporal.
-- Preparar autorización por consultorio.
-- Compartir el mismo modelo de autenticación entre Web y Mobile.
-- Soportar las siguientes Historias del MVP.
+- Generación del JWT durante el login.
+- Almacenamiento controlado del token en el Frontend.
+- Inclusión automática de `Authorization: Bearer <token>`.
+- Validación del token mediante Spring Security.
+- Disponibilidad del usuario autenticado en el SecurityContext.
+- Eliminación de autenticación temporal o bypass de seguridad.
+
+Fuera del alcance del MVP
+
+- Refresh Tokens.
+- Rotación de tokens.
+- Blacklist de tokens.
+- OAuth2.
+- Single Sign-On.
 
 Dependencias
 
@@ -2985,6 +3199,97 @@ Dependencias
 Estado
 
 Pendiente.
+
+Sprint previsto
+
+Sprint 2.
+
+---
+
+### TS-03 — Implementar contexto del usuario autenticado
+
+Objetivo
+
+Permitir que las operaciones del dominio obtengan desde el contexto autenticado la información del usuario, rol y consultorio.
+
+Alcance
+
+- Obtener usuario autenticado.
+- Obtener rol.
+- Obtener consultorio.
+- Obtener perfil de negocio asociado cuando corresponda.
+- Evitar recibir desde el Frontend identificadores que puedan derivarse del usuario autenticado.
+
+Dependencias
+
+- TS-02.
+
+Estado
+
+Pendiente.
+
+Sprint previsto
+
+Sprint 2.
+
+---
+
+### TS-04 — Implementar autorización por dominio
+
+Objetivo
+
+Aplicar controles de acceso según rol, consultorio y propiedad del recurso.
+
+Alcance
+
+- El paciente solo podrá gestionar sus propias citas.
+- La recepcionista solo podrá operar sobre recursos de su consultorio.
+- El médico solo podrá consultar sus citas y registrar observaciones sobre ellas.
+- El Backend validará autorización antes de ejecutar las reglas de negocio.
+
+Dependencias
+
+- TS-02.
+- TS-03.
+
+Estado
+
+Pendiente.
+
+Sprint previsto
+
+Sprint 3.
+
+---
+
+### TS-05 — Endurecer seguridad y manejo de accesos no autorizados
+
+Objetivo
+
+Uniformizar el comportamiento de autenticación y autorización del Backend y los clientes.
+
+Alcance
+
+- Respuestas 401 consistentes.
+- Respuestas 403 consistentes.
+- Manejo uniforme de errores de seguridad.
+- Revisión de endpoints públicos y protegidos.
+- Eliminación de configuraciones temporales.
+- Validación de no exposición de tokens ni datos sensibles.
+
+Dependencias
+
+- TS-02.
+- TS-03.
+- TS-04.
+
+Estado
+
+Pendiente.
+
+Sprint previsto
+
+Sprint 3.
 
 ---
 
@@ -3016,7 +3321,7 @@ Pendiente.
 | Elemento | Justificación                                                                          |
 |----------|----------------------------------------------------------------------------------------|
 | HU-14    | Reprogramar es importante, pero puede implementarse después de crear y cancelar citas. |
-| HU-15    | Confirmar asistencia mejora la operación diaria, pero no bloquea la reserva inicial.   |
+| HU-15    | Registrar asistencia o inasistencia completa el control operativo de la agenda, pero no bloquea la creación inicial de citas. |
 | HU-19    | Aporta valor médico, pero depende de tener observaciones previas.                      |
 
 ### Could Have
@@ -3055,43 +3360,44 @@ Secuencia lógica de implementación:
 7. Creación de citas.
 8. Consulta de citas por rol.
 9. Cancelación y reprogramación.
-10. Agenda del médico.
-11. Observación médica básica.
-12. Cita atendida.
-13. Historial básico.
+10. Registro de asistencia o inasistencia.
+11. Agenda del médico.
+12. Observación médica básica.
+13. Cita atendida.
+14. Historial básico.
 
 Dependencias principales:
 
-| Historia | Depende de                   |
-|----------|------------------------------|
-| HU-01    | Usuarios, roles, consultorio |
-| HU-03    | Ninguna                      |
-| HU-04    | HU-03                        |
-| HU-05    | HU-01, HU-03                 |
-| HU-06    | HU-05                        |
-| HU-07    | HU-04                        |
-| HU-08    | HU-07                        |
-| HU-09    | HU-01, HU-08                 |
-| HU-10    | HU-06, HU-08                 |
-| HU-11    | HU-09                        |
-| HU-12    | HU-10                        |
-| HU-13    | HU-11, HU-12                 |
-| HU-14    | HU-08, HU-12                 |
-| HU-15    | HU-12                        |
-| HU-16    | HU-10                        |
-| HU-17    | HU-16                        |
-| HU-18    | HU-17                        |
-| HU-19    | HU-17                        |
+| Historia | Depende de                         |
+|----------|------------------------------------|
+| HU-01    | Usuarios, roles, consultorio       |
+| HU-03    | Ninguna                            |
+| HU-04    | HU-03                              |
+| HU-05    | HU-01, HU-03                       |
+| HU-06    | HU-05                              |
+| HU-07    | HU-04                              |
+| HU-08    | HU-07                              |
+| HU-09    | HU-01, HU-08, TS-02, TS-03, TS-04  |
+| HU-10    | HU-06, HU-08, TS-02, TS-03         |
+| HU-11    | HU-09, TS-04                       |
+| HU-12    | HU-10, TS-03                       |
+| HU-13    | HU-11, HU-12, TS-04                |
+| HU-14    | HU-08, HU-12                       |
+| HU-15    | HU-12                              |
+| HU-16    | HU-10, TS-04                       |
+| HU-17    | HU-15, HU-16                       |
+| HU-18    | HU-17                              |
+| HU-19    | HU-17                              |
 
 ---
 
-## 7.9 Propuesta de Sprint 1
+## 7.9 Resultado del Sprint 1
 
 ### Objetivo del Sprint 1
 
 Construir el primer incremento funcional de AgenDoc, permitiendo que un usuario recepcionista acceda al sistema, opere dentro de un consultorio base, registre médicos, registre pacientes y deje preparada la base funcional para crear agendas y citas en el siguiente incremento.
 
-### Historias propuestas para Sprint 1
+### Historias completadas en Sprint 1
 
 | Historia | Nombre                             | Story Points |
 |----------|------------------------------------|-------------:|
@@ -3102,23 +3408,40 @@ Construir el primer incremento funcional de AgenDoc, permitiendo que un usuario 
 | HU-06    | Buscar paciente                    | 3            |
 | HU-07    | Crear bloques de agenda médica     | 5            |
 
-Total estimado: **25 Story Points**
+Estado del Sprint:
 
-> El número de Story Points es referencial y podrá ajustarse durante el Sprint Planning según la capacidad real del equipo.
+✅ Completado
+
+Resultado:
+
+- HU-01 completada.
+- HU-02 completada.
+- HU-04 completada.
+- HU-05 completada.
+- HU-06 completada.
+- HU-07 completada.
+- HU-03 satisfecha mediante la Foundation.
+- Repositorio integrado en `develop`.
+- Ramas feature eliminadas.
+- Working tree limpio.
+
+Total completado: **25 Story Points funcionales**
+
+HU-03 fue satisfecha durante la Foundation y no forma parte de los 25 Story Points funcionales ejecutados durante la Fase B del Sprint 1.
 
 ### Justificación
 
-El Sprint 1 entrega el primer incremento funcional del dominio del negocio.
+El Sprint 1 entregó el primer incremento funcional del dominio del negocio.
 
-Al finalizar el Sprint será posible:
+Al finalizar el Sprint quedó disponible:
 
-- Autenticar usuarios.
-- Registrar médicos.
-- Registrar pacientes.
-- Buscar pacientes.
-- Configurar una agenda médica inicial mediante bloques de disponibilidad.
+- Autenticación inicial de usuarios.
+- Registro de médicos.
+- Registro de pacientes.
+- Búsqueda de pacientes.
+- Configuración inicial de bloques de disponibilidad.
 
-Este incremento constituye el primer Vertical Slice del producto y prepara el camino para que el Sprint 2 incorpore la gestión completa de citas médicas.
+Este incremento constituyó el primer Vertical Slice funcional del producto y dejó preparada la base para iniciar la gestión de citas médicas en el Sprint 2.
 
 ---
 
@@ -3137,7 +3460,7 @@ No se identifican historias duplicadas.
 
 El backlog mantiene una secuencia incremental viable.
 
-El Sprint 1 evita sobrecarga funcional y permite iniciar desarrollo inmediatamente.
+El Product Backlog refinado mantiene una distribución incremental viable para completar el MVP durante los Sprints definidos en el Roadmap.
 
 ---
 
@@ -3400,6 +3723,52 @@ Permite reutilizar componentes, reducir inconsistencias visuales y simplificar l
 
 ---
 
+## ADR-015
+
+### Decisión
+
+El ciclo de vida de la Cita Médica del MVP utilizará únicamente los estados Programada, Confirmada, Atendida, Cancelada y No asistió.
+
+Solicitada y En atención quedan fuera del MVP.
+
+Reprogramada será considerada una acción sobre una cita Programada y no un estado permanente.
+
+### Justificación
+
+- El MVP no requiere aprobación posterior de reservas.
+- La reprogramación modifica fecha, hora y bloque sin cambiar la naturaleza de la cita.
+- El estado En atención introduce una acción adicional que no aporta valor suficiente al flujo básico.
+- El modelo reducido simplifica reglas, transiciones, experiencia de usuario y pruebas.
+
+### Estado
+
+✅ Aprobado
+
+---
+
+## ADR-016
+
+### Decisión
+
+La disponibilidad médica será calculada como información derivada de los bloques de agenda y de las citas activas.
+
+No se creará una entidad ni tabla independiente de disponibilidad.
+
+La disponibilidad será calculada únicamente para citas activas (Programada y Confirmada).
+
+### Justificación
+
+- Evita duplicidad de información.
+- Mantiene el modelo de datos normalizado.
+- Reduce el riesgo de inconsistencias.
+- Permite calcular la disponibilidad real en función de los bloques y citas existentes.
+
+### Estado
+
+✅ Aprobado
+
+---
+
 # 9. Roadmap
 
 ## Sprint 0 — Descubrimiento y Diseño del Producto
@@ -3409,6 +3778,8 @@ Permite reutilizar componentes, reducir inconsistencias visuales y simplificar l
 **Objetivo**
 
 Definir el propósito del producto, el alcance del MVP y las funcionalidades que quedan fuera de esta primera versión.
+
+Las Technical Stories podrán ejecutarse dentro del Sprint correspondiente cuando habiliten directamente la implementación de las Historias de Usuario planificadas.
 
 **Estado**
 
@@ -3498,29 +3869,137 @@ Construir:
 
 ---
 
-## Sprint 1 — Inicio del Desarrollo
+## Sprint 1 — Base operativa del consultorio
 
-### Objetivo
+### Sprint Goal
 
-Construir la plataforma base.
+Permitir que una recepcionista acceda al sistema y configure los elementos mínimos necesarios para iniciar la operación del consultorio.
 
-### Alcance inicial
+### Sprint Backlog
 
-- Configuración del proyecto
-- Backend
-- Frontend Web
-- Aplicación Mobile
-- Autenticación
-- Autorización
-- Roles
-- Gestión inicial de usuarios
-- CI/CD
-- Primer incremento funcional
+- HU-01 — Iniciar sesión.
+- HU-02 — Cerrar sesión.
+- HU-04 — Registrar médico.
+- HU-05 — Registrar paciente desde recepción.
+- HU-06 — Buscar paciente.
+- HU-07 — Crear bloques de agenda médica.
 
-### Technical Stories habilitadoras
+### Resultado
 
-- TS-01 — Externalizar configuración CORS.
-- TS-02 — Implementar autenticación JWT y contexto del usuario autenticado.
+- Consultorio base disponible.
+- Autenticación funcional inicial.
+- Médicos registrados.
+- Pacientes registrados y consultables.
+- Bloques de agenda configurados.
+
+### Estado
+
+✅ Completado
+
+---
+
+## Sprint 2 — Creación segura de citas desde recepción
+
+### Sprint Goal
+
+Permitir que la recepcionista consulte disponibilidad médica, cree citas y visualice la agenda inicial del consultorio utilizando una autenticación JWT completa y el contexto del usuario autenticado.
+
+### Product Backlog Items previstos
+
+- HU-08 — Consultar disponibilidad médica.
+- HU-10 — Crear cita desde recepción.
+- HU-12 — Consultar agenda del consultorio.
+
+### Technical Stories previstas
+
+- TS-01 — Habilitar desarrollo y pruebas multidispositivo.
+- TS-02 — Completar autenticación JWT End-to-End.
+- TS-03 — Implementar contexto del usuario autenticado.
+
+### Estimación funcional referencial
+
+18 Story Points funcionales
+más las Technical Stories TS-01, TS-02 y TS-03.
+
+### Estado
+
+Pendiente de Sprint Planning.
+
+---
+
+## Sprint 3 — Gestión operativa del ciclo de la cita
+
+### Sprint Goal
+
+Permitir que la recepcionista gestione las principales situaciones operativas de una cita después de su creación.
+
+### Product Backlog Items previstos
+
+- HU-13 — Cancelar cita.
+- HU-14 — Reprogramar cita.
+- HU-15 — Registrar resultado de asistencia.
+
+### Technical Stories previstas
+
+- TS-04 — Implementar autorización por dominio.
+- TS-05 — Endurecer seguridad y manejo de accesos no autorizados.
+
+### Estimación funcional referencial
+
+18 Story Points funcionales
+más TS-04 y TS-05.
+
+### Estado
+
+Planificado.
+
+---
+
+## Sprint 4 — Autogestión del paciente
+
+### Sprint Goal
+
+Permitir que el paciente consulte disponibilidad, reserve citas y utilice las capacidades de consulta y cancelación previamente implementadas.
+
+### Product Backlog Items previstos
+
+- HU-09 — Reservar cita como paciente.
+- HU-11 — Consultar mis citas como paciente.
+
+### Consideración funcional
+
+La capacidad del paciente para cancelar sus propias citas utilizará la funcionalidad implementada en HU-13, respetando autorización por propietario y estado de la cita.
+
+### Estimación funcional referencial
+
+11 Story Points.
+
+### Estado
+
+Planificado.
+
+---
+
+## Sprint 5 — Atención médica básica
+
+### Sprint Goal
+
+Permitir que el médico complete el ciclo de atención de una cita mediante la consulta de su agenda, el registro de observaciones, el cierre de la atención y la consulta del historial básico.
+
+### Product Backlog Items previstos
+
+- HU-16 — Consultar agenda del médico.
+- HU-17 — Registrar observación médica básica.
+- HU-18 — Marcar cita como atendida.
+- HU-19 — Consultar historial básico del paciente.
+
+### Estimación funcional referencial
+
+18 Story Points.
+
+### Estado
+
+Planificado.
 
 ---
 
@@ -3691,5 +4170,54 @@ Construir la plataforma base.
 - Se incorpora TS-01 para externalizar la configuración CORS.
 - Se incorpora TS-02 para implementar autenticación JWT y el contexto del usuario autenticado.
 - Se establece que las Technical Stories representan trabajo técnico habilitador y no funcionalidad visible para el usuario final.
+
+---
+
+### Cierre del Sprint 1
+
+**Estado**
+
+✅ Completado
+
+**Historias completadas**
+
+- HU-01 — Iniciar sesión.
+- HU-02 — Cerrar sesión.
+- HU-04 — Registrar médico.
+- HU-05 — Registrar paciente desde recepción.
+- HU-06 — Buscar paciente.
+- HU-07 — Crear bloques de agenda médica.
+
+**Decisiones tomadas**
+
+- Se declaró completado el Sprint 1.
+- Se confirmó `develop` sincronizada con `origin/develop`.
+- Se confirmó el working tree limpio.
+- Se eliminaron las ramas feature locales y remotas.
+- Se confirmó el uso de GitHub CLI como herramienta oficial de versionado.
+- Se confirmó que HU-03 quedó satisfecha mediante la Foundation.
+
+---
+
+### Product Backlog Refinement posterior al Sprint 1
+
+**Estado**
+
+✅ Completado
+
+**Decisiones tomadas**
+
+- Se revisaron las 19 Historias de Usuario del MVP.
+- Se mantuvo el alcance funcional aprobado.
+- Se definió un roadmap total de cinco Sprints.
+- Se definieron los objetivos funcionales de los Sprints 2 al 5.
+- Se refinó HU-15 para registrar llegada o inasistencia.
+- Se ajustó HU-15 de 3 a 5 Story Points.
+- Se aprobó el ciclo de vida de la cita con cinco estados.
+- Se estableció que Reprogramada será una acción y no un estado.
+- Se estableció que la disponibilidad será información derivada.
+- Se formalizaron TS-01, TS-02, TS-03, TS-04 y TS-05.
+- Se identificaron dependencias entre Historias de Usuario y Technical Stories.
+- Se declaró el Product Backlog listo para el Sprint Planning del Sprint 2.
 
 ---
