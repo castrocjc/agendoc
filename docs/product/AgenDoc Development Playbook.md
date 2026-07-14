@@ -350,6 +350,8 @@ Las Technical Stories podrán ejecutarse cuando soporten directamente una Histor
 
 Las Technical Stories no representan funcionalidades visibles para el usuario final y no sustituyen Historias de Usuario del Product Backlog.
 
+La definición funcional, alcance, dependencias, estado y planificación de las Technical Stories se mantiene exclusivamente en el AgenDoc Project Blueprint.
+
 ---
 
 ## 7.2 Configuración por Tecnología
