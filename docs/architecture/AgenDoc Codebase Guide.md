@@ -115,10 +115,10 @@ El Codebase Guide se rige por los siguientes principios:
 | Campo               | Valor                       |
 |---------------------|-----------------------------|
 | Estado del proyecto | En desarrollo               |
-| Sprint actual       | Preparación del Sprint 2    |
+| Sprint actual       | Sprint 2                    |
 | Foundation          | Completada                  |
 | Sprint 1            | Completado                  |
-| Sprint 2            | Pendiente de implementación |
+| Sprint 2            | En desarrollo               |
 
 ---
 
@@ -168,15 +168,16 @@ Componentes habilitados:
 
 ## Historias de Usuario Implementadas
 
-| Historia | Nombre                         | Estado                           |
-|----------|--------------------------------|----------------------------------|
-| HU-01    | Iniciar sesión                 | ✅ Completada                    |
-| HU-02    | Cerrar sesión                  | ✅ Completada                    |
-| HU-03    | Consultorio base               | ✅ Satisfecha durante Foundation |
-| HU-04    | Registrar médico               | ✅ Completada                    |
-| HU-05    | Registrar paciente             | ✅ Completada                    |
-| HU-06    | Buscar paciente                | ✅ Completada                    |
-| HU-07    | Crear bloques de agenda médica | ✅ Completada                    |
+| Historia | Nombre                          | Estado                           |
+|----------|---------------------------------|----------------------------------|
+| HU-01    | Iniciar sesión                  | ✅ Completada                    |
+| HU-02    | Cerrar sesión                   | ✅ Completada                    |
+| HU-03    | Consultorio base                | ✅ Satisfecha durante Foundation |
+| HU-04    | Registrar médico                | ✅ Completada                    |
+| HU-05    | Registrar paciente              | ✅ Completada                    |
+| HU-06    | Buscar paciente                 | ✅ Completada                    |
+| HU-07    | Crear bloques de agenda médica  | ✅ Completada                    |
+| HU-08    | Consultar disponibilidad médica | 🟡 Backend implementado          |
 
 Total implementado:
 
@@ -203,11 +204,11 @@ Sprint objetivo:
 
 **Sprint 2**
 
-Historias planificadas:
+Historias en desarrollo:
 
-- HU-08 — Consultar disponibilidad médica.
-- HU-10 — Crear cita desde recepción.
-- HU-12 — Consultar agenda del consultorio.
+- HU-08 — Backend implementado.
+- HU-10 — Pendiente.
+- HU-12 — Pendiente.
 
 Technical Stories:
 
@@ -971,15 +972,20 @@ Historia relacionada:
 
 Estado:
 
-**Implementado para creación de bloques**
+Implementado.
 
-Pendiente:
+Funcionalidades disponibles:
 
-- Incorporar la consulta de disponibilidad correspondiente a HU-08.
+- creación de bloques de agenda;
+- consulta de bloques disponibles por médico y fecha;
+- validación de fechas pasadas;
+- consulta ordenada por hora de inicio;
+- filtrado exclusivo de bloques disponibles (`available = true`).
 
-Observación:
+Historias relacionadas:
 
-`MedicalAgendaEntity` y `AgendaBlockEntity` pertenecen al mismo módulo funcional. Los bloques de agenda no se gestionan como un módulo independiente.
+- HU-07 — Crear bloques de agenda médica.
+- HU-08 — Consultar disponibilidad médica (Backend).
 
 ---
 
@@ -1115,14 +1121,16 @@ com/agendoc
     └── doctor
         └── service
             └── DoctorServiceImplTest.java
+            └── AgendaServiceImplTest.java
 ```
 
 Pruebas identificadas:
 
-| Archivo                      | Cobertura principal                              |
-|------------------------------|--------------------------------------------------|
-| BackendApplicationTests.java | Validación de carga del contexto de Spring Boot. |
-| DoctorServiceImplTest.java   | Validación del servicio de médicos.              |
+| Archivo                      | Cobertura principal                                        |
+|------------------------------|------------------------------------------------------------|
+| BackendApplicationTests.java | Validación de carga del contexto de Spring Boot.           |
+| DoctorServiceImplTest.java   | Validación del servicio de médicos.                        |
+| AgendaServiceImplTest.java   | Validación del servicio de agenda y disponibilidad médica. |
 
 Estado:
 
@@ -1728,15 +1736,16 @@ Cada Controller representa el punto de entrada oficial para un módulo del siste
 
 ## 10.4 Inventario de Endpoints
 
-| Módulo | Endpoint | Historia | Estado |
-|---------|----------|----------|--------|
-| Authentication | Login | HU-01 | Implementado |
-| Authentication | Logout | HU-02 | Implementado |
-| Doctor | Registrar médico | HU-04 | Implementado |
-| Doctor | Consultar especialidades médicas | HU-04 | Implementado |
-| Patient | Registrar paciente | HU-05 | Implementado |
-| Patient | Buscar paciente | HU-06 | Implementado |
-| Agenda | Crear bloques de agenda | HU-07 | Implementado |
+| Módulo         | Endpoint                         | Historia | Estado               |
+|----------------|----------------------------------|----------|----------------------|
+| Authentication | Login                            | HU-01    | Implementado         |
+| Authentication | Logout                           | HU-02    | Implementado         |
+| Doctor         | Registrar médico                 | HU-04    | Implementado         |
+| Doctor         | Consultar especialidades médicas | HU-04    | Implementado         |
+| Patient        | Registrar paciente               | HU-05    | Implementado         |
+| Patient        | Buscar paciente                  | HU-06    | Implementado         |
+| Agenda         | Crear bloques de agenda          | HU-07    | Implementado         |
+| Agenda         | Consultar disponibilidad médica  | HU-08    | Backend implementado |
 
 ---
 
@@ -1744,10 +1753,9 @@ Cada Controller representa el punto de entrada oficial para un módulo del siste
 
 Las siguientes APIs aún no forman parte de la implementación actual:
 
-| Módulo | Historia | Estado |
-|---------|----------|--------|
-| Agenda | HU-08 — Consultar disponibilidad médica | Pendiente |
-| Appointment | HU-10 — Crear cita | Pendiente |
+| Módulo      | Historia                                 | Estado    |
+|-------------|------------------------------------------|-----------|
+| Appointment | HU-10 — Crear cita                       | Pendiente |
 | Appointment | HU-12 — Consultar agenda del consultorio | Pendiente |
 
 ---
@@ -1862,9 +1870,9 @@ La planificación funcional continúa siendo responsabilidad del AgenDoc Project
 
 ## 12.2 Foundation
 
-| Historia | Backend | Frontend Web | Mobile | QA | Estado |
-|----------|---------|--------------|--------|----|--------|
-| Foundation | ✅ | ✅ | ⚪ | ✅ | Completada |
+| Historia   | Backend | Frontend Web | Mobile | QA  | Estado     |
+|------------|---------|--------------|--------|-----|------------|
+| Foundation | ✅      | ✅           | ⚪     | ✅  | Completada |
 
 ---
 
@@ -1886,8 +1894,8 @@ La planificación funcional continúa siendo responsabilidad del AgenDoc Project
 
 | Historia | Backend | Frontend Web | Mobile | QA | Estado |
 |----------|---------|--------------|--------|----|--------|
-| HU-08 — Consultar disponibilidad médica | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
-| HU-10 — Crear cita desde recepción | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
+| HU-08 — Consultar disponibilidad médica  | ✅ | ⚪ | ⚪ | ✅ | Backend implementado |
+| HU-10 — Crear cita desde recepción       | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
 | HU-12 — Consultar agenda del consultorio | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
 
 ---
@@ -2089,14 +2097,15 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 
 | Elemento | Estado |
 |----------|--------|
-| Compilación Maven | ✅ |
-| Spring Boot inicia correctamente | ✅ |
-| PostgreSQL accesible | ✅ |
-| Flyway ejecuta correctamente | ✅ |
-| API REST operativa | ✅ |
-| Manejo global de excepciones | ✅ |
-| Spring Security | ✅ |
-| JWT End-to-End | ⚪ Pendiente |
+| Compilación Maven                 | ✅ |
+| Spring Boot inicia correctamente  | ✅ |
+| PostgreSQL accesible              | ✅ |
+| Flyway ejecuta correctamente      | ✅ |
+| API REST operativa                | ✅ |
+| Manejo global de excepciones      | ✅ |
+| Spring Security                   | ✅ |
+| Consulta de disponibilidad médica | ✅ |
+| JWT End-to-End                    | ⚪ Pendiente |
 
 ---
 
@@ -2104,12 +2113,12 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 
 | Elemento | Estado |
 |----------|--------|
-| Proyecto compila | ✅ |
+| Proyecto compila          | ✅ |
 | Vite inicia correctamente | ✅ |
-| React Router | ✅ |
-| Integración con Backend | ✅ |
-| Design Tokens | ✅ |
-| Componentes base | ✅ |
+| React Router              | ✅ |
+| Integración con Backend   | ✅ |
+| Design Tokens             | ✅ |
+| Componentes base          | ✅ |
 
 ---
 
@@ -2320,6 +2329,27 @@ AgendaBlockEntity
 
 ---
 
+### HU-08 — Consultar disponibilidad médica
+
+MedicalAgendaPage
+        │
+        ▼
+agendaService.ts
+        │
+        ▼
+AgendaController
+        │
+        ▼
+AgendaService
+        │
+        ▼
+AgendaBlockRepository
+        │
+        ▼
+AgendaBlockEntity
+
+---
+
 ## 16.4 Convenciones
 
 Todos los nuevos flujos deberán documentarse siguiendo el mismo patrón:
@@ -2517,7 +2547,7 @@ Estado:
 
 | Historia | Estado |
 |----------|--------|
-| HU-08 — Consultar disponibilidad médica | Lista para implementación |
+| HU-08 — Consultar disponibilidad médica | Frontend pendiente (Backend implementado) |
 | HU-10 — Crear cita desde recepción | Lista para implementación |
 | HU-12 — Consultar agenda del consultorio | Lista para implementación |
 

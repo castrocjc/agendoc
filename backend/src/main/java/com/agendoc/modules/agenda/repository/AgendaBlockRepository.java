@@ -13,4 +13,8 @@ public interface AgendaBlockRepository extends JpaRepository<AgendaBlockEntity, 
                         LocalDate appointmentDate,
                         RecordStatus recordStatus);
 
+        List<AgendaBlockEntity> findByMedicalAgendaIdAndAppointmentDateAndAvailableTrueAndRecordStatusOrderByStartTimeAsc(
+                        Long medicalAgendaId,
+                        LocalDate appointmentDate,
+                        RecordStatus recordStatus);
 }
