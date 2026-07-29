@@ -24,6 +24,7 @@ public class SecurityConfiguration {
         private static final String PATIENTS_ENDPOINT = "/api/v1/patients";
         private static final String PATIENT_SEARCH_ENDPOINT = "/api/v1/patients/search";
         private static final String AGENDA_BLOCKS_ENDPOINT = "/api/v1/doctors/*/agenda-blocks";
+        private static final String APPOINTMENTS_ENDPOINT = "/api/v1/appointments";        
         private final boolean permitDevelopmentEndpoints;
 
         public SecurityConfiguration(
@@ -76,7 +77,11 @@ public class SecurityConfiguration {
                                                                 .requestMatchers(
                                                                         HttpMethod.GET,
                                                                         AGENDA_BLOCKS_ENDPOINT)
-                                                                .permitAll();
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                        HttpMethod.POST,
+                                                                        APPOINTMENTS_ENDPOINT)
+                                                                .permitAll();                                                                
                                         }
                                         authorize
                                                         .anyRequest()

@@ -178,11 +178,13 @@ Componentes habilitados:
 | HU-06    | Buscar paciente                 | ✅ Completada                    |
 | HU-07    | Crear bloques de agenda médica  | ✅ Completada                    |
 | HU-08    | Consultar disponibilidad médica | ✅ Completada                    |
+| HU-10    | Crear cita desde recepción      | 🟡 Backend completado            |
 
 Total implementado:
 
-- 28 Story Points funcionales.
-- Foundation completada.
+33 Story Points funcionales.
+Foundation completada.
+HU-10 Backend implementado.
 
 ---
 
@@ -202,18 +204,17 @@ Total implementado:
 
 Historia objetivo:
 
-**HU-10 — Crear cita médica**
+**HU-10 — Crear cita desde recepción (Frontend Web)**
 
 Estado previo requerido:
 
-- HU-08 Backend completado.
-- HU-08 Frontend completado.
-- Consulta de disponibilidad médica operativa.
-- Rama `develop` sincronizada y limpia después del versionado.
+Backend HU-10 completado.
+API POST /api/v1/appointments validada.
+Pruebas unitarias iniciales completadas.
 
 Objetivo:
 
-Implementar la creación de una cita médica utilizando un paciente registrado, un médico y un bloque de agenda disponible, conforme al alcance aprobado para Sprint 2.
+Implementar la interfaz Web para la creación de citas médicas integrada con el Backend ya implementado.
 
 ---
 
@@ -588,6 +589,7 @@ com.agendoc
 ```text
 modules
 ├── agenda
+├── appointment
 ├── authentication
 ├── clinic
 ├── doctor
@@ -984,7 +986,49 @@ Historias relacionadas:
 
 ---
 
-### 6.5.6 Role
+### 6.5.6 Appointment
+
+Estructura:
+
+```text
+appointment
+├── controller
+│   └── AppointmentController.java
+├── dto
+│   ├── AppointmentResponse.java
+│   └── CreateAppointmentRequest.java
+├── entity
+│   ├── AppointmentEntity.java
+│   └── AppointmentStatusEntity.java
+├── repository
+│   ├── AppointmentRepository.java
+│   └── AppointmentStatusRepository.java
+└── service
+    ├── AppointmentService.java
+    └── AppointmentServiceImpl.java
+```
+
+Responsabilidad:
+
+creación de citas médicas;
+validación del paciente;
+validación del médico;
+validación del bloque de agenda;
+asignación del estado inicial;
+bloqueo pesimista del bloque de agenda;
+prevención de doble reserva.
+
+Historia relacionada:
+
+HU-10 — Crear cita desde recepción.
+
+Estado:
+
+Backend implementado.
+
+---
+
+### 6.5.7 Role
 
 Ubicación:
 
@@ -1016,7 +1060,7 @@ No existe actualmente un Controller ni un Service para administrar roles. Los ro
 
 ---
 
-### 6.5.7 User
+### 6.5.8 User
 
 Ubicación:
 
@@ -1117,15 +1161,17 @@ com/agendoc
         └── service
             └── DoctorServiceImplTest.java
             └── AgendaServiceImplTest.java
+            └── AppointmentServiceImplTest.java
 ```
 
 Pruebas identificadas:
 
-| Archivo                      | Cobertura principal                                        |
-|------------------------------|------------------------------------------------------------|
-| BackendApplicationTests.java | Validación de carga del contexto de Spring Boot.           |
-| DoctorServiceImplTest.java   | Validación del servicio de médicos.                        |
-| AgendaServiceImplTest.java   | Validación del servicio de agenda y disponibilidad médica. |
+| Archivo                           | Cobertura principal                                        |
+|-----------------------------------|------------------------------------------------------------|
+| BackendApplicationTests.java      | Validación de carga del contexto de Spring Boot.           |
+| DoctorServiceImplTest.java        | Validación del servicio de médicos.                        |
+| AgendaServiceImplTest.java        | Validación del servicio de agenda y disponibilidad médica. |
+| AppointmentServiceImplTest.java   | Validación del servicio de creación de citas médicas.      |
 
 Estado:
 
@@ -1151,7 +1197,7 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 | Registro y búsqueda de pacientes | Implementado |
 | Creación de bloques de agenda    | Implementada |
 | Consulta de disponibilidad médica| Implementada |
-| Gestión de citas                 | Pendiente    |
+| Gestión de citas                 | Implementada |
 
 ---
 
@@ -1645,6 +1691,7 @@ migration
 ├── V5__seed_medical_specialties.sql
 ├── V6__create_patients_schema.sql
 └── V7__create_medical_agenda_schema.sql
+└── V8__create_appointments_schema.sql
 ```
 
 ---
@@ -1675,21 +1722,21 @@ Al cierre del Sprint 1 el esquema de Base de Datos implementa los elementos nece
 - agenda médica;
 - bloques de agenda.
 
-Las estructuras correspondientes a citas médicas serán incorporadas durante el Sprint 2.
+Las estructuras correspondientes a citas médicas ya forman parte del esquema mediante la migración V8.
 
 ---
 
 ## 9.6 Estado General
 
-| Elemento | Estado |
-|----------|--------|
-| PostgreSQL | Operativo |
-| Flyway | Operativo |
-| Migraciones | Versionadas |
-| Seed inicial | Implementado |
-| Esquema Foundation | Implementado |
-| Esquema Sprint 1 | Implementado |
-| Esquema Sprint 2 | Pendiente |
+| Elemento           | Estado                     |
+|--------------------|----------------------------|
+| PostgreSQL         | Operativo                  |
+| Flyway             | Operativo                  |
+| Migraciones        | Versionadas                |
+| Seed inicial       | Implementado               |
+| Esquema Foundation | Implementado               |
+| Esquema Sprint 1   | Implementado               |
+| Esquema Sprint 2   | Parcialmente implementado  |
 
 ---
 
@@ -1725,28 +1772,30 @@ Cada Controller representa el punto de entrada oficial para un módulo del siste
 
 ## 10.3 Inventario de Controllers
 
-| Controller | Módulo | Estado |
-|------------|--------|--------|
-| AuthenticationController | Authentication | Implementado |
-| DoctorController | Doctor | Implementado |
-| MedicalSpecialtyController | Doctor | Implementado |
-| PatientController | Patient | Implementado |
-| AgendaController | Agenda | Implementado |
+| Controller                 | Módulo         | Estado       |
+|----------------------------|----------------|--------------|
+| AuthenticationController   | Authentication | Implementado |
+| DoctorController           | Doctor         | Implementado |
+| MedicalSpecialtyController | Doctor         | Implementado |
+| PatientController          | Patient        | Implementado |
+| AgendaController           | Agenda         | Implementado |
+| AppointmentController      | Appointment    | Implementado |
 
 ---
 
 ## 10.4 Inventario de Endpoints
 
-| Módulo         | Endpoint                         | Historia | Estado         |
-|----------------|----------------------------------|----------|----------------|
-| Authentication | Login                            | HU-01    | Implementado   |
-| Authentication | Logout                           | HU-02    | Implementado   |
-| Doctor         | Registrar médico                 | HU-04    | Implementado   |
-| Doctor         | Consultar especialidades médicas | HU-04    | Implementado   |
-| Patient        | Registrar paciente               | HU-05    | Implementado   |
-| Patient        | Buscar paciente                  | HU-06    | Implementado   |
-| Agenda         | Crear bloques de agenda          | HU-07    | Implementado   |
-| Agenda         | Consultar disponibilidad médica  | HU-08    | Implementado   |
+| Módulo         | Endpoint                         | Historia | Estado               |
+|----------------|----------------------------------|----------|----------------------|
+| Authentication | Login                            | HU-01    | Implementado         |
+| Authentication | Logout                           | HU-02    | Implementado         |
+| Doctor         | Registrar médico                 | HU-04    | Implementado         |
+| Doctor         | Consultar especialidades médicas | HU-04    | Implementado         |
+| Patient        | Registrar paciente               | HU-05    | Implementado         |
+| Patient        | Buscar paciente                  | HU-06    | Implementado         |
+| Agenda         | Crear bloques de agenda          | HU-07    | Implementado         |
+| Agenda         | Consultar disponibilidad médica  | HU-08    | Implementado         |
+| Appointment    | Crear cita médica                | HU-10    | Backend implementado |
 
 ---
 
@@ -1756,7 +1805,6 @@ Las siguientes APIs aún no forman parte de la implementación actual:
 
 | Módulo      | Historia                                 | Estado    |
 |-------------|------------------------------------------|-----------|
-| Appointment | HU-10 — Crear cita                       | Pendiente |
 | Appointment | HU-12 — Consultar agenda del consultorio | Pendiente |
 
 ---
@@ -1893,11 +1941,11 @@ La planificación funcional continúa siendo responsabilidad del AgenDoc Project
 
 ## 12.4 Sprint 2
 
-| Historia | Backend | Frontend Web | Mobile | QA | Estado |
-|------------------------------------------|----|----|----|----|------------|
-| HU-08 — Consultar disponibilidad médica  | ✅ | ✅ | ⚪ | ✅ | Completada |
-| HU-10 — Crear cita desde recepción       | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
-| HU-12 — Consultar agenda del consultorio | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
+| Historia                                 | Backend | Frontend Web | Mobile | QA | Estado             |
+|------------------------------------------|---------|--------------|--------|----|--------------------|
+| HU-08 — Consultar disponibilidad médica  | ✅      | ✅           | ⚪     | ✅ | Completada         |
+| HU-10 — Crear cita desde recepción       | ✅      | ⚪           | ⚪     | ✅ | Backend completado |
+| HU-12 — Consultar agenda del consultorio | ⚪      | ⚪           | ⚪     | ⚪ | Pendiente          |
 
 ---
 
@@ -2548,7 +2596,7 @@ En desarrollo
 
 | Historia | Estado |
 |----------|--------|
-| HU-10 — Crear cita desde recepción | Lista para implementación |
+| HU-10 — Crear cita desde recepción | Implementar HU-10 Frontend Web |
 | HU-12 — Consultar agenda del consultorio | Lista para implementación |
 
 ---
@@ -2578,7 +2626,7 @@ Para continuar el Sprint 2 deberán mantenerse las siguientes condiciones:
 
 ## 18.6 Objetivo del Incremento
 
-Implementar HU-10 — Crear cita desde recepción utilizando pacientes registrados, médicos disponibles y bloques de agenda existentes.
+Construir la pantalla de creación de citas médicas utilizando la API POST /api/v1/appointments ya implementada y validada.
 
 ---
 
