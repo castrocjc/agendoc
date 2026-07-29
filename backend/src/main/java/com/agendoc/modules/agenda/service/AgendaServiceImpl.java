@@ -35,16 +35,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class AgendaServiceImpl implements AgendaService {
 
         private static final String CLINIC_NOT_AVAILABLE = "No existe un consultorio activo disponible.";
-
         private static final String DOCTOR_NOT_AVAILABLE = "El médico seleccionado no está disponible.";
-
         private static final String INVALID_TIME_RANGE = "La hora de inicio debe ser anterior a la hora de fin.";
-
         private static final String PAST_AGENDA_BLOCK = "No se pueden crear bloques de agenda en una fecha u hora pasada.";
-
         private static final String DUPLICATED_AGENDA_BLOCK = "Existe un bloque de agenda duplicado.";
-
         private static final String OVERLAPPING_AGENDA_BLOCK = "El bloque de agenda se superpone con otro horario registrado.";
+        private static final String PAST_AVAILABILITY_DATE = "No se puede consultar disponibilidad para una fecha pasada.";
 
         private final MedicalAgendaRepository medicalAgendaRepository;
         private final AgendaBlockRepository agendaBlockRepository;
@@ -87,6 +83,8 @@ public class AgendaServiceImpl implements AgendaService {
         public List<AgendaBlockResponse> findAgendaBlocks(
                         Long doctorId,
                         LocalDate appointmentDate) {
+                validateAvailabilityDate(appointmentDate);
+
                 ClinicEntity clinic = findActiveClinic();
                 DoctorEntity doctor = findActiveDoctor(doctorId, clinic);
 
@@ -95,7 +93,7 @@ public class AgendaServiceImpl implements AgendaService {
                                                 doctor.getId(),
                                                 RecordStatus.ACTIVE)
                                 .map(medicalAgenda -> agendaBlockRepository
-                                                .findByMedicalAgendaIdAndAppointmentDateAndRecordStatusOrderByStartTimeAsc(
+                                                .findByMedicalAgendaIdAndAppointmentDateAndAvailableTrueAndRecordStatusOrderByStartTimeAsc(
                                                                 medicalAgenda.getId(),
                                                                 appointmentDate,
                                                                 RecordStatus.ACTIVE)
@@ -103,6 +101,14 @@ public class AgendaServiceImpl implements AgendaService {
                                                 .map(this::toResponse)
                                                 .toList())
                                 .orElseGet(List::of);
+        }
+
+        private void validateAvailabilityDate(
+                        LocalDate appointmentDate) {
+                if (appointmentDate.isBefore(LocalDate.now())) {
+                        throw new BadRequestException(
+                                        PAST_AVAILABILITY_DATE);
+                }
         }
 
         private ClinicEntity findActiveClinic() {
