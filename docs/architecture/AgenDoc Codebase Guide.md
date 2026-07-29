@@ -177,11 +177,11 @@ Componentes habilitados:
 | HU-05    | Registrar paciente              | ✅ Completada                    |
 | HU-06    | Buscar paciente                 | ✅ Completada                    |
 | HU-07    | Crear bloques de agenda médica  | ✅ Completada                    |
-| HU-08    | Consultar disponibilidad médica | 🟡 Backend implementado          |
+| HU-08    | Consultar disponibilidad médica | ✅ Completada                    |
 
 Total implementado:
 
-- 25 Story Points funcionales.
+- 28 Story Points funcionales.
 - Foundation completada.
 
 ---
@@ -200,25 +200,20 @@ Total implementado:
 
 ## Próximo Incremento
 
-Sprint objetivo:
+Historia objetivo:
 
-**Sprint 2**
+**HU-10 — Crear cita médica**
 
-Historias en desarrollo:
+Estado previo requerido:
 
-- HU-08 — Backend implementado.
-- HU-10 — Pendiente.
-- HU-12 — Pendiente.
+- HU-08 Backend completado.
+- HU-08 Frontend completado.
+- Consulta de disponibilidad médica operativa.
+- Rama `develop` sincronizada y limpia después del versionado.
 
-Technical Stories:
+Objetivo:
 
-- TS-01.
-- TS-02.
-- TS-03.
-
-Objetivo del Sprint:
-
-Permitir que la recepcionista consulte disponibilidad médica, cree citas y visualice la agenda inicial del consultorio utilizando una autenticación JWT completa y el contexto del usuario autenticado.
+Implementar la creación de una cita médica utilizando un paciente registrado, un médico y un bloque de agenda disponible, conforme al alcance aprobado para Sprint 2.
 
 ---
 
@@ -964,7 +959,7 @@ Responsabilidad:
 - Crear bloques de atención.
 - Validar fechas y rangos horarios.
 - Persistir los bloques disponibles.
-- Preparar la base funcional para consultar disponibilidad y crear citas.
+- Consultar disponibilidad médica por médico y fecha.
 
 Historia relacionada:
 
@@ -1155,6 +1150,7 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 | Registro de médicos              | Implementado |
 | Registro y búsqueda de pacientes | Implementado |
 | Creación de bloques de agenda    | Implementada |
+| Consulta de disponibilidad médica| Implementada |
 | Gestión de citas                 | Pendiente    |
 
 ---
@@ -1162,10 +1158,10 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 2
 
 Sesión:
-Cierre del Sprint 1
+Implementación de HU-08 — Consultar disponibilidad médica
 
 ---
 
@@ -1404,11 +1400,15 @@ Responsabilidad:
 
 - Gestión de la agenda médica.
 - Creación de bloques de agenda.
+- Consulta de disponibilidad médica por médico y fecha.
+- Presentación de horarios disponibles.
+- Gestión de estados de carga, error y ausencia de disponibilidad.
 - Integración con los servicios del Backend.
 
-Historia relacionada:
+Historias relacionadas:
 
-- HU-07
+- HU-07 — Crear bloques de agenda médica.
+- HU-08 — Consultar disponibilidad médica.
 
 Estado:
 
@@ -1520,29 +1520,30 @@ La estructura de branding deberá mantenerse alineada con el UI Design Guide.
 
 ## 7.12 Estado General
 
-| Elemento             | Estado        |
-|----------------------|---------------|
-| React                | Operativo     |
-| TypeScript           | Operativo     |
-| Vite                 | Operativo     |
-| React Router         | Operativo     |
-| Axios                | Operativo     |
-| Componentes base     | Implementados |
-| Autenticación        | Implementada  |
-| Dashboard            | Implementado  |
-| Gestión de médicos   | Implementada  |
-| Gestión de pacientes | Implementada  |
-| Agenda médica        | Implementada  |
+| Elemento                         | Estado        |
+|----------------------------------|---------------|
+| React                            | Operativo     |
+| TypeScript                       | Operativo     |
+| Vite                             | Operativo     |
+| React Router                     | Operativo     |
+| Axios                            | Operativo     |
+| Componentes base                 | Implementados |
+| Autenticación                    | Implementada  |
+| Dashboard                        | Implementado  |
+| Gestión de médicos               | Implementada  |
+| Gestión de pacientes             | Implementada  |
+| Creación de bloques de agenda    | Implementada  |
+| Consulta de disponibilidad médica| Implementada  |
 
 ---
 
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 2
 
 Sesión:
-Cierre del Sprint 1
+Implementación de HU-08 — Consultar disponibilidad médica
 
 ---
 
@@ -1736,16 +1737,16 @@ Cada Controller representa el punto de entrada oficial para un módulo del siste
 
 ## 10.4 Inventario de Endpoints
 
-| Módulo         | Endpoint                         | Historia | Estado               |
-|----------------|----------------------------------|----------|----------------------|
-| Authentication | Login                            | HU-01    | Implementado         |
-| Authentication | Logout                           | HU-02    | Implementado         |
-| Doctor         | Registrar médico                 | HU-04    | Implementado         |
-| Doctor         | Consultar especialidades médicas | HU-04    | Implementado         |
-| Patient        | Registrar paciente               | HU-05    | Implementado         |
-| Patient        | Buscar paciente                  | HU-06    | Implementado         |
-| Agenda         | Crear bloques de agenda          | HU-07    | Implementado         |
-| Agenda         | Consultar disponibilidad médica  | HU-08    | Backend implementado |
+| Módulo         | Endpoint                         | Historia | Estado         |
+|----------------|----------------------------------|----------|----------------|
+| Authentication | Login                            | HU-01    | Implementado   |
+| Authentication | Logout                           | HU-02    | Implementado   |
+| Doctor         | Registrar médico                 | HU-04    | Implementado   |
+| Doctor         | Consultar especialidades médicas | HU-04    | Implementado   |
+| Patient        | Registrar paciente               | HU-05    | Implementado   |
+| Patient        | Buscar paciente                  | HU-06    | Implementado   |
+| Agenda         | Crear bloques de agenda          | HU-07    | Implementado   |
+| Agenda         | Consultar disponibilidad médica  | HU-08    | Implementado   |
 
 ---
 
@@ -1893,8 +1894,8 @@ La planificación funcional continúa siendo responsabilidad del AgenDoc Project
 ## 12.4 Sprint 2
 
 | Historia | Backend | Frontend Web | Mobile | QA | Estado |
-|----------|---------|--------------|--------|----|--------|
-| HU-08 — Consultar disponibilidad médica  | ✅ | ⚪ | ⚪ | ✅ | Backend implementado |
+|------------------------------------------|----|----|----|----|------------|
+| HU-08 — Consultar disponibilidad médica  | ✅ | ✅ | ⚪ | ✅ | Completada |
 | HU-10 — Crear cita desde recepción       | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
 | HU-12 — Consultar agenda del consultorio | ⚪ | ⚪ | ⚪ | ⚪ | Pendiente |
 
@@ -1913,20 +1914,22 @@ La planificación funcional continúa siendo responsabilidad del AgenDoc Project
 
 ## 12.6 Estado General
 
-Historias implementadas:
+Historias implementadas
 
-- Foundation.
-- HU-01.
-- HU-02.
-- HU-03.
-- HU-04.
-- HU-05.
-- HU-06.
-- HU-07.
+Foundation
+HU-01
+HU-02
+HU-03
+HU-04
+HU-05
+HU-06
+HU-07
+HU-08
 
-Historias pendientes:
+Historias pendientes
 
-- HU-08 en adelante.
+HU-10
+HU-12
 
 ---
 
@@ -2159,7 +2162,7 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 
 ## 15.7 Estado General
 
-Al cierre del Sprint 1 el proyecto presenta un estado técnico estable y se encuentra preparado para iniciar la implementación del Sprint 2.
+El proyecto mantiene un estado técnico estable y continúa la implementación del Sprint 2.
 
 ---
 
@@ -2331,6 +2334,7 @@ AgendaBlockEntity
 
 ### HU-08 — Consultar disponibilidad médica
 
+```text
 MedicalAgendaPage
         │
         ▼
@@ -2347,6 +2351,7 @@ AgendaBlockRepository
         │
         ▼
 AgendaBlockEntity
+```
 
 ---
 
@@ -2391,10 +2396,10 @@ Los nuevos flujos serán incorporados conforme avance el desarrollo del producto
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 2
 
 Sesión:
-Cierre del Sprint 1
+Implementación de HU-08 — Consultar disponibilidad médica
 
 ---
 
@@ -2529,17 +2534,13 @@ Esta información deberá actualizarse al cierre de cada Sprint.
 
 ## 18.2 Estado Actual
 
-Sprint actual:
+Sprint actual
 
-**Sprint 1 — Finalizado**
+Sprint 2
 
-Próximo Sprint:
+Estado
 
-**Sprint 2**
-
-Estado:
-
-**Listo para iniciar la implementación**
+En desarrollo
 
 ---
 
@@ -2547,7 +2548,6 @@ Estado:
 
 | Historia | Estado |
 |----------|--------|
-| HU-08 — Consultar disponibilidad médica | Frontend pendiente (Backend implementado) |
 | HU-10 — Crear cita desde recepción | Lista para implementación |
 | HU-12 — Consultar agenda del consultorio | Lista para implementación |
 
@@ -2565,7 +2565,7 @@ Estado:
 
 ## 18.5 Dependencias
 
-Antes de iniciar el Sprint 2 deberán mantenerse las siguientes condiciones:
+Para continuar el Sprint 2 deberán mantenerse las siguientes condiciones:
 
 - rama `develop` sincronizada con `origin/develop`;
 - Working Tree limpio;
@@ -2578,13 +2578,13 @@ Antes de iniciar el Sprint 2 deberán mantenerse las siguientes condiciones:
 
 ## 18.6 Objetivo del Incremento
 
-Implementar la primera versión del flujo de creación de citas médicas, permitiendo consultar disponibilidad, registrar citas desde recepción y visualizar la agenda del consultorio.
+Implementar HU-10 — Crear cita desde recepción utilizando pacientes registrados, médicos disponibles y bloques de agenda existentes.
 
 ---
 
 ## 18.7 Estado General
 
-El proyecto se encuentra preparado para iniciar la implementación del Sprint 2 conforme a la planificación aprobada.
+El proyecto se encuentra preparado para continuar el Sprint 2. conforme a la planificación aprobada.
 
 ---
 

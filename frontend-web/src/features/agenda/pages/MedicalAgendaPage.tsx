@@ -62,7 +62,8 @@ function MedicalAgendaPage() {
   const [isLoadingDoctors, setIsLoadingDoctors] = useState(true);
   const [doctorError, setDoctorError] = useState("");
 
-  const [appointmentDate, setAppointmentDate] = useState("");
+  const [blockAppointmentDate, setBlockAppointmentDate] = useState("");
+  const [availabilityDate, setAvailabilityDate] = useState("");
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
 
@@ -140,7 +141,7 @@ function MedicalAgendaPage() {
     let isMounted = true;
 
     async function loadExistingBlocks(): Promise<void> {
-      if (!selectedDoctorId || !appointmentDate) {
+      if (!selectedDoctorId || !availabilityDate) {
         setExistingBlocks([]);
         setExistingBlocksError("");
         setIsLoadingExistingBlocks(false);
@@ -153,7 +154,7 @@ function MedicalAgendaPage() {
       try {
         const results = await findAgendaBlocks(
           Number(selectedDoctorId),
-          appointmentDate,
+          availabilityDate,
         );
 
         if (isMounted) {
@@ -189,7 +190,7 @@ function MedicalAgendaPage() {
     return () => {
       isMounted = false;
     };
-  }, [selectedDoctorId, appointmentDate]);
+  }, [selectedDoctorId, availabilityDate]);
 
   useEffect(() => {
     if (!successMessage) {
@@ -223,13 +224,16 @@ function MedicalAgendaPage() {
     clearOperationMessages();
   }
 
-  function handleDateChange(value: string): void {
-    setAppointmentDate(value);
+  function handleBlockDateChange(value: string): void {
+    setBlockAppointmentDate(value);
     setDateError("");
-    setPreparedBlocks([]);
+    clearOperationMessages();
+  }
+
+  function handleAvailabilityDateChange(value: string): void {
+    setAvailabilityDate(value);
     setExistingBlocks([]);
     setExistingBlocksError("");
-    clearOperationMessages();
   }
 
   function handleStartTimeChange(value: string): void {
@@ -248,7 +252,7 @@ function MedicalAgendaPage() {
   function validateBlock(): boolean {
     const validation = validateAgendaBlock({
       doctorId: selectedDoctorId,
-      appointmentDate,
+      appointmentDate: blockAppointmentDate,
       startTime,
       endTime,
     });
@@ -264,7 +268,7 @@ function MedicalAgendaPage() {
   function blockAlreadyPrepared(): boolean {
     return preparedBlocks.some(
       (block) =>
-        block.appointmentDate === appointmentDate
+        block.appointmentDate === blockAppointmentDate
         && block.startTime === startTime
         && block.endTime === endTime,
     );
@@ -290,7 +294,7 @@ function MedicalAgendaPage() {
 
     const newBlock: PreparedAgendaBlock = {
       id: crypto.randomUUID(),
-      appointmentDate,
+      appointmentDate: blockAppointmentDate,
       startTime,
       endTime,
     };
@@ -313,7 +317,7 @@ function MedicalAgendaPage() {
   }
 
   async function refreshExistingBlocks(): Promise<void> {
-    if (!selectedDoctorId || !appointmentDate) {
+    if (!selectedDoctorId || !availabilityDate) {
       return;
     }
 
@@ -323,7 +327,7 @@ function MedicalAgendaPage() {
     try {
       const results = await findAgendaBlocks(
         Number(selectedDoctorId),
-        appointmentDate,
+        availabilityDate,
       );
 
       setExistingBlocks(
@@ -554,11 +558,11 @@ function MedicalAgendaPage() {
                       label="Fecha"
                       type="date"
                       min={getToday()}
-                      value={appointmentDate}
+                      value={blockAppointmentDate}
                       error={dateError}
                       disabled={isSaving}
                       onChange={(event) =>
-                        handleDateChange(event.target.value)
+                        handleBlockDateChange(event.target.value)
                       }
                     />
 
@@ -719,12 +723,12 @@ function MedicalAgendaPage() {
                 <div className="medical-agenda-page__section-heading">
                   <div>
                     <h2 id="existing-agenda-title">
-                      Agenda existente
+                      Consultar disponibilidad
                     </h2>
 
                     <p>
-                      Consulta los bloques registrados para el médico
-                      y la fecha seleccionados.
+                      Selecciona una fecha para revisar los horarios
+                      disponibles del médico.
                     </p>
                   </div>
 
@@ -735,21 +739,41 @@ function MedicalAgendaPage() {
                   )}
                 </div>
 
-                {!selectedDoctorId || !appointmentDate ? (
+                <div className="medical-agenda-page__availability-filter">
+                  <AppInput
+                    id="availabilityDate"
+                    name="availabilityDate"
+                    label="Fecha de consulta"
+                    type="date"
+                    min={getToday()}
+                    value={availabilityDate}
+                    disabled={!selectedDoctorId || isSaving}
+                    helperText={
+                      selectedDoctorId
+                        ? "Selecciona la fecha que deseas consultar."
+                        : "Selecciona primero un médico."
+                    }
+                    onChange={(event) =>
+                      handleAvailabilityDateChange(event.target.value)
+                    }
+                  />
+                </div>
+
+                {!selectedDoctorId || !availabilityDate ? (
                   <div className="medical-agenda-page__state">
                     <CalendarDays size={32} aria-hidden="true" />
 
                     <h3>Selecciona médico y fecha</h3>
 
                     <p>
-                      Los bloques ya registrados aparecerán en esta
+                      Los horarios disponibles aparecerán en esta
                       sección.
                     </p>
                   </div>
                 ) : null}
 
                 {selectedDoctorId
-                  && appointmentDate
+                  && availabilityDate
                   && isLoadingExistingBlocks && (
                     <div
                       className="medical-agenda-page__state"
@@ -770,7 +794,7 @@ function MedicalAgendaPage() {
                   )}
 
                 {selectedDoctorId
-                  && appointmentDate
+                  && availabilityDate
                   && !isLoadingExistingBlocks
                   && existingBlocksError && (
                     <div
@@ -789,7 +813,7 @@ function MedicalAgendaPage() {
                   )}
 
                 {selectedDoctorId
-                  && appointmentDate
+                  && availabilityDate
                   && !isLoadingExistingBlocks
                   && !existingBlocksError
                   && existingBlocks.length === 0 && (
@@ -802,8 +826,8 @@ function MedicalAgendaPage() {
                       <h3>No hay bloques registrados</h3>
 
                       <p>
-                        No existen bloques para el médico y la fecha
-                        seleccionados.
+                        No existen horarios disponibles para el médico
+                        y la fecha seleccionados.
                       </p>
                     </div>
                   )}
