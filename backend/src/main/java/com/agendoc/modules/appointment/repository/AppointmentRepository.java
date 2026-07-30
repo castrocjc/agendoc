@@ -5,8 +5,9 @@ import com.agendoc.modules.appointment.entity.AppointmentEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Optional;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -40,5 +41,30 @@ public interface AppointmentRepository
                         LocalTime startTime,
                         LocalTime endTime,
                         Collection<String> statusCodes,
+                        RecordStatus recordStatus);
+
+        @Query("""
+                        SELECT DISTINCT a
+                        FROM AppointmentEntity a
+                        JOIN FETCH a.patient patient
+                        JOIN FETCH a.doctor doctor
+                        JOIN FETCH doctor.specialty specialty
+                        JOIN FETCH a.agendaBlock agendaBlock
+                        JOIN FETCH a.status appointmentStatus
+                        WHERE a.clinic.id = :clinicId
+                        AND a.recordStatus = :recordStatus
+                        AND agendaBlock.appointmentDate = :appointmentDate
+                        AND (:doctorId IS NULL OR doctor.id = :doctorId)
+                        AND (:statusCode IS NULL OR appointmentStatus.code = :statusCode)
+                        ORDER BY
+                            agendaBlock.startTime ASC,
+                            doctor.lastName ASC,
+                            doctor.firstName ASC
+                        """)
+        List<AppointmentEntity> findClinicAppointments(
+                        Long clinicId,
+                        LocalDate appointmentDate,
+                        Long doctorId,
+                        String statusCode,
                         RecordStatus recordStatus);
 }

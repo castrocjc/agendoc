@@ -1,9 +1,12 @@
 import {
   ApiClientError,
+  apiGet,
   apiPost,
 } from "../../../shared/api/apiClient";
 
 import type {
+  AppointmentAgendaFilters,
+  AppointmentAgendaResponse,
   AppointmentResponse,
   CreateAppointmentRequest,
 } from "../types/appointment.types";
@@ -24,13 +27,42 @@ export class AppointmentServiceError extends Error {
   }
 }
 
-function getUserMessage(status: number): string {
+type AppointmentOperation =
+  | "create"
+  | "find";
+
+function getUserMessage(
+  status: number,
+  operation: AppointmentOperation,
+): string {
+  if (operation === "find") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "La fecha seleccionada no es válida.";
+
+      case 403:
+        return "No tienes autorización para consultar la agenda del consultorio.";
+
+      case 404:
+        return "No se encontró la información solicitada.";
+
+      default:
+        return "No fue posible consultar la agenda del consultorio. Inténtalo nuevamente.";
+    }
+  }
+
   switch (status) {
     case 0:
       return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
 
     case 400:
       return "Revisa la información ingresada para agendar la cita.";
+
+    case 403:
+      return "No tienes autorización para registrar citas médicas.";
 
     case 404:
       return "No se encontró el paciente, médico o bloque de agenda seleccionado.";
@@ -45,10 +77,12 @@ function getUserMessage(status: number): string {
 
 function mapServiceError(
   error: unknown,
+  operation: AppointmentOperation,
 ): AppointmentServiceError {
   if (error instanceof ApiClientError) {
     const message =
-      error.apiMessage?.trim() || getUserMessage(error.status);
+      error.apiMessage?.trim()
+      || getUserMessage(error.status, operation);
 
     return new AppointmentServiceError(
       message,
@@ -58,7 +92,7 @@ function mapServiceError(
   }
 
   return new AppointmentServiceError(
-    "No fue posible crear la cita médica. Inténtalo nuevamente.",
+    getUserMessage(500, operation),
     500,
   );
 }
@@ -75,6 +109,38 @@ export async function createAppointment(
       request,
     );
   } catch (error) {
-    throw mapServiceError(error);
+    throw mapServiceError(error, "create");
+  }
+}
+
+export async function findAppointments(
+  filters: AppointmentAgendaFilters,
+): Promise<AppointmentAgendaResponse[]> {
+  const searchParameters = new URLSearchParams();
+
+  searchParameters.set("date", filters.date);
+
+  if (filters.doctorId !== undefined) {
+    searchParameters.set(
+      "doctorId",
+      filters.doctorId.toString(),
+    );
+  }
+
+  const normalizedStatus = filters.status?.trim();
+
+  if (normalizedStatus) {
+    searchParameters.set(
+      "status",
+      normalizedStatus,
+    );
+  }
+
+  try {
+    return await apiGet<AppointmentAgendaResponse[]>(
+      `/api/v1/appointments?${searchParameters.toString()}`,
+    );
+  } catch (error) {
+    throw mapServiceError(error, "find");
   }
 }
