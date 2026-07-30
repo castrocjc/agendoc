@@ -1,0 +1,522 @@
+.appointment-page {
+  min-height: 100vh;
+  background: var(--color-neutral-50, #f8fafc);
+}
+
+.appointment-page__header {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--color-neutral-200, #e2e8f0);
+  background: #ffffff;
+}
+
+.appointment-page__logo {
+  display: block;
+  width: 140px;
+  height: auto;
+}
+
+.appointment-page__content {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0 64px;
+}
+
+.appointment-page__content
+  > .appointment-page__message {
+  margin-top: 24px;
+}
+
+.appointment-page__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+.appointment-page__heading-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--color-primary-600, #2563eb);
+}
+
+.appointment-page__heading h1 {
+  margin: 0 0 8px;
+  color: var(--color-neutral-900, #0f172a);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.appointment-page__heading p {
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.appointment-page__card {
+  margin-top: 24px;
+  padding: 24px;
+  border: 1px solid var(--color-neutral-200, #e2e8f0);
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.appointment-page__card:first-of-type {
+  margin-top: 0;
+}
+
+.appointment-page__section-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.appointment-page__section-heading h2 {
+  margin: 0 0 4px;
+  color: var(--color-neutral-900, #0f172a);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+}
+
+.appointment-page__section-heading p {
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.appointment-page__completed {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.appointment-page__patient-search {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.appointment-page__patient-search > .app-button {
+  margin-top: 28px;
+}
+
+.appointment-page__patient-results {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.appointment-page__patient-result {
+  padding: 16px;
+  border: 1px solid var(--color-neutral-200, #e2e8f0);
+  border-radius: 16px;
+  background: var(--color-neutral-50, #f8fafc);
+}
+
+.appointment-page__patient-result .patient-search-card {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.appointment-page__patient-result
+  .patient-search-card:hover {
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.appointment-page__patient-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-neutral-200, #e2e8f0);
+}
+
+.appointment-page__selected-patient {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-page__selected-patient > .app-button {
+  align-self: flex-start;
+}
+
+.appointment-page__doctor-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.appointment-page__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 170px;
+  padding: 32px 24px;
+  border: 1px dashed var(--color-neutral-300, #cbd5e1);
+  border-radius: 12px;
+  background: var(--color-neutral-50, #f8fafc);
+  color: var(--color-neutral-500, #64748b);
+  text-align: center;
+}
+
+.appointment-page__state svg {
+  margin-bottom: 16px;
+}
+
+.appointment-page__state h3 {
+  margin: 0 0 8px;
+  color: var(--color-neutral-800, #1e293b);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+}
+
+.appointment-page__state p {
+  max-width: 480px;
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.appointment-page__state--error {
+  border-color: rgba(239, 68, 68, 0.35);
+  background: rgba(239, 68, 68, 0.05);
+  color: var(--color-danger-500, #ef4444);
+}
+
+.appointment-page__state--error h3 {
+  color: var(--color-danger-500, #ef4444);
+}
+
+.appointment-page__spinner {
+  width: 32px;
+  height: 32px;
+  margin-bottom: 16px;
+  border: 3px solid var(--color-neutral-200, #e2e8f0);
+  border-top-color: var(--color-primary-600, #2563eb);
+  border-radius: 50%;
+  animation: appointment-page-spin 800ms linear infinite;
+}
+
+.appointment-page__message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.appointment-page__message--error {
+  border-color: rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.06);
+  color: #b91c1c;
+}
+
+.appointment-page__message--success {
+  border-color: rgba(16, 185, 129, 0.3);
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
+}
+
+.appointment-page__schedule-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.appointment-page__schedule {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid var(--color-neutral-200, #e2e8f0);
+  border-radius: 12px;
+  background: var(--color-neutral-50, #f8fafc);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.appointment-page__schedule--available:hover {
+  border-color: rgba(37, 99, 235, 0.5);
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.appointment-page__schedule--selected {
+  border-color: var(--color-primary-600, #2563eb);
+  background: rgba(37, 99, 235, 0.08);
+  box-shadow: 0 0 0 1px var(--color-primary-600, #2563eb);
+}
+
+.appointment-page__schedule--unavailable {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.appointment-page__schedule-date {
+  margin: 0 0 4px;
+  color: var(--color-neutral-900, #0f172a);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.appointment-page__schedule-time {
+  margin: 0;
+  color: var(--color-neutral-600, #475569);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.appointment-page__schedule-status {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--color-neutral-600, #475569);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+.appointment-page__schedule--available
+  .appointment-page__schedule-status {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+.appointment-page__schedule--selected
+  .appointment-page__schedule-status {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--color-primary-600, #2563eb);
+}
+
+.appointment-page__details-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.appointment-page__textarea-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.appointment-page__textarea-field label {
+  color: var(--color-neutral-800, #1e293b);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.appointment-page__textarea-field textarea {
+  width: 100%;
+  min-height: 128px;
+  padding: 12px 14px;
+  border: 1px solid var(--color-neutral-300, #cbd5e1);
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--color-neutral-900, #0f172a);
+  font: inherit;
+  font-size: 14px;
+  line-height: 21px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.appointment-page__textarea-field textarea::placeholder {
+  color: var(--color-neutral-400, #94a3b8);
+}
+
+.appointment-page__textarea-field textarea:focus {
+  outline: 2px solid rgba(37, 99, 235, 0.2);
+  border-color: var(--color-primary-600, #2563eb);
+}
+
+.appointment-page__field-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--color-neutral-500, #64748b);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.appointment-page__summary {
+  margin-bottom: 0;
+}
+
+.appointment-page__summary-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.appointment-page__summary-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+}
+
+.appointment-page__summary-list div {
+  padding: 16px;
+  border: 1px solid var(--color-neutral-200, #e2e8f0);
+  border-radius: 12px;
+  background: var(--color-neutral-50, #f8fafc);
+}
+
+.appointment-page__summary-list dt {
+  margin-bottom: 4px;
+  color: var(--color-neutral-500, #64748b);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+}
+
+.appointment-page__summary-list dd {
+  margin: 0;
+  color: var(--color-neutral-900, #0f172a);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.appointment-page__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding-top: 20px;
+  border-top: 1px solid var(--color-neutral-200, #e2e8f0);
+}
+
+@keyframes appointment-page-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 767px) {
+  .appointment-page__header {
+    padding: 12px 16px;
+  }
+
+  .appointment-page__logo {
+    width: 120px;
+  }
+
+  .appointment-page__content {
+    width: min(100% - 24px, 1120px);
+    padding: 32px 0 48px;
+  }
+
+  .appointment-page__heading {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .appointment-page__heading-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .appointment-page__heading h1 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+
+  .appointment-page__card {
+    margin-top: 16px;
+    padding: 20px;
+  }
+
+  .appointment-page__section-heading {
+    gap: 12px;
+  }
+
+  .appointment-page__patient-search,
+  .appointment-page__doctor-fields,
+  .appointment-page__schedule-list,
+  .appointment-page__details-fields,
+  .appointment-page__summary-list {
+    grid-template-columns: 1fr;
+  }
+
+  .appointment-page__patient-search .app-button {
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .appointment-page__patient-action {
+    display: block;
+  }
+
+  .appointment-page__patient-action .app-button,
+  .appointment-page__selected-patient > .app-button {
+    width: 100%;
+  }
+
+  .appointment-page__schedule {
+    align-items: flex-start;
+  }
+
+  .appointment-page__actions {
+    align-items: stretch;
+    flex-direction: column-reverse;
+  }
+
+  .appointment-page__actions .app-button {
+    width: 100%;
+  }
+
+}

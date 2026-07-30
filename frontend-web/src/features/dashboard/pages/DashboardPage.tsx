@@ -1,5 +1,6 @@
 import {
   Calendar,
+  CalendarPlus,
   LogOut,
   Stethoscope,
   UserPlus,
@@ -45,6 +46,10 @@ function DashboardPage() {
 
   function handleMedicalAgenda(): void {
     navigate("/agenda");
+  }
+
+  function handleCreateAppointment(): void {
+    navigate("/appointments/new");
   }
 
   return (
@@ -187,6 +192,32 @@ function DashboardPage() {
               Gestionar agenda
             </AppButton>
           </article>
+
+          <article className="dashboard-page__card">
+            <div
+              className="dashboard-page__card-icon"
+              aria-hidden="true"
+            >
+              <CalendarPlus size={24} />
+            </div>
+
+            <div className="dashboard-page__card-content">
+              <h2>Agendar cita</h2>
+
+              <p>
+                Programa una nueva cita seleccionando paciente, médico y horario disponible.
+              </p>
+            </div>
+
+            <AppButton
+              type="button"
+              fullWidth={false}
+              onClick={handleCreateAppointment}
+            >
+              Agendar cita
+            </AppButton>
+          </article>
+
         </section>
       </section>
     </main>

@@ -1,10 +1,13 @@
 package com.agendoc.modules.appointment.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.agendoc.common.exception.ConflictException;
 import com.agendoc.common.entity.RecordStatus;
 import com.agendoc.modules.agenda.entity.AgendaBlockEntity;
 import com.agendoc.modules.agenda.entity.MedicalAgendaEntity;
@@ -35,268 +38,333 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class AppointmentServiceImplTest {
 
-    @Mock
-    private AppointmentRepository appointmentRepository;
+        @Mock
+        private AppointmentRepository appointmentRepository;
 
-    @Mock
-    private AppointmentStatusRepository appointmentStatusRepository;
+        @Mock
+        private AppointmentStatusRepository appointmentStatusRepository;
 
-    @Mock
-    private AgendaBlockRepository agendaBlockRepository;
+        @Mock
+        private AgendaBlockRepository agendaBlockRepository;
 
-    @Mock
-    private PatientRepository patientRepository;
+        @Mock
+        private PatientRepository patientRepository;
 
-    @Mock
-    private DoctorRepository doctorRepository;
+        @Mock
+        private DoctorRepository doctorRepository;
 
-    @Mock
-    private ClinicRepository clinicRepository;
+        @Mock
+        private ClinicRepository clinicRepository;
 
-    private AppointmentServiceImpl appointmentService;
+        private AppointmentServiceImpl appointmentService;
 
-    @BeforeEach
-    void setUp() {
-        appointmentService = new AppointmentServiceImpl(
-                appointmentRepository,
-                appointmentStatusRepository,
-                agendaBlockRepository,
-                patientRepository,
-                doctorRepository,
-                clinicRepository
-        );
-    }
+        @BeforeEach
+        void setUp() {
+                appointmentService = new AppointmentServiceImpl(
+                                appointmentRepository,
+                                appointmentStatusRepository,
+                                agendaBlockRepository,
+                                patientRepository,
+                                doctorRepository,
+                                clinicRepository);
+        }
 
-    @Test
-    void shouldCreateAppointmentWhenRequestIsValid() {
+        @Test
+        void shouldCreateAppointmentWhenRequestIsValid() {
 
-        CreateAppointmentRequest request =
-                new CreateAppointmentRequest(
-                        1L,
-                        2L,
-                        12L,
-                        "Consulta médica general",
-                        "Primera cita del paciente"
-                );
+                CreateAppointmentRequest request = new CreateAppointmentRequest(
+                                1L,
+                                2L,
+                                12L,
+                                "Consulta médica general",
+                                "Primera cita del paciente");
 
-        ClinicEntity clinic = createClinic();
-        PatientEntity patient = createPatient(clinic);
-        DoctorEntity doctor = createDoctor(clinic);
-        AgendaBlockEntity agendaBlock =
-                createAgendaBlock(clinic, doctor);
-        AppointmentStatusEntity appointmentStatus =
-                createAppointmentStatus();
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+                AgendaBlockEntity agendaBlock = createAgendaBlock(clinic, doctor);
+                AppointmentStatusEntity appointmentStatus = createAppointmentStatus();
 
-        when(clinicRepository
-                .findFirstByRecordStatusOrderByIdAsc(
-                        RecordStatus.ACTIVE
-                ))
-                .thenReturn(Optional.of(clinic));
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
 
-        when(patientRepository.findByIdAndRecordStatus(
-                1L,
-                RecordStatus.ACTIVE
-        ))
-                .thenReturn(Optional.of(patient));
+                when(patientRepository.findByIdAndRecordStatus(
+                                1L,
+                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(patient));
 
-        when(doctorRepository.findByIdAndRecordStatus(
-                2L,
-                RecordStatus.ACTIVE
-        ))
-                .thenReturn(Optional.of(doctor));
+                when(doctorRepository.findByIdAndRecordStatus(
+                                2L,
+                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(doctor));
 
-        when(agendaBlockRepository
-                .findByIdAndRecordStatusForUpdate(
-                        12L,
-                        RecordStatus.ACTIVE
-                ))
-                .thenReturn(Optional.of(agendaBlock));
+                when(agendaBlockRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                12L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(agendaBlock));
 
-        when(appointmentStatusRepository
-                .findByCodeAndRecordStatus(
-                        AppointmentStatusCode.PROGRAMADA.name(),
-                        RecordStatus.ACTIVE
-                ))
-                .thenReturn(Optional.of(appointmentStatus));
+                when(appointmentRepository
+                        .existsPatientScheduleConflict(
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any()))
+                        .thenReturn(false);
 
-        when(appointmentRepository.save(
-                any(AppointmentEntity.class)
-        ))
-                .thenAnswer(invocation -> {
-                    AppointmentEntity appointment =
-                            invocation.getArgument(0);
+                when(appointmentStatusRepository
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.PROGRAMADA.name(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointmentStatus));
 
-                    appointment.setId(20L);
+                when(appointmentRepository.save(
+                                any(AppointmentEntity.class)))
+                                .thenAnswer(invocation -> {
+                                        AppointmentEntity appointment = invocation.getArgument(0);
 
-                    return appointment;
-                });
+                                        appointment.setId(20L);
 
-        AppointmentResponse response =
-                appointmentService.createAppointment(request);
+                                        return appointment;
+                                });
 
-        assertThat(response.id()).isEqualTo(20L);
-        assertThat(response.clinicId()).isEqualTo(1L);
+                AppointmentResponse response = appointmentService.createAppointment(request);
 
-        assertThat(response.patientId()).isEqualTo(1L);
-        assertThat(response.patientFirstName()).isEqualTo("María");
-        assertThat(response.patientLastName()).isEqualTo("González");
+                assertThat(response.id()).isEqualTo(20L);
+                assertThat(response.clinicId()).isEqualTo(1L);
 
-        assertThat(response.doctorId()).isEqualTo(2L);
-        assertThat(response.doctorFirstName()).isEqualTo("Ana");
-        assertThat(response.doctorLastName()).isEqualTo("Torres");
+                assertThat(response.patientId()).isEqualTo(1L);
+                assertThat(response.patientFirstName()).isEqualTo("María");
+                assertThat(response.patientLastName()).isEqualTo("González");
 
-        assertThat(response.agendaBlockId()).isEqualTo(12L);
-        assertThat(response.appointmentDate())
-                .isEqualTo(LocalDate.now().plusDays(1));
-        assertThat(response.startTime())
-                .isEqualTo(LocalTime.of(9, 0));
-        assertThat(response.endTime())
-                .isEqualTo(LocalTime.of(9, 30));
+                assertThat(response.doctorId()).isEqualTo(2L);
+                assertThat(response.doctorFirstName()).isEqualTo("Ana");
+                assertThat(response.doctorLastName()).isEqualTo("Torres");
 
-        assertThat(response.statusCode())
-                .isEqualTo("PROGRAMADA");
-        assertThat(response.statusName())
-                .isEqualTo("Programada");
+                assertThat(response.agendaBlockId()).isEqualTo(12L);
+                assertThat(response.appointmentDate())
+                                .isEqualTo(LocalDate.now().plusDays(1));
+                assertThat(response.startTime())
+                                .isEqualTo(LocalTime.of(9, 0));
+                assertThat(response.endTime())
+                                .isEqualTo(LocalTime.of(9, 30));
 
-        assertThat(response.reason())
-                .isEqualTo("Consulta médica general");
-        assertThat(response.notes())
-                .isEqualTo("Primera cita del paciente");
-        assertThat(response.recordStatus())
-                .isEqualTo("ACTIVE");
+                assertThat(response.statusCode())
+                                .isEqualTo("PROGRAMADA");
+                assertThat(response.statusName())
+                                .isEqualTo("Programada");
 
-        ArgumentCaptor<AppointmentEntity> appointmentCaptor =
-                ArgumentCaptor.forClass(AppointmentEntity.class);
+                assertThat(response.reason())
+                                .isEqualTo("Consulta médica general");
+                assertThat(response.notes())
+                                .isEqualTo("Primera cita del paciente");
+                assertThat(response.recordStatus())
+                                .isEqualTo("ACTIVE");
 
-        verify(appointmentRepository)
-                .save(appointmentCaptor.capture());
+                ArgumentCaptor<AppointmentEntity> appointmentCaptor = ArgumentCaptor.forClass(AppointmentEntity.class);
 
-        AppointmentEntity savedAppointment =
-                appointmentCaptor.getValue();
+                verify(appointmentRepository)
+                                .save(appointmentCaptor.capture());
 
-        assertThat(savedAppointment.getClinic())
-                .isSameAs(clinic);
-        assertThat(savedAppointment.getPatient())
-                .isSameAs(patient);
-        assertThat(savedAppointment.getDoctor())
-                .isSameAs(doctor);
-        assertThat(savedAppointment.getAgendaBlock())
-                .isSameAs(agendaBlock);
-        assertThat(savedAppointment.getStatus())
-                .isSameAs(appointmentStatus);
+                AppointmentEntity savedAppointment = appointmentCaptor.getValue();
 
-        assertThat(savedAppointment.getReason())
-                .isEqualTo("Consulta médica general");
-        assertThat(savedAppointment.getNotes())
-                .isEqualTo("Primera cita del paciente");
+                assertThat(savedAppointment.getClinic())
+                                .isSameAs(clinic);
+                assertThat(savedAppointment.getPatient())
+                                .isSameAs(patient);
+                assertThat(savedAppointment.getDoctor())
+                                .isSameAs(doctor);
+                assertThat(savedAppointment.getAgendaBlock())
+                                .isSameAs(agendaBlock);
+                assertThat(savedAppointment.getStatus())
+                                .isSameAs(appointmentStatus);
 
-        assertThat(agendaBlock.getAvailable()).isFalse();
+                assertThat(savedAppointment.getReason())
+                                .isEqualTo("Consulta médica general");
+                assertThat(savedAppointment.getNotes())
+                                .isEqualTo("Primera cita del paciente");
 
-        verify(clinicRepository)
-                .findFirstByRecordStatusOrderByIdAsc(
-                        RecordStatus.ACTIVE
-                );
+                assertThat(agendaBlock.getAvailable()).isFalse();
 
-        verify(patientRepository)
-                .findByIdAndRecordStatus(
-                        1L,
-                        RecordStatus.ACTIVE
-                );
+                verify(clinicRepository)
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE);
 
-        verify(doctorRepository)
-                .findByIdAndRecordStatus(
-                        2L,
-                        RecordStatus.ACTIVE
-                );
+                verify(patientRepository)
+                                .findByIdAndRecordStatus(
+                                                1L,
+                                                RecordStatus.ACTIVE);
 
-        verify(agendaBlockRepository)
-                .findByIdAndRecordStatusForUpdate(
-                        12L,
-                        RecordStatus.ACTIVE
-                );
+                verify(doctorRepository)
+                                .findByIdAndRecordStatus(
+                                                2L,
+                                                RecordStatus.ACTIVE);
 
-        verify(appointmentStatusRepository)
-                .findByCodeAndRecordStatus(
-                        AppointmentStatusCode.PROGRAMADA.name(),
-                        RecordStatus.ACTIVE
-                );
-    }
+                verify(agendaBlockRepository)
+                                .findByIdAndRecordStatusForUpdate(
+                                                12L,
+                                                RecordStatus.ACTIVE);
 
-    private ClinicEntity createClinic() {
-        ClinicEntity clinic = new ClinicEntity();
+                verify(appointmentRepository)
+                        .existsPatientScheduleConflict(
+                                1L,
+                                agendaBlock.getAppointmentDate(),
+                                agendaBlock.getStartTime(),
+                                agendaBlock.getEndTime(),
+                                java.util.List.of(
+                                        AppointmentStatusCode.PROGRAMADA.name(),
+                                        AppointmentStatusCode.CONFIRMADA.name()
+                                ),
+                                RecordStatus.ACTIVE
+                        );
 
-        clinic.setId(1L);
+                verify(appointmentStatusRepository)
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.PROGRAMADA.name(),
+                                                RecordStatus.ACTIVE);
+        }
 
-        return clinic;
-    }
+        @Test
+        void shouldRejectAppointmentWhenPatientHasScheduleConflict() {
 
-    private PatientEntity createPatient(
-            ClinicEntity clinic
-    ) {
-        PatientEntity patient = new PatientEntity();
+                CreateAppointmentRequest request =
+                        new CreateAppointmentRequest(
+                                1L,
+                                2L,
+                                12L,
+                                "Consulta médica general",
+                                null
+                        );
 
-        patient.setId(1L);
-        patient.setClinic(clinic);
-        patient.setFirstName("María");
-        patient.setLastName("González");
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+                AgendaBlockEntity agendaBlock =
+                        createAgendaBlock(clinic, doctor);
 
-        return patient;
-    }
+                when(clinicRepository
+                        .findFirstByRecordStatusOrderByIdAsc(
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(clinic));
 
-    private DoctorEntity createDoctor(
-            ClinicEntity clinic
-    ) {
-        DoctorEntity doctor = new DoctorEntity();
+                when(patientRepository
+                        .findByIdAndRecordStatus(
+                                1L,
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(patient));
 
-        doctor.setId(2L);
-        doctor.setClinic(clinic);
-        doctor.setFirstName("Ana");
-        doctor.setLastName("Torres");
+                when(doctorRepository
+                        .findByIdAndRecordStatus(
+                                2L,
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(doctor));
 
-        return doctor;
-    }
+                when(agendaBlockRepository
+                        .findByIdAndRecordStatusForUpdate(
+                                12L,
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(agendaBlock));
 
-    private AgendaBlockEntity createAgendaBlock(
-            ClinicEntity clinic,
-            DoctorEntity doctor
-    ) {
-        MedicalAgendaEntity medicalAgenda =
-                new MedicalAgendaEntity();
+                when(appointmentRepository
+                        .existsPatientScheduleConflict(
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any()))
+                        .thenReturn(true);
 
-        medicalAgenda.setId(5L);
-        medicalAgenda.setClinic(clinic);
-        medicalAgenda.setDoctor(doctor);
-        medicalAgenda.setName("Agenda de Ana Torres");
-        medicalAgenda.setActive(true);
+                assertThatThrownBy(
+                        () -> appointmentService.createAppointment(request)
+                )
+                        .isInstanceOf(ConflictException.class)
+                        .hasMessage(
+                                "El paciente ya tiene una cita programada en el horario seleccionado."
+                        );
 
-        AgendaBlockEntity agendaBlock =
-                new AgendaBlockEntity();
+                verify(appointmentRepository, never())
+                        .save(any(AppointmentEntity.class));
 
-        agendaBlock.setId(12L);
-        agendaBlock.setMedicalAgenda(medicalAgenda);
-        agendaBlock.setAppointmentDate(
-                LocalDate.now().plusDays(1)
-        );
-        agendaBlock.setStartTime(LocalTime.of(9, 0));
-        agendaBlock.setEndTime(LocalTime.of(9, 30));
-        agendaBlock.setAvailable(true);
+                verify(appointmentStatusRepository, never())
+                        .findByCodeAndRecordStatus(
+                                any(),
+                                any()
+                        );
 
-        return agendaBlock;
-    }
+                assertThat(agendaBlock.getAvailable()).isTrue();
+        }
 
-    private AppointmentStatusEntity createAppointmentStatus() {
-        AppointmentStatusEntity appointmentStatus =
-                new AppointmentStatusEntity();
+        private ClinicEntity createClinic() {
+                ClinicEntity clinic = new ClinicEntity();
 
-        appointmentStatus.setId(1L);
-        appointmentStatus.setCode(
-                AppointmentStatusCode.PROGRAMADA.name()
-        );
-        appointmentStatus.setName("Programada");
-        appointmentStatus.setDescription(
-                "Cita médica registrada y pendiente de confirmación."
-        );
+                clinic.setId(1L);
 
-        return appointmentStatus;
-    }
+                return clinic;
+        }
+
+        private PatientEntity createPatient(
+                        ClinicEntity clinic) {
+                PatientEntity patient = new PatientEntity();
+
+                patient.setId(1L);
+                patient.setClinic(clinic);
+                patient.setFirstName("María");
+                patient.setLastName("González");
+
+                return patient;
+        }
+
+        private DoctorEntity createDoctor(
+                        ClinicEntity clinic) {
+                DoctorEntity doctor = new DoctorEntity();
+
+                doctor.setId(2L);
+                doctor.setClinic(clinic);
+                doctor.setFirstName("Ana");
+                doctor.setLastName("Torres");
+
+                return doctor;
+        }
+
+        private AgendaBlockEntity createAgendaBlock(
+                        ClinicEntity clinic,
+                        DoctorEntity doctor) {
+                MedicalAgendaEntity medicalAgenda = new MedicalAgendaEntity();
+
+                medicalAgenda.setId(5L);
+                medicalAgenda.setClinic(clinic);
+                medicalAgenda.setDoctor(doctor);
+                medicalAgenda.setName("Agenda de Ana Torres");
+                medicalAgenda.setActive(true);
+
+                AgendaBlockEntity agendaBlock = new AgendaBlockEntity();
+
+                agendaBlock.setId(12L);
+                agendaBlock.setMedicalAgenda(medicalAgenda);
+                agendaBlock.setAppointmentDate(
+                                LocalDate.now().plusDays(1));
+                agendaBlock.setStartTime(LocalTime.of(9, 0));
+                agendaBlock.setEndTime(LocalTime.of(9, 30));
+                agendaBlock.setAvailable(true);
+
+                return agendaBlock;
+        }
+
+        private AppointmentStatusEntity createAppointmentStatus() {
+                AppointmentStatusEntity appointmentStatus = new AppointmentStatusEntity();
+
+                appointmentStatus.setId(1L);
+                appointmentStatus.setCode(
+                                AppointmentStatusCode.PROGRAMADA.name());
+                appointmentStatus.setName("Programada");
+                appointmentStatus.setDescription(
+                                "Cita médica registrada y pendiente de confirmación.");
+
+                return appointmentStatus;
+        }
 }
