@@ -19,7 +19,11 @@ import com.agendoc.modules.doctor.entity.DoctorEntity;
 import com.agendoc.modules.doctor.repository.DoctorRepository;
 import com.agendoc.modules.patient.entity.PatientEntity;
 import com.agendoc.modules.patient.repository.PatientRepository;
+import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
+import com.agendoc.modules.doctor.entity.MedicalSpecialtyEntity;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -109,6 +113,31 @@ public class AppointmentServiceImpl implements AppointmentService {
                 AppointmentEntity savedAppointment = appointmentRepository.save(appointment);
 
                 return toResponse(savedAppointment);
+        }
+
+        @Override
+        @Transactional(readOnly = true)
+        public List<AppointmentAgendaResponse> findAppointments(
+                LocalDate appointmentDate,
+                Long doctorId,
+                String statusCode
+        ) {
+        ClinicEntity clinic = findActiveClinic();
+
+        String normalizedStatusCode =
+                normalizeStatusCode(statusCode);
+
+        return appointmentRepository
+                .findClinicAppointments(
+                        clinic.getId(),
+                        appointmentDate,
+                        doctorId,
+                        normalizedStatusCode,
+                        RecordStatus.ACTIVE
+                )
+                .stream()
+                .map(this::toAppointmentAgendaResponse)
+                .toList();
         }
 
         private ClinicEntity findActiveClinic() {
@@ -286,12 +315,60 @@ public class AppointmentServiceImpl implements AppointmentService {
                 return appointment;
         }
 
+        private String normalizeStatusCode(String statusCode) {
+        if (statusCode == null || statusCode.isBlank()) {
+                return null;
+        }
+
+        return statusCode
+                .trim()
+                .toUpperCase(Locale.ROOT);
+        }
+
         private String normalizeOptional(String value) {
                 if (value == null || value.isBlank()) {
                         return null;
                 }
 
                 return value.trim();
+        }
+
+        private AppointmentAgendaResponse toAppointmentAgendaResponse(
+                AppointmentEntity appointment
+        ) {
+        AgendaBlockEntity agendaBlock =
+                appointment.getAgendaBlock();
+
+        PatientEntity patient =
+                appointment.getPatient();
+
+        DoctorEntity doctor =
+                appointment.getDoctor();
+
+        MedicalSpecialtyEntity specialty =
+                doctor.getSpecialty();
+
+        AppointmentStatusEntity status =
+                appointment.getStatus();
+
+        return new AppointmentAgendaResponse(
+                appointment.getId(),
+                patient.getId(),
+                patient.getFirstName(),
+                patient.getLastName(),
+                doctor.getId(),
+                doctor.getFirstName(),
+                doctor.getLastName(),
+                specialty.getId(),
+                specialty.getName(),
+                agendaBlock.getId(),
+                agendaBlock.getAppointmentDate(),
+                agendaBlock.getStartTime(),
+                agendaBlock.getEndTime(),
+                status.getCode(),
+                status.getName(),
+                appointment.getReason()
+        );
         }
 
         private AppointmentResponse toResponse(

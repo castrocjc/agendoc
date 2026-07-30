@@ -7,7 +7,7 @@
 |-----------|---------------------------------------------|
 | Proyecto  | AgenDoc                                     |
 | Documento | Codebase Guide                              |
-| Versión   | v1.1                                        |
+| Versión   | v1.2                                        |
 | Estado    | Vigente                                     |
 | Ubicación | docs/architecture/AgenDoc Codebase Guide.md |
 
@@ -19,6 +19,7 @@ Historial del Documento
 |----------|------------|--------------------------------------|
 | v1.0     | 2026-07-14 | Creación inicial del Codebase Guide. |
 | v1.1     | 2026-07-29 | Actualización del Codebase Guide con la implementación completa de HU-10, creación de citas médicas desde recepción. |
+| v1.2     | 2026-07-30 | Actualización del Codebase Guide con la implementación completa de HU-12, consulta de la agenda del consultorio. |
 
 ---
 
@@ -130,7 +131,7 @@ El Codebase Guide se rige por los siguientes principios:
 | AgenDoc Project Blueprint    | v1.6    | Aprobado       |
 | AgenDoc Development Playbook | v1.3    | Aprobado       |
 | UI Design Guide              | v1.0    | Aprobado       |
-| AgenDoc Codebase Guide       | v1.1    | Vigente        |
+| AgenDoc Codebase Guide       | v1.2    | Vigente        |
 
 ---
 
@@ -169,17 +170,18 @@ Componentes habilitados:
 
 ## Historias de Usuario Implementadas
 
-| Historia | Nombre                          | Estado                           |
-|----------|---------------------------------|----------------------------------|
-| HU-01    | Iniciar sesión                  | ✅ Completada                    |
-| HU-02    | Cerrar sesión                   | ✅ Completada                    |
-| HU-03    | Consultorio base                | ✅ Satisfecha durante Foundation |
-| HU-04    | Registrar médico                | ✅ Completada                    |
-| HU-05    | Registrar paciente              | ✅ Completada                    |
-| HU-06    | Buscar paciente                 | ✅ Completada                    |
-| HU-07    | Crear bloques de agenda médica  | ✅ Completada                    |
-| HU-08    | Consultar disponibilidad médica | ✅ Completada                    |
-| HU-10    | Crear cita desde recepción      | ✅ Completada                    |
+| Historia | Nombre                           | Estado                           |
+|----------|----------------------------------|----------------------------------|
+| HU-01    | Iniciar sesión                   | ✅ Completada                    |
+| HU-02    | Cerrar sesión                    | ✅ Completada                    |
+| HU-03    | Consultorio base                 | ✅ Satisfecha durante Foundation |
+| HU-04    | Registrar médico                 | ✅ Completada                    |
+| HU-05    | Registrar paciente               | ✅ Completada                    |
+| HU-06    | Buscar paciente                  | ✅ Completada                    |
+| HU-07    | Crear bloques de agenda médica   | ✅ Completada                    |
+| HU-08    | Consultar disponibilidad médica  | ✅ Completada                    |
+| HU-10    | Crear cita desde recepción       | ✅ Completada                    |
+| HU-12    | Consultar agenda del consultorio | ✅ Completada                    |
 
 Total implementado:
 
@@ -187,6 +189,7 @@ Total implementado:
 - Sprint 1 completado.
 - HU-08 completada.
 - HU-10 completada de extremo a extremo.
+- HU-12 completada de extremo a extremo.
 
 ---
 
@@ -206,19 +209,20 @@ Total implementado:
 
 Historia objetivo:
 
-**HU-12 — Consultar agenda del consultorio**
+**Por definir conforme al AgenDoc Project Blueprint vigente.**
 
-Estado previo requerido:
+Estado actual:
 
 - HU-08 completada.
 - HU-10 completada.
+- HU-12 completada.
 - Backend y Frontend Web compilando correctamente.
-- Pruebas unitarias de citas médicas exitosas.
-- Flujo de creación de citas validado funcionalmente.
+- Pruebas automatizadas del Backend exitosas.
+- Consulta de la agenda del consultorio validada funcionalmente.
 
 Objetivo:
 
-Implementar la consulta de la agenda general del consultorio, utilizando la información de citas médicas registrada durante HU-10.
+Mantener el proyecto preparado para iniciar el siguiente incremento definido en la planificación oficial del Sprint 2.
 
 ---
 
@@ -996,13 +1000,16 @@ Ubicación:
 
 ```text
 backend/src/main/java/com/agendoc/modules/appointment
+```
 
 Estructura:
 
+```text
 appointment
 ├── controller
 │   └── AppointmentController.java
 ├── dto
+│   ├── AppointmentAgendaResponse.java
 │   ├── AppointmentResponse.java
 │   └── CreateAppointmentRequest.java
 ├── entity
@@ -1019,17 +1026,21 @@ appointment
 
 Responsabilidad:
 
-Crear citas médicas desde recepción.
-Validar la existencia y vigencia del paciente.
-Validar la existencia y vigencia del médico.
-Validar la pertenencia del paciente, médico y agenda al consultorio.
-Validar el bloque de agenda seleccionado.
-Impedir el registro de citas en fechas u horarios pasados.
-Asignar el estado inicial PROGRAMADA.
-Marcar el bloque reservado como no disponible.
-Bloquear pesimistamente el bloque de agenda durante la creación.
-Prevenir la doble reserva del mismo bloque.
-Impedir que un paciente tenga citas activas con horarios superpuestos, incluso cuando correspondan a médicos diferentes.
+- Crear citas médicas desde recepción.
+- Consultar la agenda general del consultorio.
+- Filtrar las citas por fecha obligatoria.
+- Filtrar opcionalmente las citas por médico.
+- Filtrar opcionalmente las citas por estado.
+- Validar la existencia y vigencia del paciente.
+- Validar la existencia y vigencia del médico.
+- Validar la pertenencia del paciente, médico y agenda al consultorio.
+- Validar el bloque de agenda seleccionado.
+- Impedir el registro de citas en fechas u horarios pasados.
+- Asignar el estado inicial PROGRAMADA.
+- Marcar el bloque reservado como no disponible.
+- Bloquear pesimistamente el bloque de agenda durante la creación.
+- Prevenir la doble reserva del mismo bloque.
+- Impedir que un paciente tenga citas activas con horarios superpuestos, incluso cuando correspondan a médicos diferentes.
 
 Estados funcionales implementados:
 PROGRAMADA
@@ -1043,9 +1054,10 @@ La validación de superposición considera como citas activas para ocupación de
 PROGRAMADA
 CONFIRMADA
 
-Historia relacionada:
+Historias relacionadas:
 
-HU-10 — Crear cita desde recepción.
+- HU-10 — Crear cita desde recepción.
+- HU-12 — Consultar agenda del consultorio.
 
 Estado:
 
@@ -1201,7 +1213,7 @@ Pruebas identificadas:
 | BackendApplicationTests.java      | Validación de carga del contexto de Spring Boot.           |
 | DoctorServiceImplTest.java        | Validación del servicio de médicos.                        |
 | AgendaServiceImplTest.java        | Validación del servicio de agenda y disponibilidad médica. |
-| AppointmentServiceImplTest.java   | Validación de creación de citas y prevención de conflictos de horario del paciente. |
+| AppointmentServiceImplTest.java   | Validación de creación de citas, prevención de conflictos de horario y consulta de la agenda del consultorio. |
 
 La prueba del servicio de citas cubre actualmente:
 
@@ -1209,7 +1221,12 @@ La prueba del servicio de citas cubre actualmente:
 - asociación correcta con clínica, paciente, médico, bloque y estado;
 - cambio del bloque de agenda a no disponible;
 - rechazo de una cita cuando el paciente ya tiene una cita activa superpuesta;
-- confirmación de que no se persiste la cita ni se ocupa el bloque cuando existe conflicto.
+- confirmación de que no se persiste la cita ni se ocupa el bloque cuando existe conflicto;
+- consulta de citas por fecha;
+- consulta de citas filtradas por médico;
+- consulta de citas filtradas por estado;
+- consulta de citas combinando médico y estado;
+- construcción de la respuesta de agenda con la información de paciente, médico, horario y estado.
 
 Estado:
 
@@ -1221,21 +1238,22 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 
 ## 6.9 Estado General del Backend
 
-| Elemento                         | Estado       |
-|----------------------------------|--------------|
-| Aplicación Spring Boot           | Operativa    |
-| Compilación Maven                | Exitosa      |
-| PostgreSQL                       | Integrado    |
-| Flyway                           | Operativo    |
-| Manejo global de excepciones     | Implementado |
-| Autenticación inicial            | Implementada |
-| JWT End-to-End                   | Pendiente    |
-| Contexto autenticado             | Pendiente    |
-| Registro de médicos              | Implementado |
-| Registro y búsqueda de pacientes | Implementado |
-| Creación de bloques de agenda    | Implementada |
-| Consulta de disponibilidad médica| Implementada |
-| Gestión de citas                 | Implementada |
+| Elemento                           | Estado       |
+|------------------------------------|--------------|
+| Aplicación Spring Boot             | Operativa    |
+| Compilación Maven                  | Exitosa      |
+| PostgreSQL                         | Integrado    |
+| Flyway                             | Operativo    |
+| Manejo global de excepciones       | Implementado |
+| Autenticación inicial              | Implementada |
+| JWT End-to-End                     | Pendiente    |
+| Contexto autenticado               | Pendiente    |
+| Registro de médicos                | Implementado |
+| Registro y búsqueda de pacientes   | Implementado |
+| Creación de bloques de agenda      | Implementada |
+| Consulta de disponibilidad médica  | Implementada |
+| Gestión de citas                   | Implementada |
+| Consulta de agenda del consultorio | Implementada |
 
 ---
 
@@ -1245,7 +1263,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Implementación completa de HU-12 — Consultar agenda del consultorio
 
 ---
 
@@ -1507,7 +1525,6 @@ Ubicación:
 
 ```text
 features/appointment
-
 ```
 
 Estructura principal:
@@ -1525,18 +1542,39 @@ Seleccionar el médico.
 Consultar y seleccionar un bloque disponible.
 Registrar el motivo y las observaciones de la cita.
 Consumir la API de creación de citas médicas.
+Consultar la agenda general del consultorio.
+Filtrar las citas por fecha, médico y estado.
+Mostrar la información de paciente, médico, horario y estado de cada cita.
+Gestionar estados de carga, error y ausencia de resultados.
 Mostrar mensajes de éxito y error.
 Limpiar el formulario después de una creación exitosa.
 Presentar al usuario los conflictos de horario detectados por el Backend.
 
-Historia relacionada:
+Pantallas implementadas:
+
+AppointmentPage: creación de citas médicas desde recepción.
+AppointmentAgendaPage: consulta de la agenda del consultorio.
+
+Servicios implementados:
+
+createAppointment(): creación de una cita médica.
+findAppointments(): consulta de citas mediante filtros.
+
+Contratos principales:
+
+AppointmentAgendaFilters.
+AppointmentAgendaResponse.
+AppointmentResponse.
+CreateAppointmentRequest.
+
+Historias relacionadas:
 
 HU-10 — Crear cita desde recepción.
+HU-12 — Consultar agenda del consultorio.
 
 Estado:
 
 Implementado
-
 
 ---
 
@@ -1644,21 +1682,22 @@ La estructura de branding deberá mantenerse alineada con el UI Design Guide.
 
 ## 7.13 Estado General
 
-| Elemento                         | Estado        |
-|----------------------------------|---------------|
-| React                            | Operativo     |
-| TypeScript                       | Operativo     |
-| Vite                             | Operativo     |
-| React Router                     | Operativo     |
-| Axios                            | Operativo     |
-| Componentes base                 | Implementados |
-| Autenticación                    | Implementada  |
-| Dashboard                        | Implementado  |
-| Gestión de médicos               | Implementada  |
-| Gestión de pacientes             | Implementada  |
-| Creación de bloques de agenda    | Implementada  |
-| Consulta de disponibilidad médica| Implementada  |
-| Creación de citas médicas        | Implementada  |
+| Elemento                           | Estado        |
+|------------------------------------|---------------|
+| React                              | Operativo     |
+| TypeScript                         | Operativo     |
+| Vite                               | Operativo     |
+| React Router                       | Operativo     |
+| Axios                              | Operativo     |
+| Componentes base                   | Implementados |
+| Autenticación                      | Implementada  |
+| Dashboard                          | Implementado  |
+| Gestión de médicos                 | Implementada  |
+| Gestión de pacientes               | Implementada  |
+| Creación de bloques de agenda      | Implementada  |
+| Consulta de disponibilidad médica  | Implementada  |
+| Creación de citas médicas          | Implementada  |
+| Consulta de agenda del consultorio | Implementada  |
 
 ---
 
@@ -1668,7 +1707,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Implementación completa de HU-12 — Consultar agenda del consultorio
 
 ---
 
@@ -1769,7 +1808,7 @@ migration
 ├── V4__create_doctors_schema.sql
 ├── V5__seed_medical_specialties.sql
 ├── V6__create_patients_schema.sql
-└── V7__create_medical_agenda_schema.sql
+├── V7__create_medical_agenda_schema.sql
 └── V8__create_appointments_schema.sql
 ```
 
@@ -1878,16 +1917,15 @@ Cada Controller representa el punto de entrada oficial para un módulo del siste
 | Agenda         | Crear bloques de agenda          | HU-07    | Implementado         |
 | Agenda         | Consultar disponibilidad médica  | HU-08    | Implementado         |
 | Appointment    | Crear cita médica                | HU-10    | Implementado         |
+| Appointment    | Consultar agenda del consultorio | HU-12    | Implementado         |
 
 ---
 
 ## 10.5 APIs Pendientes
 
-Las siguientes APIs aún no forman parte de la implementación actual:
+No existen APIs funcionales pendientes dentro de las Historias de Usuario implementadas hasta HU-12.
 
-| Módulo      | Historia                                 | Estado    |
-|-------------|------------------------------------------|-----------|
-| Appointment | HU-12 — Consultar agenda del consultorio | Pendiente |
+Las próximas APIs serán incorporadas conforme avance el backlog oficial del producto.
 
 ---
 
@@ -1897,8 +1935,8 @@ Las siguientes APIs aún no forman parte de la implementación actual:
 |----------|--------|
 | Controllers implementados | 6 |
 | APIs Foundation | Implementadas |
-| APIs Sprint 1 | Implementadas |
-| APIs Sprint 2 | Implementación parcial |
+| APIs Sprint 1   | Implementadas |
+| APIs Sprint 2   | Implementadas hasta HU-12 |
 
 ---
 
@@ -1908,7 +1946,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Implementación completa de HU-12 — Consultar agenda del consultorio
 
 ---
 
@@ -2027,7 +2065,7 @@ La planificación funcional continúa siendo responsabilidad del AgenDoc Project
 |------------------------------------------|---------|--------------|--------|----|--------------------|
 | HU-08 — Consultar disponibilidad médica  | ✅      | ✅           | ⚪     | ✅ | Completada         |
 | HU-10 — Crear cita desde recepción       | ✅      | ✅           | ⚪     | ✅ | Completada         |
-| HU-12 — Consultar agenda del consultorio | ⚪      | ⚪           | ⚪     | ⚪ | Pendiente          |
+| HU-12 — Consultar agenda del consultorio | ✅      | ✅           | ⚪     | ✅ | Completada         |
 
 ---
 
@@ -2056,10 +2094,11 @@ Historias implementadas:
 - HU-07
 - HU-08
 - HU-10
+- HU-12
 
 Historias pendientes:
 
-- HU-12
+- Por definir conforme al backlog oficial del producto.
 
 ---
 
@@ -2069,7 +2108,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Implementación completa de HU-12 — Consultar agenda del consultorio
 
 ---
 
@@ -2228,33 +2267,35 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 
 ## 15.2 Backend
 
-| Elemento | Estado |
-|----------|--------|
-| Compilación Maven                 | ✅ |
-| Spring Boot inicia correctamente  | ✅ |
-| PostgreSQL accesible              | ✅ |
-| Flyway ejecuta correctamente      | ✅ |
-| API REST operativa                | ✅ |
-| Manejo global de excepciones      | ✅ |
-| Spring Security                   | ✅ |
-| Consulta de disponibilidad médica | ✅ |
-| JWT End-to-End                    | ⚪ Pendiente |
-| Creación de citas médicas         | ✅ |
-| Conflicto de horario del paciente | ✅ |
+| Elemento                           | Estado       |
+|------------------------------------|--------------|
+| Compilación Maven                  | ✅           |
+| Spring Boot inicia correctamente   | ✅           |
+| PostgreSQL accesible               | ✅           |
+| Flyway ejecuta correctamente       | ✅           |
+| API REST operativa                 | ✅           |
+| Manejo global de excepciones       | ✅           |
+| Spring Security                    | ✅           |
+| Consulta de disponibilidad médica  | ✅           |
+| JWT End-to-End                     | ⚪ Pendiente |
+| Creación de citas médicas          | ✅           |
+| Conflicto de horario del paciente  | ✅           |
+| Consulta de agenda del consultorio | ✅           |
 
 ---
 
 ## 15.3 Frontend Web
 
-| Elemento                   | Estado |
-|----------------------------|--------|
-| Proyecto compila           | ✅ |
-| Vite inicia correctamente  | ✅ |
-| React Router               | ✅ |
-| Integración con Backend    | ✅ |
-| Design Tokens              | ✅ |
-| Componentes base           | ✅ |
-| Flujo de creación de citas | ✅ |
+| Elemento                           | Estado |
+|------------------------------------|--------|
+| Proyecto compila                   | ✅ |
+| Vite inicia correctamente          | ✅ |
+| React Router                       | ✅ |
+| Integración con Backend            | ✅ |
+| Design Tokens                      | ✅ |
+| Componentes base                   | ✅ |
+| Flujo de creación de citas         | ✅ |
+| Consulta de agenda del consultorio | ✅ |
 
 ---
 
@@ -2296,7 +2337,7 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 
 ## 15.7 Estado General
 
-El proyecto mantiene un estado técnico estable y continúa la implementación del Sprint 2.
+El proyecto mantiene un estado técnico estable y cuenta con HU-08, HU-10 y HU-12 implementadas y validadas dentro del Sprint 2.
 
 ---
 
@@ -2306,7 +2347,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Implementación completa de HU-12 — Consultar agenda del consultorio
 
 ---
 
@@ -2518,6 +2559,34 @@ AppointmentPage
 
 ---
 
+### HU-12 — Consultar agenda del consultorio
+
+```text
+AppointmentAgendaPage
+        │
+        ├── doctorService.ts
+        └── appointmentService.ts
+                    │
+                    ▼
+        AppointmentController
+                    │
+                    ▼
+        AppointmentService
+                    │
+                    ▼
+        AppointmentRepository
+                    │
+                    ▼
+        AppointmentEntity
+                    │
+                    ├── PatientEntity
+                    ├── DoctorEntity
+                    ├── AgendaBlockEntity
+                    └── AppointmentStatusEntity
+```
+
+---
+
 ## 16.4 Convenciones
 
 Todos los nuevos flujos deberán documentarse siguiendo el mismo patrón:
@@ -2562,7 +2631,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Implementación completa de HU-12 — Consultar agenda del consultorio
 
 ---
 
@@ -2717,9 +2786,10 @@ En desarrollo
 
 | Historia | Estado |
 |----------|--------|
-| HU-08 — Consultar disponibilidad médica | Completada |
-| HU-10 — Crear cita desde recepción | Completada |
-| HU-12 — Consultar agenda del consultorio | Próximo incremento |
+| HU-08 — Consultar disponibilidad médica  | Completada |
+| HU-10 — Crear cita desde recepción       | Completada |
+| HU-12 — Consultar agenda del consultorio | Completada |
+| Próxima Historia de Usuario              | Por definir conforme al AgenDoc Project Blueprint vigente |
 
 ---
 
@@ -2742,20 +2812,20 @@ Para continuar el Sprint 2 deberán mantenerse las siguientes condiciones:
 - Backend compilando correctamente;
 - Frontend Web compilando correctamente;
 - migraciones Flyway aplicadas;
-- HU-10 validada funcionalmente;
+- HU-12 validada funcionalmente;
 - documentación oficial sincronizada.
 
 ---
 
 ## 18.6 Objetivo del Incremento
 
-Implementar HU-12, consulta de la agenda del consultorio, utilizando las citas médicas registradas y la disponibilidad de agenda ya implementada.
+Preparar el inicio del siguiente incremento funcional definido en el AgenDoc Project Blueprint vigente, manteniendo como línea base las funcionalidades completadas hasta HU-12.
 
 ---
 
 ## 18.7 Estado General
 
-El proyecto se encuentra preparado para continuar el Sprint 2 con HU-12, una vez versionados los cambios correspondientes a HU-10.
+El proyecto cuenta con HU-08, HU-10 y HU-12 completadas y se encuentra preparado para continuar el Sprint 2 una vez actualizada la documentación oficial y versionados los cambios correspondientes a HU-12.
 
 ---
 
@@ -2765,7 +2835,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Cierre de HU-10 — Crear cita desde recepción
+Cierre de HU-12 — Consultar agenda del consultorio
 
 ---
 
@@ -2787,7 +2857,7 @@ El historial se mantiene a nivel de Sprint y no pretende reemplazar el historial
 |------------|--------|---------|
 | Foundation | ✅ Completado | Configuración inicial del proyecto, arquitectura base, Backend, Frontend Web, Mobile, Base de Datos, seguridad, Flyway, GitHub Actions y estructura oficial del repositorio. |
 | Sprint 1 | ✅ Completado | Implementación de autenticación inicial, gestión de médicos, gestión de pacientes y creación de bloques de agenda médica. |
-| Sprint 2 | 🔄 En desarrollo | HU-08 y HU-10 completadas. Consulta de disponibilidad médica y creación de citas desde recepción implementadas y validadas. HU-12 permanece pendiente. |
+| Sprint 2 | 🔄 En desarrollo | HU-08, HU-10 y HU-12 completadas. Consulta de disponibilidad médica, creación de citas desde recepción y consulta de la agenda del consultorio implementadas y validadas. |
 
 ---
 
@@ -2815,7 +2885,7 @@ Sprint:
 Sprint 2
 
 Sesión:
-Cierre de HU-10 — Crear cita desde recepción
+Cierre de HU-12 — Consultar agenda del consultorio
 
 ---
 

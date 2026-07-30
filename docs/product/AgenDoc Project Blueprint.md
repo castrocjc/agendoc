@@ -7,10 +7,10 @@
 | Proyecto             | AgenDoc                                           |
 | Tipo                 | Plataforma Web + Mobile                           |
 | Metodología          | Scrum                                             |
-| Blueprint Version    | v1.6                                              |
-| Sprint Actual        | Preparación del Sprint 2                          |
-| Estado               | Product Backlog refinado                          |
-| Última actualización | Post Sprint 1 — Product Backlog Refinement        |
+| Blueprint Version    | v1.7                                              |
+| Sprint Actual        | Sprint 2                                          |
+| Estado               | Sprint 2 en ejecución                             |
+| Última actualización | Sprint 2 — HU-12 completada                       |
 
 ---
 
@@ -3902,15 +3902,19 @@ Permitir que una recepcionista acceda al sistema y configure los elementos míni
 
 ### Sprint Goal
 
-Permitir que la recepcionista consulte disponibilidad médica, cree citas y visualice la agenda inicial del consultorio utilizando una autenticación JWT completa y el contexto del usuario autenticado.
+Permitir que la recepcionista consulte disponibilidad médica, cree citas y visualice la agenda del consultorio, preparando la transición hacia una autenticación JWT completa y el uso del contexto del usuario autenticado.
 
 ### Product Backlog Items previstos
 
-- HU-08 — Consultar disponibilidad médica.
-- HU-10 — Crear cita desde recepción.
-- HU-12 — Consultar agenda del consultorio.
+Product Backlog Items del Sprint
 
-### Technical Stories previstas
+✅ HU-08 — Consultar disponibilidad médica
+
+✅ HU-10 — Crear cita desde recepción
+
+✅ HU-12 — Consultar agenda del consultorio
+
+### Technical Stories asociadas
 
 - TS-01 — Habilitar desarrollo y pruebas multidispositivo.
 - TS-02 — Completar autenticación JWT End-to-End.
@@ -3923,7 +3927,7 @@ más las Technical Stories TS-01, TS-02 y TS-03.
 
 ### Estado
 
-Pendiente de Sprint Planning.
+En ejecución.
 
 ---
 
@@ -4221,3 +4225,29 @@ Planificado.
 - Se declaró el Product Backlog listo para el Sprint Planning del Sprint 2.
 
 ---
+
+Sprint 2
+Sesión 1 — Disponibilidad médica, creación de citas y agenda del consultorio
+
+Estado
+
+✅ Completada
+
+Historias completadas
+
+HU-08 — Consultar disponibilidad médica.
+HU-10 — Crear cita desde recepción.
+HU-12 — Consultar agenda del consultorio.
+
+Decisiones tomadas
+
+Se implementó la consulta de disponibilidad por médico y fecha.
+Se implementó la creación de citas desde recepción.
+Se incorporó la validación de disponibilidad en el Backend.
+Se implementó la consulta de la agenda del consultorio con filtros por fecha, médico y estado.
+Se mantuvo la separación entre Agenda Médica y Cita Médica definida en el modelo de dominio.
+Se mantuvo el Backend como fuente oficial de reglas de negocio.
+Se mantuvo la autenticación temporal prevista hasta completar TS-02 y TS-03.
+
+---
+

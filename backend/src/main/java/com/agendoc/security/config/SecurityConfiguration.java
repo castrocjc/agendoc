@@ -81,7 +81,11 @@ public class SecurityConfiguration {
                                                                 .requestMatchers(
                                                                         HttpMethod.POST,
                                                                         APPOINTMENTS_ENDPOINT)
-                                                                .permitAll();                                                                
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                        HttpMethod.GET,
+                                                                        APPOINTMENTS_ENDPOINT)
+                                                                .permitAll();                                                            
                                         }
                                         authorize
                                                         .anyRequest()

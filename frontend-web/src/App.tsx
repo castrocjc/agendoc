@@ -13,6 +13,7 @@ import RegisterPatientPage from "./features/patient/pages/RegisterPatientPage";
 import SearchPatientPage from "./features/patient/pages/SearchPatientPage";
 import MedicalAgendaPage from "./features/agenda/pages/MedicalAgendaPage";
 import AppointmentPage from "./features/appointment/pages/AppointmentPage";
+import AppointmentAgendaPage from "./features/appointment/pages/AppointmentAgendaPage";
 
 function App() {
   return (
@@ -69,6 +70,15 @@ function App() {
           element={
             <ProtectedRoute>
               <MedicalAgendaPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/appointments"
+          element={
+            <ProtectedRoute>
+              <AppointmentAgendaPage />
             </ProtectedRoute>
           }
         />

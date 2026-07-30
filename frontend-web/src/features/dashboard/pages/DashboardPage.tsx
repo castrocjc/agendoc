@@ -1,6 +1,7 @@
 import {
   Calendar,
   CalendarPlus,
+  CalendarSearch,
   LogOut,
   Stethoscope,
   UserPlus,
@@ -50,6 +51,10 @@ function DashboardPage() {
 
   function handleCreateAppointment(): void {
     navigate("/appointments/new");
+  }
+
+  function handleAppointmentAgenda(): void {
+    navigate("/appointments");
   }
 
   return (
@@ -215,6 +220,31 @@ function DashboardPage() {
               onClick={handleCreateAppointment}
             >
               Agendar cita
+            </AppButton>
+          </article>
+
+          <article className="dashboard-page__card">
+            <div
+              className="dashboard-page__card-icon"
+              aria-hidden="true"
+            >
+              <CalendarSearch size={24} />
+            </div>
+
+            <div className="dashboard-page__card-content">
+              <h2>Agenda del consultorio</h2>
+
+              <p>
+                Consulta las citas registradas por fecha, médico y estado.
+              </p>
+            </div>
+
+            <AppButton
+              type="button"
+              fullWidth={false}
+              onClick={handleAppointmentAgenda}
+            >
+              Consultar agenda
             </AppButton>
           </article>
 
