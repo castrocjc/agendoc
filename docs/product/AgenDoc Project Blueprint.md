@@ -7,10 +7,10 @@
 | Proyecto             | AgenDoc                                           |
 | Tipo                 | Plataforma Web + Mobile                           |
 | Metodología          | Scrum                                             |
-| Blueprint Version    | v1.7                                              |
-| Sprint Actual        | Sprint 2                                          |
-| Estado               | Sprint 2 en ejecución                             |
-| Última actualización | Sprint 2 — HU-12 completada                       |
+| Blueprint Version    | v1.8                                              |
+| Sprint Actual        | Sprint 3                                          |
+| Estado               | Sprint 3 en ejecución                             |
+| Última actualización | Sprint 3 — HU-14 completada                       |
 
 ---
 
@@ -3927,7 +3927,25 @@ más las Technical Stories TS-01, TS-02 y TS-03.
 
 ### Estado
 
-En ejecución.
+✅ Completado.
+
+Resultado
+
+Historias completadas
+
+✅ HU-08 — Consultar disponibilidad médica
+
+✅ HU-10 — Crear cita desde recepción
+
+✅ HU-12 — Consultar agenda del consultorio
+
+Resultado funcional
+
+- Consulta de disponibilidad implementada.
+- Creación de citas desde recepción implementada.
+- Agenda del consultorio implementada.
+- Integración Backend–Frontend completada.
+- Flujo de creación de citas validado de extremo a extremo.
 
 ---
 
@@ -3953,9 +3971,15 @@ Permitir que la recepcionista gestione las principales situaciones operativas de
 18 Story Points funcionales
 más TS-04 y TS-05.
 
+Avance
+
+✅ HU-13 — Cancelar cita
+
+✅ HU-14 — Reprogramar cita
+
 ### Estado
 
-Planificado.
+En ejecución.
 
 ---
 
@@ -4251,3 +4275,30 @@ Se mantuvo la autenticación temporal prevista hasta completar TS-02 y TS-03.
 
 ---
 
+Sprint 3
+
+Sesión 1 — Cancelación y reprogramación de citas
+
+Estado
+
+✅ Completada
+
+Historias completadas
+
+HU-13 — Cancelar cita.
+
+HU-14 — Reprogramar cita.
+
+Decisiones tomadas
+
+- Se implementó la cancelación de citas respetando las reglas del dominio.
+- Se implementó la reprogramación conservando el identificador de la cita.
+- Se liberan automáticamente los bloques de agenda al cancelar una cita cuando corresponde.
+- Se actualiza automáticamente la agenda del consultorio después de cancelar o reprogramar.
+- Se implementó la validación de estados permitidos para ambas operaciones.
+- Se incorporó la trazabilidad básica de reprogramaciones.
+- Se mantuvo el Backend como fuente oficial de reglas de negocio.
+- Se completó la integración Backend–Frontend.
+- Se validó el flujo funcional completo mediante pruebas manuales.
+
+---

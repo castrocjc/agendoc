@@ -2,13 +2,14 @@ package com.agendoc.modules.appointment.repository;
 
 import com.agendoc.common.entity.RecordStatus;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
-
+import jakarta.persistence.LockModeType;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 /**
@@ -18,6 +19,23 @@ public interface AppointmentRepository
                 extends JpaRepository<AppointmentEntity, Long> {
 
         Optional<AppointmentEntity> findByIdAndRecordStatus(
+                        Long id,
+                        RecordStatus recordStatus);
+
+        /**
+         * Retrieves an active appointment using a pessimistic write lock.
+         *
+         * The lock prevents concurrent transactions from modifying the same
+         * appointment while a state transition is being processed.
+         */
+        @Lock(LockModeType.PESSIMISTIC_WRITE)
+        @Query("""
+                        SELECT a
+                        FROM AppointmentEntity a
+                        WHERE a.id = :id
+                        AND a.recordStatus = :recordStatus
+                        """)
+        Optional<AppointmentEntity> findByIdAndRecordStatusForUpdate(
                         Long id,
                         RecordStatus recordStatus);
 
@@ -67,4 +85,25 @@ public interface AppointmentRepository
                         Long doctorId,
                         String statusCode,
                         RecordStatus recordStatus);
+
+        @Query("""
+                SELECT COUNT(a) > 0
+                FROM AppointmentEntity a
+                WHERE a.recordStatus = :recordStatus
+                AND a.patient.id = :patientId
+                AND a.id <> :appointmentId
+                AND a.status.code IN :statusCodes
+                AND a.agendaBlock.appointmentDate = :appointmentDate
+                AND a.agendaBlock.startTime < :endTime
+                AND a.agendaBlock.endTime > :startTime
+                """)
+        boolean existsPatientScheduleConflictExcludingAppointment(
+                Long appointmentId,
+                Long patientId,
+                LocalDate appointmentDate,
+                LocalTime startTime,
+                LocalTime endTime,
+                Collection<String> statusCodes,
+                RecordStatus recordStatus
+        );                        
 }

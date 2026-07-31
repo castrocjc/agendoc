@@ -108,3 +108,16 @@ export function apiPost<TResponse, TRequest>(
     body: JSON.stringify(body),
   });
 }
+
+export function apiPatch<TResponse, TRequest>(
+  path: string,
+  body: TRequest,
+): Promise<TResponse> {
+  return apiRequest<TResponse>(path, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}

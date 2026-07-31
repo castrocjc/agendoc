@@ -3,6 +3,8 @@ package com.agendoc.modules.appointment.controller;
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.AppointmentResponse;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
+import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.service.AppointmentService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 /**
  * REST controller for medical appointment management operations.
@@ -26,39 +30,52 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AppointmentController {
 
-    private final AppointmentService appointmentService;
+        private final AppointmentService appointmentService;
 
-    @PostMapping
-    public ResponseEntity<AppointmentResponse> createAppointment(
-            @Valid @RequestBody CreateAppointmentRequest request
-    ) {
-        AppointmentResponse response =
-                appointmentService.createAppointment(request);
+        @PostMapping
+        public ResponseEntity<AppointmentResponse> createAppointment(
+                        @Valid @RequestBody CreateAppointmentRequest request) {
+                AppointmentResponse response = appointmentService.createAppointment(request);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(response);
+        }
 
-    @GetMapping
-    public ResponseEntity<List<AppointmentAgendaResponse>> findAppointments(
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate date,
+        @PatchMapping("/{appointmentId}/cancel")
+        public ResponseEntity<AppointmentResponse> cancelAppointment(
+                        @PathVariable Long appointmentId,
+                        @Valid @RequestBody CancelAppointmentRequest request) {
+                AppointmentResponse response = appointmentService.cancelAppointment(
+                                appointmentId,
+                                request);
 
-            @RequestParam(required = false)
-            Long doctorId,
+                return ResponseEntity.ok(response);
+        }
 
-            @RequestParam(required = false)
-            String status
-    ) {
-        List<AppointmentAgendaResponse> response =
-                appointmentService.findAppointments(
-                        date,
-                        doctorId,
-                        status
-                );
+        @PatchMapping("/{appointmentId}/reschedule")
+        public ResponseEntity<AppointmentResponse> rescheduleAppointment(
+                        @PathVariable Long appointmentId,
+                        @Valid @RequestBody RescheduleAppointmentRequest request) {
+                AppointmentResponse response = appointmentService.rescheduleAppointment(
+                                appointmentId,
+                                request);
 
-        return ResponseEntity.ok(response);
-    }
+                return ResponseEntity.ok(response);
+        }
+
+        @GetMapping
+        public ResponseEntity<List<AppointmentAgendaResponse>> findAppointments(
+                        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+
+                        @RequestParam(required = false) Long doctorId,
+
+                        @RequestParam(required = false) String status) {
+                List<AppointmentAgendaResponse> response = appointmentService.findAppointments(
+                                date,
+                                doctorId,
+                                status);
+
+                return ResponseEntity.ok(response);
+        }
 }

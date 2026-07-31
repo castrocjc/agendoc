@@ -1,6 +1,7 @@
 import {
   ApiClientError,
   apiGet,
+  apiPatch,
   apiPost,
 } from "../../../shared/api/apiClient";
 
@@ -8,7 +9,9 @@ import type {
   AppointmentAgendaFilters,
   AppointmentAgendaResponse,
   AppointmentResponse,
+  CancelAppointmentRequest,
   CreateAppointmentRequest,
+  RescheduleAppointmentRequest,
 } from "../types/appointment.types";
 
 export class AppointmentServiceError extends Error {
@@ -29,7 +32,9 @@ export class AppointmentServiceError extends Error {
 
 type AppointmentOperation =
   | "create"
-  | "find";
+  | "find"
+  | "cancel"
+  | "reschedule";
 
 function getUserMessage(
   status: number,
@@ -51,6 +56,50 @@ function getUserMessage(
 
       default:
         return "No fue posible consultar la agenda del consultorio. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "cancel") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "Revisa la información ingresada para cancelar la cita.";
+
+      case 403:
+        return "No tienes autorización para cancelar citas médicas.";
+
+      case 404:
+        return "La cita seleccionada no se encuentra disponible.";
+
+      case 409:
+        return "La cita no puede cancelarse en su estado actual.";
+
+      default:
+        return "No fue posible cancelar la cita médica. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "reschedule") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "Revisa la fecha y el horario seleccionados para reprogramar la cita.";
+
+      case 403:
+        return "No tienes autorización para reprogramar citas médicas.";
+
+      case 404:
+        return "La cita o el bloque de agenda seleccionado no se encuentra disponible.";
+
+      case 409:
+        return "La cita no puede reprogramarse al horario seleccionado.";
+
+      default:
+        return "No fue posible reprogramar la cita médica. Inténtalo nuevamente.";
     }
   }
 
@@ -110,6 +159,40 @@ export async function createAppointment(
     );
   } catch (error) {
     throw mapServiceError(error, "create");
+  }
+}
+
+export async function cancelAppointment(
+  appointmentId: number,
+  request: CancelAppointmentRequest,
+): Promise<AppointmentResponse> {
+  try {
+    return await apiPatch<
+      AppointmentResponse,
+      CancelAppointmentRequest
+    >(
+      `/api/v1/appointments/${appointmentId}/cancel`,
+      request,
+    );
+  } catch (error) {
+    throw mapServiceError(error, "cancel");
+  }
+}
+
+export async function rescheduleAppointment(
+  appointmentId: number,
+  request: RescheduleAppointmentRequest,
+): Promise<AppointmentResponse> {
+  try {
+    return await apiPatch<
+      AppointmentResponse,
+      RescheduleAppointmentRequest
+    >(
+      `/api/v1/appointments/${appointmentId}/reschedule`,
+      request,
+    );
+  } catch (error) {
+    throw mapServiceError(error, "reschedule");
   }
 }
 

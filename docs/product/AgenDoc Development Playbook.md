@@ -7,7 +7,7 @@
 |-----------|----------------------|
 | Proyecto  | AgenDoc              |
 | Documento | Development Playbook |
-| Versión   | v1.3                 |
+| Versión   | v1.4                 |
 | Estado    | Aprobado             |
 | Vigencia  | Desde Sprint 1       |
 

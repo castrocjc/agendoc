@@ -6,14 +6,17 @@ import java.time.Instant;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Centralized REST exception handler.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -58,21 +61,19 @@ public class GlobalExceptionHandler {
 
         @ExceptionHandler(BadRequestException.class)
         public ResponseEntity<ApiError> handleBadRequest(
-                BadRequestException exception,
-                HttpServletRequest request
-        ) {
+                        BadRequestException exception,
+                        HttpServletRequest request) {
 
-        ApiError error = new ApiError(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                exception.getMessage(),
-                request.getRequestURI()
-        );
+                ApiError error = new ApiError(
+                                Instant.now(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                exception.getMessage(),
+                                request.getRequestURI());
 
-        return ResponseEntity
-                .status(HttpStatus.BAD_REQUEST)
-                .body(error);
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(error);
         }
 
         @ExceptionHandler(ResourceNotFoundException.class)
@@ -109,21 +110,35 @@ public class GlobalExceptionHandler {
 
         @ExceptionHandler(MissingServletRequestParameterException.class)
         public ResponseEntity<ApiError> handleMissingRequestParameter(
-                MissingServletRequestParameterException exception,
-                HttpServletRequest request
-        ) {
-        String message = String.format(
-                "El parámetro '%s' es obligatorio.",
-                exception.getParameterName()
-        );
+                        MissingServletRequestParameterException exception,
+                        HttpServletRequest request) {
+                String message = String.format(
+                                "El parámetro '%s' es obligatorio.",
+                                exception.getParameterName());
+
+                ApiError error = new ApiError(
+                                Instant.now(),
+                                HttpStatus.BAD_REQUEST.value(),
+                                HttpStatus.BAD_REQUEST.getReasonPhrase(),
+                                message,
+                                request.getRequestURI());
+
+                return ResponseEntity
+                                .status(HttpStatus.BAD_REQUEST)
+                                .body(error);
+        }
+
+        @ExceptionHandler(HttpMessageNotReadableException.class)
+        public ResponseEntity<ApiError> handleHttpMessageNotReadable(
+                HttpMessageNotReadableException exception,
+                HttpServletRequest request) {
 
         ApiError error = new ApiError(
                 Instant.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 HttpStatus.BAD_REQUEST.getReasonPhrase(),
-                message,
-                request.getRequestURI()
-        );
+                "El cuerpo de la solicitud es obligatorio y debe contener un JSON válido.",
+                request.getRequestURI());
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
@@ -135,6 +150,12 @@ public class GlobalExceptionHandler {
                         Exception exception,
                         HttpServletRequest request) {
 
+                log.error(
+                                "Unexpected error while processing {} {}",
+                                request.getMethod(),
+                                request.getRequestURI(),
+                                exception);
+
                 ApiError error = new ApiError(
                                 Instant.now(),
                                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
@@ -142,7 +163,8 @@ public class GlobalExceptionHandler {
                                 "An unexpected error occurred.",
                                 request.getRequestURI());
 
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                return ResponseEntity
+                                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                                 .body(error);
         }
 }

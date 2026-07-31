@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import java.time.LocalDateTime;
 
 /**
  * Persistent representation of a medical appointment.
@@ -26,50 +27,35 @@ import lombok.Setter;
 @Table(name = "appointments")
 public class AppointmentEntity extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "clinic_id",
-            nullable = false
-    )
-    private ClinicEntity clinic;
+        @ManyToOne(fetch = FetchType.LAZY, optional = false)
+        @JoinColumn(name = "clinic_id", nullable = false)
+        private ClinicEntity clinic;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "patient_id",
-            nullable = false
-    )
-    private PatientEntity patient;
+        @ManyToOne(fetch = FetchType.LAZY, optional = false)
+        @JoinColumn(name = "patient_id", nullable = false)
+        private PatientEntity patient;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "doctor_id",
-            nullable = false
-    )
-    private DoctorEntity doctor;
+        @ManyToOne(fetch = FetchType.LAZY, optional = false)
+        @JoinColumn(name = "doctor_id", nullable = false)
+        private DoctorEntity doctor;
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "agenda_block_id",
-            nullable = false
-    )
-    private AgendaBlockEntity agendaBlock;
+        @OneToOne(fetch = FetchType.LAZY, optional = false)
+        @JoinColumn(name = "agenda_block_id", nullable = false)
+        private AgendaBlockEntity agendaBlock;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(
-            name = "status_id",
-            nullable = false
-    )
-    private AppointmentStatusEntity status;
+        @ManyToOne(fetch = FetchType.LAZY, optional = false)
+        @JoinColumn(name = "status_id", nullable = false)
+        private AppointmentStatusEntity status;
 
-    @Column(
-            name = "reason",
-            length = 500
-    )
-    private String reason;
+        @Column(name = "reason", length = 500)
+        private String reason;
 
-    @Column(
-            name = "notes",
-            length = 1000
-    )
-    private String notes;
+        @Column(name = "notes", length = 1000)
+        private String notes;
+
+        @Column(name = "cancellation_reason", length = 500)
+        private String cancellationReason;
+
+        @Column(name = "cancelled_at")
+        private LocalDateTime cancelledAt;
 }
