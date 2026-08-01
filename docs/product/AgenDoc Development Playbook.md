@@ -182,7 +182,7 @@ docs/product/AgenDoc Development Playbook.md
 
 ## Reglas:
 
-- El código fuente vive únicamente en backend, frontend-web y mobile.
+- El código fuente vive únicamente en backend, frontend y mobile.
 - La documentación vive en docs.
 - Los scripts y recursos de base de datos viven en database.
 - La infraestructura vive en docker y .github.
@@ -351,6 +351,16 @@ Las Technical Stories podrán ejecutarse cuando soporten directamente una Histor
 Las Technical Stories no representan funcionalidades visibles para el usuario final y no sustituyen Historias de Usuario del Product Backlog.
 
 La definición funcional, alcance, dependencias, estado y planificación de las Technical Stories se mantiene exclusivamente en el AgenDoc Project Blueprint.
+
+### Planificación de Technical Stories
+
+El Sprint Backlog podrá estar compuesto por Historias de Usuario y Technical Stories.
+
+Durante la planificación del Sprint deberán evaluarse las dependencias técnicas necesarias para soportar el incremento funcional comprometido.
+
+Cuando una Historia de Usuario requiera capacidades técnicas aún no implementadas, la Technical Story correspondiente deberá incorporarse al Sprint.
+
+Las Technical Stories seguirán el mismo ciclo de refinamiento, implementación, pruebas, documentación y versionado que las Historias de Usuario.
 
 ---
 
@@ -567,6 +577,9 @@ Después del merge
 21. git branch
 22. git branch -r
 
+Nota:
+Durante el desarrollo individual del MVP, el proyecto podrá integrar directamente los cambios sobre develop, omitiendo la creación de Pull Requests. Cuando exista más de un desarrollador o se establezcan revisiones formales de código, se retomará el flujo completo mediante Pull Requests.
+
 ---
 
 ## 8.4 Política de Gestión de Ramas
@@ -630,7 +643,7 @@ Una Historia estará terminada cuando:
 - cumple criterios de aceptación
 - código revisado
 - pruebas ejecutadas
-- Pull Request aprobado
+- Cambios integrados correctamente en develop.
 - todos los GitHub Actions finalizan exitosamente
 - integrada en develop
 - ramas feature eliminadas local y remotamente
@@ -948,7 +961,7 @@ La estructura oficial será:
 ```text
 agendoc/
 ├── backend/
-├── frontend-web/
+├── frontend/
 ├── mobile/
 ├── database/
 ├── docker/
@@ -964,7 +977,7 @@ agendoc/
 
 Responsabilidades:
 - backend: Backend API con Java Spring Boot.
-- frontend-web: Aplicación Web con React y TypeScript.
+- frontend: Aplicación Web con React y TypeScript.
 - mobile: Aplicación Mobile con React Native y Expo.
 - database: migraciones, seeds y scripts de base de datos.
 - docker: configuración de contenedores.
@@ -979,7 +992,7 @@ README por módulo
 Cada módulo principal podrá tener un README específico:
 
 backend/README.md
-frontend-web/README.md
+frontend/README.md
 mobile/README.md
 database/README.md
 docker/README.md
@@ -1048,25 +1061,29 @@ Todos los Sprints futuros deberán seguir este Playbook.
 
 ---
 
-# Próxima Sesión
+# Sesión actual
 
 Sprint 4 — Autogestión del paciente
 
 Objetivo:
 
-Implementar el primer flujo funcional del paciente, permitiéndole consultar la disponibilidad médica y reservar citas utilizando la infraestructura y reglas de negocio ya implementadas para recepción.
+Implementar TS-01 para habilitar el entorno multidispositivo y multiambiente requerido antes de continuar con el flujo funcional del paciente.
 
-Historia objetivo:
+Technical Story activa:
 
-HU-09 — Reservar cita como paciente
+TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
 
 Antes de iniciar:
 
-- Validar que la rama `develop` se encuentre sincronizada con el repositorio remoto.
-- Confirmar que Backend y Frontend Web compilan correctamente.
-- Crear una nueva rama `feature/sprint4-hu09-patient-appointment`.
-- Revisar las reglas de negocio de disponibilidad, creación de citas y autorización definidas en el Blueprint.
-- Mantener el desarrollo dentro del alcance aprobado para el Sprint 4.
+- Validar que `develop` se encuentre sincronizada con `origin/develop`.
+- Confirmar que Backend y Frontend compilan correctamente.
+- Trabajar directamente sobre `develop` conforme a la excepción aprobada para desarrollo individual, o utilizar `feature/sprint4-ts01-multienvironment` si se retoma el flujo de ramas.
+- Revisar la configuración actual del Backend, Frontend y CORS.
+- Mantener el desarrollo exclusivamente dentro del alcance de TS-01.
+
+Estado:
+
+En ejecución
 
 ---
 

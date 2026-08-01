@@ -7,10 +7,10 @@
 | Proyecto             | AgenDoc                                           |
 | Tipo                 | Plataforma Web + Mobile                           |
 | Metodología          | Scrum                                             |
-| Blueprint Version    | v1.8                                              |
-| Sprint Actual        | Sprint 3                                          |
-| Estado               | Sprint 3 en ejecución                             |
-| Última actualización | Sprint 3 — HU-15 completada                       |
+| Blueprint Version    | v1.9                                              |
+| Sprint Actual        | Sprint 4                                          |
+| Estado               | Sprint 4 en ejecución                             |
+| Última actualización | Sprint 4 — Inicio con HU-09                       |
 
 ---
 
@@ -3139,11 +3139,25 @@ Podrán ejecutarse dentro de un Sprint cuando soporten directamente una Historia
 
 ---
 
-### TS-01 — Habilitar desarrollo y pruebas multidispositivo
+### 7.6.1 Regla de planificación de Technical Stories
+
+Las Technical Stories forman parte del Product Backlog oficial del proyecto y se planifican dentro de los Sprints al igual que las Historias de Usuario.
+
+Una Technical Story solo podrá marcarse como Completada cuando se implemente íntegramente el alcance definido para ella.
+
+Cuando una Historia de Usuario dependa de una capacidad técnica pendiente, la Technical Story correspondiente deberá planificarse antes o dentro del mismo Sprint.
+
+Las Technical Stories podrán coexistir con Historias de Usuario dentro del mismo Sprint y formarán parte del incremento comprometido.
+
+---
+
+### TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
 
 Objetivo
 
-Permitir ejecutar y validar AgenDoc desde dispositivos conectados a la misma red local del desarrollador.
+Configurar el entorno de desarrollo para permitir la ejecución y validación del sistema desde múltiples dispositivos conectados a la red local (computadora, teléfono y tablet), utilizando una estrategia de configuración por ambientes (Local, Desarrollo y Producción) basada en variables de entorno.
+
+Esta Technical Story habilita un flujo de trabajo donde el desarrollo continúa ejecutándose localmente mientras el producto puede desplegarse posteriormente en entornos de desarrollo o producción (por ejemplo Railway y Vercel), sin requerir modificaciones en el código fuente.
 
 Alcance
 
@@ -3160,11 +3174,25 @@ Dependencias
 
 Estado
 
-En progreso.
+Completada.
 
 Sprint previsto
 
-Sprint 2.
+Sprint 4.
+
+Sprint ejecutado
+
+Sprint 4.
+
+Resultado
+
+- Configuración por ambientes implementada.
+- Backend accesible mediante localhost e IP local.
+- Frontend accesible mediante localhost e IP local.
+- Configuración CORS externalizada mediante perfiles.
+- Uso de variables de entorno para URL del Backend.
+- Validación funcional desde computadora, teléfono y tablet.
+- Base preparada para despliegues en Railway y Vercel sin modificar el código.
 
 ---
 
@@ -3202,7 +3230,7 @@ Pendiente.
 
 Sprint previsto
 
-Sprint 2.
+Sprint 4.
 
 ---
 
@@ -3230,7 +3258,7 @@ Pendiente.
 
 Sprint previsto
 
-Sprint 2.
+Sprint 4.
 
 ---
 
@@ -3258,7 +3286,7 @@ Pendiente.
 
 Sprint previsto
 
-Sprint 3.
+Sprint 4.
 
 ---
 
@@ -3289,7 +3317,7 @@ Pendiente.
 
 Sprint previsto
 
-Sprint 3.
+Sprint 5.
 
 ---
 
@@ -3916,7 +3944,7 @@ Product Backlog Items del Sprint
 
 ### Technical Stories asociadas
 
-- TS-01 — Habilitar desarrollo y pruebas multidispositivo.
+- TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente.
 - TS-02 — Completar autenticación JWT End-to-End.
 - TS-03 — Implementar contexto del usuario autenticado.
 
@@ -4002,8 +4030,14 @@ Permitir que el paciente consulte disponibilidad, reserve citas y utilice las ca
 
 ### Product Backlog Items previstos
 
-- HU-09 — Reservar cita como paciente.
-- HU-11 — Consultar mis citas como paciente.
+Sprint 4
+
+- TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
+- TS-02 — Completar autenticación JWT End-to-End
+- TS-03 — Implementar contexto del usuario autenticado
+- TS-04 — Implementar autorización por dominio
+- HU-09 — Reservar cita como paciente
+- HU-11 — Consultar mis citas como paciente
 
 ### Consideración funcional
 
@@ -4015,7 +4049,13 @@ La capacidad del paciente para cancelar sus propias citas utilizará la funciona
 
 ### Estado
 
-Planificado.
+🚧 En ejecución.
+
+Avance
+
+- ✅ TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
+- ⏳ HU-09 — Reservar cita como paciente
+- ⏳ HU-11 — Consultar mis citas como paciente
 
 ---
 
@@ -4262,17 +4302,18 @@ Planificado.
 ---
 
 Sprint 2
+
 Sesión 1 — Disponibilidad médica, creación de citas y agenda del consultorio
 
 Estado
 
 ✅ Completada
 
-Historias completadas
+Historias completadas:
 
-HU-08 — Consultar disponibilidad médica.
-HU-10 — Crear cita desde recepción.
-HU-12 — Consultar agenda del consultorio.
+- HU-08 — Consultar disponibilidad médica.
+- HU-10 — Crear cita desde recepción.
+- HU-12 — Consultar agenda del consultorio.
 
 Decisiones tomadas
 
@@ -4294,13 +4335,11 @@ Estado
 
 ✅ Completada
 
-Historias completadas
+Historias completadas:
 
-HU-13 — Cancelar cita.
-
-HU-14 — Reprogramar cita.
-
-HU-15 — Registrar resultado de asistencia.
+- HU-13 — Cancelar cita.
+- HU-14 — Reprogramar cita.
+- HU-15 — Registrar resultado de asistencia.
 
 Decisiones tomadas
 
@@ -4314,5 +4353,23 @@ Decisiones tomadas
 - Se mantuvo el Backend como fuente oficial de reglas de negocio.
 - Se completó la integración Backend–Frontend para el ciclo operativo de la recepcionista.
 - Se validó funcionalmente el flujo completo mediante pruebas manuales y pruebas automatizadas.
+
+---
+
+Sprint 4
+
+Sesión 1 — Inicio del Sprint 4
+
+Estado
+
+✅ Aprobada
+
+Decisiones tomadas
+
+- Se declara oficialmente iniciado el Sprint 4.
+- Se confirma el cierre completo del Sprint 3.
+- Se selecciona HU-09 como primera Historia del Sprint.
+- Se inicia el refinamiento funcional de HU-09.
+- Se revisa y sincroniza la documentación oficial antes del desarrollo.
 
 ---

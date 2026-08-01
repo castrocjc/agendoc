@@ -30,10 +30,15 @@ public class SecurityConfiguration {
         private static final String APPOINTMENT_NO_SHOW_ENDPOINT = "/api/v1/appointments/*/no-show";
         private static final String APPOINTMENT_RESCHEDULE_ENDPOINT = "/api/v1/appointments/*/reschedule";
         private final boolean permitDevelopmentEndpoints;
+        private final List<String> allowedOrigins;
 
         public SecurityConfiguration(
-                        @Value("${agendoc.security.permit-development-endpoints:false}") boolean permitDevelopmentEndpoints) {
+                        @Value("${agendoc.security.permit-development-endpoints:false}")
+                        boolean permitDevelopmentEndpoints,
+                        @Value("${agendoc.cors.allowed-origins}")
+                        List<String> allowedOrigins) {
                 this.permitDevelopmentEndpoints = permitDevelopmentEndpoints;
+                this.allowedOrigins = List.copyOf(allowedOrigins);
         }
 
         @Bean
@@ -124,9 +129,7 @@ public class SecurityConfiguration {
 
                 CorsConfiguration configuration = new CorsConfiguration();
 
-                configuration.setAllowedOrigins(List.of(
-                                "http://localhost:5173",
-                                "http://127.0.0.1:5173"));
+                configuration.setAllowedOrigins(allowedOrigins);
 
                 configuration.setAllowedMethods(List.of(
                                 "GET",

@@ -54,6 +54,19 @@ function formatAgendaTime(value: string): string {
   return value.slice(0, 5);
 }
 
+function createTemporaryId(): string {
+  if (typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+
+  const randomValues = new Uint32Array(4);
+  crypto.getRandomValues(randomValues);
+
+  return Array.from(randomValues, (value) =>
+    value.toString(16).padStart(8, "0"),
+  ).join("-");
+}
+
 function MedicalAgendaPage() {
   const navigate = useNavigate();
 
@@ -293,7 +306,7 @@ function MedicalAgendaPage() {
     }
 
     const newBlock: PreparedAgendaBlock = {
-      id: crypto.randomUUID(),
+      id: createTemporaryId(),
       appointmentDate: blockAppointmentDate,
       startTime,
       endTime,

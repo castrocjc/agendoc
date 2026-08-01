@@ -18,10 +18,10 @@ Historial del Documento
 | Versión  | Fecha      | Descripción                          |
 |----------|------------|--------------------------------------|
 | v1.0     | 2026-07-14 | Creación inicial del Codebase Guide. |
-| v1.1     | 2026-07-29 | Actualización del Codebase Guide con la implementación completa de HU-10, creación de citas médicas desde recepción. |
-| v1.2     | 2026-07-30 | Actualización del Codebase Guide con la implementación completa de HU-12, consulta de la agenda del consultorio. |
-| v1.3     | 2026-07-30 | Actualización del Codebase Guide con la implementación completa de HU-13 (Cancelar cita) y HU-14 (Reprogramar cita). |
-| v1.4     | 2026-07-31 | Actualización del Codebase Guide con la implementación completa de HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
+| v1.1     | 2026-07-29 | Actualización Codebase Guide completa HU-10, creación de citas médicas desde recepción. |
+| v1.2     | 2026-07-30 | Actualización Codebase Guide completa HU-12, consulta de la agenda del consultorio. |
+| v1.3     | 2026-07-30 | Actualización Codebase Guide completa HU-13 (Cancelar cita) y HU-14 (Reprogramar cita). |
+| v1.4     | 2026-07-31 | Actualización Codebase Guide completa HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
 
 ---
 
@@ -119,11 +119,15 @@ El Codebase Guide se rige por los siguientes principios:
 | Campo               | Valor                       |
 |---------------------|-----------------------------|
 | Estado del proyecto | En desarrollo               |
-| Sprint actual       | Sprint 3                    |
+| Sprint actual       | Sprint 4                    |
 | Foundation          | Completada                  |
 | Sprint 1            | Completado                  |
 | Sprint 2            | Completado                  |
 | Sprint 3            | Completado                  |
+
+Sprint 4: 🚧 En ejecución
+Incremento activo: TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
+Siguiente historia funcional: HU-09 — Reservar cita como paciente
 
 ---
 
@@ -131,9 +135,9 @@ El Codebase Guide se rige por los siguientes principios:
 
 | Documento                    | Versión | Estado         |
 |------------------------------|---------|----------------|
-| AgenDoc Project Blueprint    | v1.8    | Aprobado       |
+| AgenDoc Project Blueprint    | v1.9    | Aprobado       |
 | AgenDoc Development Playbook | v1.4    | Aprobado       |
-| UI Design Guide              | v1.0    | Aprobado       |
+| UI Design Guide              | v1.1    | Aprobado       |
 | AgenDoc Codebase Guide       | v1.4    | Vigente        |
 
 ---
@@ -207,7 +211,7 @@ Total implementado:
 
 | ID    | Nombre                                                 | Estado        |
 |-------|--------------------------------------------------------|---------------|
-| TS-01 | Habilitar desarrollo y pruebas multidispositivo        | En desarrollo |
+| TS-01 | Configurar entorno de desarrollo multidispositivo y multiambiente        | En desarrollo |
 | TS-02 | Completar autenticación JWT End-to-End                 | Pendiente     |
 | TS-03 | Implementar contexto del usuario autenticado           | Pendiente     |
 | TS-04 | Implementar autorización por dominio                   | Pendiente     |
@@ -2253,7 +2257,7 @@ La definición funcional y la planificación de las Technical Stories se mantien
 
 | Technical Story | Descripción | Estado |
 |-----------------|-------------|--------|
-| TS-01 | Habilitar desarrollo y pruebas multidispositivo | En desarrollo |
+| TS-01 | Configurar entorno de desarrollo multidispositivo y multiambiente | En desarrollo |
 | TS-02 | Completar autenticación JWT End-to-End | Pendiente |
 | TS-03 | Implementar contexto del usuario autenticado | Pendiente |
 | TS-04 | Implementar autorización por dominio | Pendiente |
@@ -3062,11 +3066,11 @@ Preparación del Sprint 4
 
 | Technical Story | Estado |
 |-----------------|--------|
-| TS-01 — Habilitar desarrollo y pruebas multidispositivo | En desarrollo |
+| TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente | En desarrollo |
 | TS-02 — Completar autenticación JWT End-to-End | Pendiente |
 | TS-03 — Implementar contexto del usuario autenticado | Pendiente |
-| TS-04 —
-| TS-05 —
+| TS-04 — Implementar autorización por dominio | Pendiente |
+| TS-05 — Endurecer seguridad y manejo de accesos no autorizados | Pendiente |
 
 ---
 
@@ -3090,7 +3094,9 @@ Para iniciar el Sprint 4 deberán mantenerse las siguientes condiciones:
 
 ## 18.6 Objetivo del Incremento
 
-Iniciar HU-09 — Reservar cita como paciente.
+Sprint 4: 🚧 En ejecución
+Incremento activo: TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
+Siguiente historia funcional: HU-09 — Reservar cita como paciente
 
 ---
 

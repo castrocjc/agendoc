@@ -7,7 +7,7 @@
 | Proyecto  | AgenDoc                              |
 | Documento | UI Design Guide                      |
 | Versión   | v1.1                                 |
-| Estado    | Borrador aprobado para diseño visual |
+| Estado    | Aprobado                             |
 | Ubicación | docs/ux/UI Design Guide.md           |
 
 Historial del Documento
@@ -189,7 +189,7 @@ No se permitirán variantes adicionales.
 
 Los archivos oficiales del branding deberán mantenerse en:
 
-frontend-web/
+frontend/
 └── public/
     └── branding/
         ├── agendoc-logo.svg
