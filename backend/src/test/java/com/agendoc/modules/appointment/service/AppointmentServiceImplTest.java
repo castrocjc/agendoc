@@ -19,6 +19,7 @@ import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
+import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
 import com.agendoc.modules.appointment.entity.AppointmentStatusCode;
 import com.agendoc.modules.appointment.entity.AppointmentStatusEntity;
@@ -26,7 +27,6 @@ import com.agendoc.modules.appointment.entity.AppointmentRescheduleHistoryEntity
 import com.agendoc.modules.appointment.repository.AppointmentRepository;
 import com.agendoc.modules.appointment.repository.AppointmentRescheduleHistoryRepository;
 import com.agendoc.modules.appointment.repository.AppointmentStatusRepository;
-import com.agendoc.modules.appointment.repository.AppointmentRescheduleHistoryRepository;
 import com.agendoc.modules.clinic.entity.ClinicEntity;
 import com.agendoc.modules.clinic.repository.ClinicRepository;
 import com.agendoc.modules.doctor.entity.DoctorEntity;
@@ -740,6 +740,462 @@ class AppointmentServiceImplTest {
         }
 
         @Test
+        void shouldConfirmArrivalForScheduledAppointment() {
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.now().plusDays(1));
+
+                agendaBlock.setAvailable(false);
+
+                AppointmentStatusEntity scheduledStatus = createAppointmentStatus(
+                                AppointmentStatusCode.PROGRAMADA,
+                                "Programada");
+
+                AppointmentStatusEntity confirmedStatus = createAppointmentStatus(
+                                AppointmentStatusCode.CONFIRMADA,
+                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                scheduledStatus);
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                when(appointmentStatusRepository
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.CONFIRMADA.name(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(confirmedStatus));
+
+                when(appointmentRepository.save(appointment))
+                                .thenReturn(appointment);
+
+                AppointmentResponse response = appointmentService.confirmArrival(
+                                20L);
+
+                assertThat(response.id())
+                                .isEqualTo(20L);
+
+                assertThat(response.statusCode())
+                                .isEqualTo("CONFIRMADA");
+
+                assertThat(response.statusName())
+                                .isEqualTo("Confirmada");
+
+                assertThat(appointment.getStatus())
+                                .isSameAs(confirmedStatus);
+
+                assertThat(appointment.getConfirmedAt())
+                                .isNotNull();
+
+                assertThat(appointment.getConfirmedBy())
+                                .isEqualTo("SYSTEM");
+
+                /*
+                 * Confirming the patient's arrival must not release
+                 * the agenda block because the appointment remains active.
+                 */
+                assertThat(agendaBlock.getAvailable())
+                                .isFalse();
+
+                assertThat(appointment.getAgendaBlock())
+                                .isSameAs(agendaBlock);
+
+                verify(appointmentRepository)
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE);
+
+                verify(appointmentStatusRepository)
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.CONFIRMADA.name(),
+                                                RecordStatus.ACTIVE);
+
+                verify(appointmentRepository)
+                                .save(appointment);
+        }
+
+        @Test
+        void shouldRejectArrivalConfirmationForConfirmedAppointment() {
+                assertArrivalConfirmationRejectedForStatus(
+                                AppointmentStatusCode.CONFIRMADA,
+                                "Confirmada");
+        }
+
+        @Test
+        void shouldRejectArrivalConfirmationForAttendedAppointment() {
+                assertArrivalConfirmationRejectedForStatus(
+                                AppointmentStatusCode.ATENDIDA,
+                                "Atendida");
+        }
+
+        @Test
+        void shouldRejectArrivalConfirmationForCancelledAppointment() {
+                assertArrivalConfirmationRejectedForStatus(
+                                AppointmentStatusCode.CANCELADA,
+                                "Cancelada");
+        }
+
+        @Test
+        void shouldRejectArrivalConfirmationForNoShowAppointment() {
+                assertArrivalConfirmationRejectedForStatus(
+                                AppointmentStatusCode.NO_ASISTIO,
+                                "No asistió");
+        }
+
+        @Test
+        void shouldRejectArrivalConfirmationForUnknownAppointment() {
+                ClinicEntity clinic = createClinic();
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                99L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.empty());
+
+                assertThatThrownBy(
+                                () -> appointmentService.confirmArrival(99L))
+                                .isInstanceOf(ResourceNotFoundException.class)
+                                .hasMessage(
+                                                "La cita seleccionada no está disponible.");
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRegisterNoShowForStartedScheduledAppointmentWithComment() {
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.now().minusDays(1));
+
+                agendaBlock.setAvailable(false);
+
+                AppointmentStatusEntity scheduledStatus = createAppointmentStatus(
+                                AppointmentStatusCode.PROGRAMADA,
+                                "Programada");
+
+                AppointmentStatusEntity noShowStatus = createAppointmentStatus(
+                                AppointmentStatusCode.NO_ASISTIO,
+                                "No asistió");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                scheduledStatus);
+
+                RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(
+                                "  El paciente no se presentó  ");
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                when(appointmentStatusRepository
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.NO_ASISTIO.name(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(noShowStatus));
+
+                when(appointmentRepository.save(appointment))
+                                .thenReturn(appointment);
+
+                AppointmentResponse response = appointmentService.registerNoShow(
+                                20L,
+                                request);
+
+                assertThat(response.id())
+                                .isEqualTo(20L);
+
+                assertThat(response.statusCode())
+                                .isEqualTo("NO_ASISTIO");
+
+                assertThat(response.statusName())
+                                .isEqualTo("No asistió");
+
+                assertThat(appointment.getStatus())
+                                .isSameAs(noShowStatus);
+
+                assertThat(appointment.getNoShowAt())
+                                .isNotNull();
+
+                assertThat(appointment.getNoShowBy())
+                                .isEqualTo("SYSTEM");
+
+                assertThat(appointment.getNoShowComment())
+                                .isEqualTo("El paciente no se presentó");
+
+                /*
+                 * Registering a no-show must not modify the agenda block.
+                 * The appointment time has already started or elapsed.
+                 */
+                assertThat(agendaBlock.getAvailable())
+                                .isFalse();
+
+                assertThat(appointment.getAgendaBlock())
+                                .isSameAs(agendaBlock);
+
+                verify(appointmentRepository)
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE);
+
+                verify(appointmentStatusRepository)
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.NO_ASISTIO.name(),
+                                                RecordStatus.ACTIVE);
+
+                verify(appointmentRepository)
+                                .save(appointment);
+        }
+
+        @Test
+        void shouldRegisterNoShowWithoutComment() {
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.now().minusDays(1));
+
+                agendaBlock.setAvailable(false);
+
+                AppointmentStatusEntity scheduledStatus = createAppointmentStatus(
+                                AppointmentStatusCode.PROGRAMADA,
+                                "Programada");
+
+                AppointmentStatusEntity noShowStatus = createAppointmentStatus(
+                                AppointmentStatusCode.NO_ASISTIO,
+                                "No asistió");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                scheduledStatus);
+
+                RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(null);
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                when(appointmentStatusRepository
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.NO_ASISTIO.name(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(noShowStatus));
+
+                when(appointmentRepository.save(appointment))
+                                .thenReturn(appointment);
+
+                AppointmentResponse response = appointmentService.registerNoShow(
+                                20L,
+                                request);
+
+                assertThat(response.statusCode())
+                                .isEqualTo("NO_ASISTIO");
+
+                assertThat(appointment.getNoShowAt())
+                                .isNotNull();
+
+                assertThat(appointment.getNoShowBy())
+                                .isEqualTo("SYSTEM");
+
+                assertThat(appointment.getNoShowComment())
+                                .isNull();
+
+                assertThat(agendaBlock.getAvailable())
+                                .isFalse();
+
+                verify(appointmentRepository)
+                                .save(appointment);
+        }
+
+        @Test
+        void shouldRejectNoShowRegistrationBeforeAppointmentStart() {
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.now().plusDays(1));
+
+                agendaBlock.setAvailable(false);
+
+                AppointmentStatusEntity scheduledStatus = createAppointmentStatus(
+                                AppointmentStatusCode.PROGRAMADA,
+                                "Programada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                scheduledStatus);
+
+                RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(
+                                "Registro anticipado");
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(
+                                () -> appointmentService.registerNoShow(
+                                                20L,
+                                                request))
+                                .isInstanceOf(BadRequestException.class)
+                                .hasMessage(
+                                                "La cita solo puede marcarse como no asistida cuando haya comenzado su horario.");
+
+                assertThat(appointment.getStatus())
+                                .isSameAs(scheduledStatus);
+
+                assertThat(appointment.getNoShowAt())
+                                .isNull();
+
+                assertThat(appointment.getNoShowBy())
+                                .isNull();
+
+                assertThat(appointment.getNoShowComment())
+                                .isNull();
+
+                assertThat(agendaBlock.getAvailable())
+                                .isFalse();
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRejectNoShowRegistrationForConfirmedAppointment() {
+                assertNoShowRegistrationRejectedForStatus(
+                                AppointmentStatusCode.CONFIRMADA,
+                                "Confirmada");
+        }
+
+        @Test
+        void shouldRejectNoShowRegistrationForAttendedAppointment() {
+                assertNoShowRegistrationRejectedForStatus(
+                                AppointmentStatusCode.ATENDIDA,
+                                "Atendida");
+        }
+
+        @Test
+        void shouldRejectNoShowRegistrationForCancelledAppointment() {
+                assertNoShowRegistrationRejectedForStatus(
+                                AppointmentStatusCode.CANCELADA,
+                                "Cancelada");
+        }
+
+        @Test
+        void shouldRejectNoShowRegistrationForNoShowAppointment() {
+                assertNoShowRegistrationRejectedForStatus(
+                                AppointmentStatusCode.NO_ASISTIO,
+                                "No asistió");
+        }
+
+        @Test
+        void shouldRejectNoShowRegistrationForUnknownAppointment() {
+                ClinicEntity clinic = createClinic();
+
+                RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(null);
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                99L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.empty());
+
+                assertThatThrownBy(
+                                () -> appointmentService.registerNoShow(
+                                                99L,
+                                                request))
+                                .isInstanceOf(ResourceNotFoundException.class)
+                                .hasMessage(
+                                                "La cita seleccionada no está disponible.");
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
         void shouldRescheduleScheduledAppointment() {
                 ClinicEntity clinic = createClinic();
                 PatientEntity patient = createPatient(clinic);
@@ -1089,6 +1545,142 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRescheduleHistoryRepository, never())
                                 .save(any(AppointmentRescheduleHistoryEntity.class));
+        }
+
+        private void assertNoShowRegistrationRejectedForStatus(
+                        AppointmentStatusCode statusCode,
+                        String statusName) {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.now().minusDays(1));
+
+                agendaBlock.setAvailable(false);
+
+                AppointmentStatusEntity currentStatus = createAppointmentStatus(
+                                statusCode,
+                                statusName);
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                currentStatus);
+
+                RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(
+                                "Paciente ausente");
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(
+                                () -> appointmentService.registerNoShow(
+                                                20L,
+                                                request))
+                                .isInstanceOf(ConflictException.class)
+                                .hasMessage(
+                                                "La inasistencia no puede registrarse en el estado actual de la cita.");
+
+                assertThat(appointment.getStatus())
+                                .isSameAs(currentStatus);
+
+                assertThat(appointment.getNoShowAt())
+                                .isNull();
+
+                assertThat(appointment.getNoShowBy())
+                                .isNull();
+
+                assertThat(appointment.getNoShowComment())
+                                .isNull();
+
+                assertThat(agendaBlock.getAvailable())
+                                .isFalse();
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        private void assertArrivalConfirmationRejectedForStatus(
+                        AppointmentStatusCode statusCode,
+                        String statusName) {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.now().plusDays(1));
+
+                agendaBlock.setAvailable(false);
+
+                AppointmentStatusEntity currentStatus = createAppointmentStatus(
+                                statusCode,
+                                statusName);
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                currentStatus);
+
+                when(clinicRepository
+                                .findFirstByRecordStatusOrderByIdAsc(
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(clinic));
+
+                when(appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                20L,
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(
+                                () -> appointmentService.confirmArrival(20L))
+                                .isInstanceOf(ConflictException.class)
+                                .hasMessage(
+                                                "La llegada del paciente no puede ser confirmada en el estado actual de la cita.");
+
+                assertThat(appointment.getStatus())
+                                .isSameAs(currentStatus);
+
+                assertThat(appointment.getConfirmedAt())
+                                .isNull();
+
+                assertThat(appointment.getConfirmedBy())
+                                .isNull();
+
+                assertThat(agendaBlock.getAvailable())
+                                .isFalse();
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
         }
 
         private void assertCancellationRejectedForStatus(

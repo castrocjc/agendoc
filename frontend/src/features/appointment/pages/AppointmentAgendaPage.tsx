@@ -8,7 +8,9 @@ import {
   Clock3,
   Search,
   Stethoscope,
+  UserCheck,
   UserRound,
+  UserX,
   X,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +26,9 @@ import type { DoctorResponse } from "../../doctor/types/doctor.types";
 import {
   AppointmentServiceError,
   cancelAppointment,
+  confirmAppointmentArrival,
   findAppointments,
+  registerAppointmentNoShow,
   rescheduleAppointment,
 } from "../services/appointmentService";
 import {
@@ -79,6 +83,16 @@ function formatTime(value: string): string {
   return value.slice(0, 5);
 }
 
+function hasAppointmentStarted(
+  appointment: AppointmentAgendaResponse,
+): boolean {
+  const appointmentStart = new Date(
+    `${appointment.appointmentDate}T${appointment.startTime}`,
+  );
+
+  return appointmentStart.getTime() <= Date.now();
+}
+
 function getAppointmentStatusClass(statusCode: string): string {
   return `appointment-agenda-page__status appointment-agenda-page__status--${statusCode
     .toLowerCase()
@@ -101,6 +115,8 @@ function AppointmentAgendaPage() {
   );
   const [isLoadingAppointments, setIsLoadingAppointments] = useState(false);
   const [isCancellingAppointment, setIsCancellingAppointment] = useState(false);
+  const [isConfirmingArrival, setIsConfirmingArrival] = useState(false);
+  const [isRegisteringNoShow, setIsRegisteringNoShow] = useState(false);
   const [appointmentToReschedule, setAppointmentToReschedule] =
     useState<AppointmentAgendaResponse | null>(null);
   const [rescheduleDate, setRescheduleDate] = useState("");
@@ -109,8 +125,10 @@ function AppointmentAgendaPage() {
   >([]);
   const [selectedAgendaBlockId, setSelectedAgendaBlockId] = useState("");
   const [isLoadingAgendaBlocks, setIsLoadingAgendaBlocks] = useState(false);
-  const [isReschedulingAppointment, setIsReschedulingAppointment] = useState(false);
-  const [agendaBlockSelectionError, setAgendaBlockSelectionError] = useState("");
+  const [isReschedulingAppointment, setIsReschedulingAppointment] =
+    useState(false);
+  const [agendaBlockSelectionError, setAgendaBlockSelectionError] =
+    useState("");
   const [agendaBlockError, setAgendaBlockError] = useState("");
   const [rescheduleDateError, setRescheduleDateError] = useState("");
 
@@ -334,54 +352,146 @@ function AppointmentAgendaPage() {
     }
   }
 
-async function handleConfirmReschedule(): Promise<void> {
-  if (!appointmentToReschedule) {
-    return;
+  async function handleConfirmReschedule(): Promise<void> {
+    if (!appointmentToReschedule) {
+      return;
+    }
+
+    setAgendaBlockSelectionError("");
+    setAppointmentError("");
+    setSuccessMessage("");
+
+    if (!selectedAgendaBlockId) {
+      setAgendaBlockSelectionError("Selecciona el nuevo horario de la cita.");
+      return;
+    }
+
+    const selectedAgendaBlock = availableAgendaBlocks.find(
+      (agendaBlock) => agendaBlock.id === Number(selectedAgendaBlockId),
+    );
+
+    if (!selectedAgendaBlock) {
+      setAgendaBlockSelectionError(
+        "El horario seleccionado ya no se encuentra disponible.",
+      );
+      return;
+    }
+
+    const confirmed = window.confirm(
+      [
+        "¿Deseas reprogramar esta cita?",
+        "",
+        `Horario actual: ${formatDate(
+          appointmentToReschedule.appointmentDate,
+        )} · ${formatTime(appointmentToReschedule.startTime)} - ${formatTime(
+          appointmentToReschedule.endTime,
+        )}`,
+        "",
+        `Nuevo horario: ${formatDate(
+          selectedAgendaBlock.appointmentDate,
+        )} · ${formatTime(selectedAgendaBlock.startTime)} - ${formatTime(
+          selectedAgendaBlock.endTime,
+        )}`,
+      ].join("\n"),
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setIsReschedulingAppointment(true);
+
+    try {
+      await rescheduleAppointment(appointmentToReschedule.id, {
+        agendaBlockId: selectedAgendaBlock.id,
+      });
+
+      await loadAppointments();
+
+      handleCloseReschedule();
+
+      setSuccessMessage("La cita fue reprogramada correctamente.");
+    } catch (error) {
+      if (error instanceof AppointmentServiceError) {
+        setAppointmentError(error.message);
+      } else {
+        setAppointmentError("No fue posible reprogramar la cita.");
+      }
+    } finally {
+      setIsReschedulingAppointment(false);
+    }
   }
 
-  setAgendaBlockSelectionError("");
-  setAppointmentError("");
-  setSuccessMessage("");
-
-  if (!selectedAgendaBlockId) {
-    setAgendaBlockSelectionError(
-      "Selecciona el nuevo horario de la cita.",
+  async function handleConfirmArrival(
+    appointment: AppointmentAgendaResponse,
+  ): Promise<void> {
+    const confirmed = window.confirm(
+      [
+        "¿Deseas confirmar la llegada del paciente?",
+        "",
+        `Paciente: ${appointment.patientFirstName} ${appointment.patientLastName}`,
+        `Horario: ${formatTime(appointment.startTime)} - ${formatTime(
+          appointment.endTime,
+        )}`,
+      ].join("\n"),
     );
-    return;
+
+    if (!confirmed) {
+      return;
+    }
+
+    setSuccessMessage("");
+    setAppointmentError("");
+    setIsConfirmingArrival(true);
+
+    try {
+      await confirmAppointmentArrival(appointment.id);
+
+      await loadAppointments();
+
+      setSuccessMessage(
+        "La llegada del paciente fue confirmada correctamente.",
+      );
+    } catch (error) {
+      if (error instanceof AppointmentServiceError) {
+        setAppointmentError(error.message);
+      } else {
+        setAppointmentError(
+          "No fue posible confirmar la llegada del paciente.",
+        );
+      }
+    } finally {
+      setIsConfirmingArrival(false);
+    }
   }
 
-  const selectedAgendaBlock =
-    availableAgendaBlocks.find(
-      (agendaBlock) =>
-        agendaBlock.id === Number(selectedAgendaBlockId),
-    );
+async function handleRegisterNoShow(
+  appointment: AppointmentAgendaResponse,
+): Promise<void> {
+  const comment = window.prompt(
+    [
+      "Registrar inasistencia",
+      "",
+      `Paciente: ${appointment.patientFirstName} ${appointment.patientLastName}`,
+      `Horario: ${formatTime(appointment.startTime)} - ${formatTime(
+        appointment.endTime,
+      )}`,
+      "",
+      "Puedes ingresar un comentario opcional.",
+      "Presiona Cancelar para cerrar sin realizar cambios.",
+    ].join("\n"),
+    "",
+  );
 
-  if (!selectedAgendaBlock) {
-    setAgendaBlockSelectionError(
-      "El horario seleccionado ya no se encuentra disponible.",
-    );
+  if (comment === null) {
     return;
   }
 
   const confirmed = window.confirm(
     [
-      "¿Deseas reprogramar esta cita?",
+      "¿Deseas registrar que el paciente no asistió?",
       "",
-      `Horario actual: ${formatDate(
-        appointmentToReschedule.appointmentDate,
-      )} · ${formatTime(
-        appointmentToReschedule.startTime,
-      )} - ${formatTime(
-        appointmentToReschedule.endTime,
-      )}`,
-      "",
-      `Nuevo horario: ${formatDate(
-        selectedAgendaBlock.appointmentDate,
-      )} · ${formatTime(
-        selectedAgendaBlock.startTime,
-      )} - ${formatTime(
-        selectedAgendaBlock.endTime,
-      )}`,
+      "Esta acción dejará la cita en un estado final.",
     ].join("\n"),
   );
 
@@ -389,33 +499,33 @@ async function handleConfirmReschedule(): Promise<void> {
     return;
   }
 
-  setIsReschedulingAppointment(true);
+  setSuccessMessage("");
+  setAppointmentError("");
+  setIsRegisteringNoShow(true);
 
   try {
-    await rescheduleAppointment(
-      appointmentToReschedule.id,
+    await registerAppointmentNoShow(
+      appointment.id,
       {
-        agendaBlockId: selectedAgendaBlock.id,
+        comment: comment.trim() || null,
       },
     );
 
     await loadAppointments();
 
-    handleCloseReschedule();
-
     setSuccessMessage(
-      "La cita fue reprogramada correctamente.",
+      "La inasistencia del paciente fue registrada correctamente.",
     );
   } catch (error) {
     if (error instanceof AppointmentServiceError) {
       setAppointmentError(error.message);
     } else {
       setAppointmentError(
-        "No fue posible reprogramar la cita.",
+        "No fue posible registrar la inasistencia del paciente.",
       );
     }
   } finally {
-    setIsReschedulingAppointment(false);
+    setIsRegisteringNoShow(false);
   }
 }
 
@@ -517,6 +627,8 @@ async function handleConfirmReschedule(): Promise<void> {
               disabled={
                 isLoadingAppointments ||
                 isCancellingAppointment ||
+                isConfirmingArrival ||
+                isRegisteringNoShow ||
                 isLoadingAgendaBlocks ||
                 isReschedulingAppointment
               }
@@ -535,6 +647,8 @@ async function handleConfirmReschedule(): Promise<void> {
                 isLoadingDoctors ||
                 isLoadingAppointments ||
                 isCancellingAppointment ||
+                isConfirmingArrival ||
+                isRegisteringNoShow ||
                 isLoadingAgendaBlocks ||
                 isReschedulingAppointment ||
                 doctors.length === 0
@@ -553,6 +667,8 @@ async function handleConfirmReschedule(): Promise<void> {
               disabled={
                 isLoadingAppointments ||
                 isCancellingAppointment ||
+                isConfirmingArrival ||
+                isRegisteringNoShow ||
                 isLoadingAgendaBlocks ||
                 isReschedulingAppointment
               }
@@ -568,6 +684,8 @@ async function handleConfirmReschedule(): Promise<void> {
                 disabled={
                   isLoadingAppointments ||
                   isCancellingAppointment ||
+                  isConfirmingArrival ||
+                  isRegisteringNoShow ||
                   isLoadingAgendaBlocks ||
                   isReschedulingAppointment
                 }
@@ -659,10 +777,7 @@ async function handleConfirmReschedule(): Promise<void> {
                   type="button"
                   className="appointment-agenda-page__reschedule-close"
                   aria-label="Cerrar reprogramación"
-                  disabled={
-                    isLoadingAgendaBlocks
-                    || isReschedulingAppointment
-                  }
+                  disabled={isLoadingAgendaBlocks || isReschedulingAppointment}
                   onClick={handleCloseReschedule}
                 >
                   <X size={20} aria-hidden="true" />
@@ -701,10 +816,7 @@ async function handleConfirmReschedule(): Promise<void> {
                   value={rescheduleDate}
                   min={getToday()}
                   error={rescheduleDateError}
-                  disabled={
-                    isLoadingAgendaBlocks
-                    || isReschedulingAppointment
-                  }
+                  disabled={isLoadingAgendaBlocks || isReschedulingAppointment}
                   onChange={(event) =>
                     handleRescheduleDateChange(event.target.value)
                   }
@@ -717,9 +829,9 @@ async function handleConfirmReschedule(): Promise<void> {
                     leftIcon={<Search size={18} />}
                     isLoading={isLoadingAgendaBlocks}
                     disabled={
-                      isLoadingAgendaBlocks
-                      || isReschedulingAppointment
-                      || !rescheduleDate
+                      isLoadingAgendaBlocks ||
+                      isReschedulingAppointment ||
+                      !rescheduleDate
                     }
                     onClick={() => void handleFindAvailableAgendaBlocks()}
                   >
@@ -742,14 +854,12 @@ async function handleConfirmReschedule(): Promise<void> {
                   }
                   error={agendaBlockSelectionError}
                   disabled={
-                    isLoadingAgendaBlocks
-                    || isReschedulingAppointment
-                    || availableAgendaBlocks.length === 0
+                    isLoadingAgendaBlocks ||
+                    isReschedulingAppointment ||
+                    availableAgendaBlocks.length === 0
                   }
                   onChange={(event) => {
-                    setSelectedAgendaBlockId(
-                      event.target.value,
-                    );
+                    setSelectedAgendaBlockId(event.target.value);
                     setAgendaBlockSelectionError("");
                   }}
                 />
@@ -760,10 +870,7 @@ async function handleConfirmReschedule(): Promise<void> {
                   type="button"
                   variant="ghost"
                   fullWidth={false}
-                  disabled={
-                    isLoadingAgendaBlocks
-                    || isReschedulingAppointment
-                  }
+                  disabled={isLoadingAgendaBlocks || isReschedulingAppointment}
                   onClick={handleCloseReschedule}
                 >
                   Cancelar
@@ -775,18 +882,15 @@ async function handleConfirmReschedule(): Promise<void> {
                   leftIcon={<CalendarClock size={18} />}
                   isLoading={isReschedulingAppointment}
                   disabled={
-                    isLoadingAgendaBlocks
-                    || isReschedulingAppointment
-                    || !selectedAgendaBlockId
+                    isLoadingAgendaBlocks ||
+                    isReschedulingAppointment ||
+                    !selectedAgendaBlockId
                   }
-                  onClick={() =>
-                    void handleConfirmReschedule()
-                  }
+                  onClick={() => void handleConfirmReschedule()}
                 >
                   Confirmar reprogramación
                 </AppButton>
               </div>
-
             </section>
           )}
 
@@ -883,11 +987,52 @@ async function handleConfirmReschedule(): Promise<void> {
                               <div className="appointment-agenda-page__table-actions">
                                 <AppButton
                                   type="button"
+                                  fullWidth={false}
+                                  leftIcon={<UserCheck size={16} />}
+                                  isLoading={isConfirmingArrival}
+                                  disabled={
+                                    isCancellingAppointment ||
+                                    isConfirmingArrival ||
+                                    isRegisteringNoShow ||
+                                    isLoadingAgendaBlocks ||
+                                    isReschedulingAppointment
+                                  }
+                                  onClick={() =>
+                                    void handleConfirmArrival(appointment)
+                                  }
+                                >
+                                  Confirmar llegada
+                                </AppButton>
+                                {hasAppointmentStarted(appointment) && (
+                                  <AppButton
+                                    type="button"
+                                    variant="outline"
+                                    fullWidth={false}
+                                    leftIcon={<UserX size={16} />}
+                                    isLoading={isRegisteringNoShow}
+                                    disabled={
+                                      isCancellingAppointment ||
+                                      isConfirmingArrival ||
+                                      isRegisteringNoShow ||
+                                      isLoadingAgendaBlocks ||
+                                      isReschedulingAppointment
+                                    }
+                                    onClick={() =>
+                                      void handleRegisterNoShow(appointment)
+                                    }
+                                  >
+                                    No asistió
+                                  </AppButton>
+                                )}
+                                <AppButton
+                                  type="button"
                                   variant="outline"
                                   fullWidth={false}
                                   leftIcon={<CalendarClock size={16} />}
                                   disabled={
                                     isCancellingAppointment ||
+                                    isConfirmingArrival ||
+                                    isRegisteringNoShow ||
                                     isLoadingAgendaBlocks ||
                                     isReschedulingAppointment
                                   }
@@ -897,13 +1042,14 @@ async function handleConfirmReschedule(): Promise<void> {
                                 >
                                   Reprogramar
                                 </AppButton>
-
                                 <AppButton
                                   type="button"
                                   variant="ghost"
                                   fullWidth={false}
                                   disabled={
                                     isCancellingAppointment ||
+                                    isConfirmingArrival ||
+                                    isRegisteringNoShow ||
                                     isLoadingAgendaBlocks ||
                                     isReschedulingAppointment
                                   }
@@ -993,27 +1139,69 @@ async function handleConfirmReschedule(): Promise<void> {
                         <div className="appointment-agenda-page__appointment-actions">
                           <AppButton
                             type="button"
+                            fullWidth
+                            leftIcon={<UserCheck size={18} />}
+                            isLoading={isConfirmingArrival}
+                            disabled={
+                              isCancellingAppointment ||
+                              isConfirmingArrival ||
+                              isRegisteringNoShow ||
+                              isLoadingAgendaBlocks ||
+                              isReschedulingAppointment
+                            }
+                            onClick={() =>
+                              void handleConfirmArrival(appointment)
+                            }
+                          >
+                            Confirmar llegada
+                          </AppButton>
+                          {hasAppointmentStarted(appointment) && (
+                            <AppButton
+                              type="button"
+                              variant="outline"
+                              fullWidth
+                              leftIcon={<UserX size={18} />}
+                              isLoading={isRegisteringNoShow}
+                              disabled={
+                                isCancellingAppointment ||
+                                isConfirmingArrival ||
+                                isRegisteringNoShow ||
+                                isLoadingAgendaBlocks ||
+                                isReschedulingAppointment
+                              }
+                              onClick={() =>
+                                void handleRegisterNoShow(appointment)
+                              }
+                            >
+                              Registrar inasistencia
+                            </AppButton>
+                          )}
+                          <AppButton
+                            type="button"
                             variant="outline"
                             fullWidth
                             leftIcon={<CalendarClock size={18} />}
                             disabled={
-                              isCancellingAppointment
-                              || isLoadingAgendaBlocks
-                              || isReschedulingAppointment
+                              isCancellingAppointment ||
+                              isConfirmingArrival ||
+                              isRegisteringNoShow ||
+                              isLoadingAgendaBlocks ||
+                              isReschedulingAppointment
                             }
                             onClick={() => handleStartReschedule(appointment)}
                           >
                             Reprogramar cita
                           </AppButton>
-
                           <AppButton
                             type="button"
                             variant="ghost"
                             fullWidth
                             disabled={
-                              isCancellingAppointment
-                              || isLoadingAgendaBlocks
-                              || isReschedulingAppointment
+                              isCancellingAppointment ||
+                              isConfirmingArrival ||
+                              isRegisteringNoShow ||
+                              isLoadingAgendaBlocks ||
+                              isReschedulingAppointment
                             }
                             onClick={() =>
                               void handleCancelAppointment(appointment.id)

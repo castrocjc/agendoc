@@ -5,6 +5,7 @@ import com.agendoc.modules.appointment.dto.AppointmentResponse;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
+import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import com.agendoc.modules.appointment.service.AppointmentService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -47,6 +48,28 @@ public class AppointmentController {
                         @PathVariable Long appointmentId,
                         @Valid @RequestBody CancelAppointmentRequest request) {
                 AppointmentResponse response = appointmentService.cancelAppointment(
+                                appointmentId,
+                                request);
+
+                return ResponseEntity.ok(response);
+        }
+
+        @PatchMapping("/{appointmentId}/confirm-arrival")
+        public ResponseEntity<AppointmentResponse> confirmArrival(
+                        @PathVariable Long appointmentId) {
+
+                AppointmentResponse response = appointmentService.confirmArrival(
+                                appointmentId);
+
+                return ResponseEntity.ok(response);
+        }
+
+        @PatchMapping("/{appointmentId}/no-show")
+        public ResponseEntity<AppointmentResponse> registerNoShow(
+                        @PathVariable Long appointmentId,
+                        @Valid @RequestBody RegisterAppointmentNoShowRequest request) {
+
+                AppointmentResponse response = appointmentService.registerNoShow(
                                 appointmentId,
                                 request);
 

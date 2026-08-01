@@ -10,6 +10,10 @@ export interface CancelAppointmentRequest {
   reason: string | null;
 }
 
+export interface RegisterAppointmentNoShowRequest {
+  comment: string | null;
+}
+
 export interface RescheduleAppointmentRequest {
   agendaBlockId: number;
 }

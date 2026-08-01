@@ -7,7 +7,7 @@
 |-----------|---------------------------------------------|
 | Proyecto  | AgenDoc                                     |
 | Documento | Codebase Guide                              |
-| Versión   | v1.3                                        |
+| Versión   | v1.4                                        |
 | Estado    | Vigente                                     |
 | Ubicación | docs/architecture/AgenDoc Codebase Guide.md |
 
@@ -21,17 +21,18 @@ Historial del Documento
 | v1.1     | 2026-07-29 | Actualización del Codebase Guide con la implementación completa de HU-10, creación de citas médicas desde recepción. |
 | v1.2     | 2026-07-30 | Actualización del Codebase Guide con la implementación completa de HU-12, consulta de la agenda del consultorio. |
 | v1.3     | 2026-07-30 | Actualización del Codebase Guide con la implementación completa de HU-13 (Cancelar cita) y HU-14 (Reprogramar cita). |
+| v1.4     | 2026-07-31 | Actualización del Codebase Guide con la implementación completa de HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
 
 ---
 
 Relación con la documentación oficial
 
-| Documento | Responsabilidad |
-|------------|----------------|
-| Blueprint | Define el producto. |
-| Development Playbook | Define el proceso de desarrollo. |
-| UI Design Guide | Define la experiencia visual. |
-| Codebase Guide | Describe la implementación existente. |
+| Documento            | Responsabilidad                       |
+|----------------------|---------------------------------------|
+| Blueprint            | Define el producto.                   |
+| Development Playbook | Define el proceso de desarrollo.      |
+| UI Design Guide      | Define la experiencia visual.         |
+| Codebase Guide       | Describe la implementación existente. |
 
 ---
 
@@ -122,7 +123,7 @@ El Codebase Guide se rige por los siguientes principios:
 | Foundation          | Completada                  |
 | Sprint 1            | Completado                  |
 | Sprint 2            | Completado                  |
-| Sprint 3            | En desarrollo               |
+| Sprint 3            | Completado                  |
 
 ---
 
@@ -130,10 +131,10 @@ El Codebase Guide se rige por los siguientes principios:
 
 | Documento                    | Versión | Estado         |
 |------------------------------|---------|----------------|
-| AgenDoc Project Blueprint    | v1.6    | Aprobado       |
-| AgenDoc Development Playbook | v1.3    | Aprobado       |
+| AgenDoc Project Blueprint    | v1.8    | Aprobado       |
+| AgenDoc Development Playbook | v1.4    | Aprobado       |
 | UI Design Guide              | v1.0    | Aprobado       |
-| AgenDoc Codebase Guide       | v1.2    | Vigente        |
+| AgenDoc Codebase Guide       | v1.4    | Vigente        |
 
 ---
 
@@ -172,20 +173,21 @@ Componentes habilitados:
 
 ## Historias de Usuario Implementadas
 
-| Historia | Nombre                           | Estado                           |
-|----------|----------------------------------|----------------------------------|
-| HU-01    | Iniciar sesión                   | ✅ Completada                    |
-| HU-02    | Cerrar sesión                    | ✅ Completada                    |
-| HU-03    | Consultorio base                 | ✅ Satisfecha durante Foundation |
-| HU-04    | Registrar médico                 | ✅ Completada                    |
-| HU-05    | Registrar paciente               | ✅ Completada                    |
-| HU-06    | Buscar paciente                  | ✅ Completada                    |
-| HU-07    | Crear bloques de agenda médica   | ✅ Completada                    |
-| HU-08    | Consultar disponibilidad médica  | ✅ Completada                    |
-| HU-10    | Crear cita desde recepción       | ✅ Completada                    |
-| HU-12    | Consultar agenda del consultorio | ✅ Completada                    |
-| HU-13    | Cancelar cita                    | ✅ Completada                    |
-| HU-14    | Reprogramar cita                 | ✅ Completada                    |
+| Historia | Nombre                            | Estado                           |
+|----------|-----------------------------------|----------------------------------|
+| HU-01    | Iniciar sesión                    | ✅ Completada                    |
+| HU-02    | Cerrar sesión                     | ✅ Completada                    |
+| HU-03    | Consultorio base                  | ✅ Satisfecha durante Foundation |
+| HU-04    | Registrar médico                  | ✅ Completada                    |
+| HU-05    | Registrar paciente                | ✅ Completada                    |
+| HU-06    | Buscar paciente                   | ✅ Completada                    |
+| HU-07    | Crear bloques de agenda médica    | ✅ Completada                    |
+| HU-08    | Consultar disponibilidad médica   | ✅ Completada                    |
+| HU-10    | Crear cita desde recepción        | ✅ Completada                    |
+| HU-12    | Consultar agenda del consultorio  | ✅ Completada                    |
+| HU-13    | Cancelar cita                     | ✅ Completada                    |
+| HU-14    | Reprogramar cita                  | ✅ Completada                    |
+| HU-15    | Registrar resultado de asistencia | ✅ Completada                    |
 
 Total implementado:
 
@@ -196,6 +198,8 @@ Total implementado:
 - HU-12 completada de extremo a extremo.
 - HU-13 completada de extremo a extremo.
 - HU-14 completada de extremo a extremo.
+- HU-15 completada de extremo a extremo.
+- Sprint 3 completado funcionalmente.
 
 ---
 
@@ -215,19 +219,20 @@ Total implementado:
 
 Historia objetivo
 
-Continuar el Sprint 3 conforme al Project Blueprint.
+HU-09 — Reservar cita como paciente.
 
 Estado actual
 
-- HU-13 completada.
-- HU-14 completada.
+- Sprint 3 completado funcionalmente.
+- HU-13, HU-14 y HU-15 completadas.
 - Backend compilando correctamente.
 - Frontend compilando correctamente.
-- Pruebas automatizadas exitosas.
+- 45 pruebas automatizadas exitosas.
+- Validación funcional de extremo a extremo completada.
 
 Objetivo
 
-Preparar el siguiente incremento funcional del Sprint 3.
+Iniciar el Sprint 4 con el flujo de autogestión del paciente, conforme al Product Backlog vigente.
 
 ---
 
@@ -265,7 +270,7 @@ Su propósito es proporcionar una visión rápida del stack tecnológico del pro
 | TypeScript   | Desarrollo tipado del Frontend.          |
 | Vite         | Herramienta de desarrollo y empaquetado. |
 | React Router | Navegación entre pantallas.              |
-| Axios        | Consumo de la API REST.                  |
+| Fetch API    | Consumo centralizado de la API REST mediante apiClient.ts. |
 | Lucide React | Biblioteca oficial de iconografía.       |
 
 ---
@@ -387,7 +392,7 @@ agendoc/
 | Directorio   | Responsabilidad                                                           |
 |--------------|---------------------------------------------------------------------------|
 | backend      | Backend API desarrollado con Spring Boot.                                 |
-| frontend-web | Aplicación Web desarrollada con React + TypeScript + Vite.                |
+| frontend     | Aplicación Web desarrollada con React + TypeScript + Vite.                |
 | mobile       | Aplicación Mobile desarrollada con React Native + Expo.                   |
 | database     | Migraciones Flyway, scripts y recursos relacionados con la base de datos. |
 | docker       | Recursos reservados para una futura incorporación de contenedores.        |
@@ -498,7 +503,7 @@ La solución se organiza en:
 - utilitarios;
 - recursos estáticos.
 
-La navegación se realiza mediante React Router y el consumo de servicios se centraliza a través de Axios.
+La navegación se realiza mediante React Router y el consumo de servicios se centraliza mediante `apiClient.ts`, construido sobre Fetch API
 
 ---
 
@@ -506,7 +511,7 @@ La navegación se realiza mediante React Router y el consumo de servicios se cen
 
 La aplicación Mobile se desarrolla utilizando React Native y Expo.
 
-Durante el cierre del Sprint 1 se encuentra preparada la estructura base del proyecto y la configuración inicial para su evolución en los siguientes Sprints.
+La aplicación Mobile mantiene actualmente su estructura base y permanece pendiente de integración funcional con el Backend.
 
 ---
 
@@ -524,7 +529,7 @@ La autenticación se implementa mediante Spring Security.
 
 Al cierre del Sprint 1 se encuentra disponible la infraestructura inicial de autenticación.
 
-La implementación completa basada en JSON Web Token (JWT) será finalizada durante el Sprint 2 mediante las Technical Stories correspondientes.
+La implementación completa basada en JSON Web Token (JWT) permanece pendiente mediante TS-02, junto con el contexto autenticado y la autorización por dominio.
 
 ---
 
@@ -545,7 +550,7 @@ La implementación actual sigue los siguientes principios:
 
 ## Estado Actual
 
-La arquitectura implementada soporta completamente las funcionalidades desarrolladas durante Foundation y Sprint 1.
+La arquitectura implementada soporta las funcionalidades desarrolladas durante Foundation, Sprint 1, Sprint 2 y Sprint 3.
 
 La evolución de la arquitectura deberá mantenerse alineada con las decisiones registradas en el AgenDoc Project Blueprint.
 
@@ -554,10 +559,10 @@ La evolución de la arquitectura deberá mantenerse alineada con las decisiones 
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 3
 
 Sesión:
-Cierre del Sprint 1
+Cierre funcional de HU-15
 
 ---
 
@@ -1016,13 +1021,18 @@ appointment
 ├── dto
 │   ├── AppointmentAgendaResponse.java
 │   ├── AppointmentResponse.java
-│   └── CreateAppointmentRequest.java
+│   ├── CancelAppointmentRequest.java
+│   ├── CreateAppointmentRequest.java
+│   ├── RegisterAppointmentNoShowRequest.java
+│   └── RescheduleAppointmentRequest.java
 ├── entity
 │   ├── AppointmentEntity.java
+│   ├── AppointmentRescheduleHistoryEntity.java
 │   ├── AppointmentStatusCode.java
 │   └── AppointmentStatusEntity.java
 ├── repository
 │   ├── AppointmentRepository.java
+│   ├── AppointmentRescheduleHistoryRepository.java
 │   └── AppointmentStatusRepository.java
 └── service
     ├── AppointmentService.java
@@ -1053,6 +1063,16 @@ Responsabilidad:
 - Validar estados permitidos para cancelación y reprogramación.
 - Impedir reprogramaciones hacia bloques ocupados.
 - Mantener el identificador original de la cita durante la reprogramación.
+- Confirmar la llegada de pacientes para citas Programadas.
+- Cambiar el estado de la cita de PROGRAMADA a CONFIRMADA.
+- Registrar fecha, hora y usuario responsable de la confirmación.
+- Registrar la inasistencia de pacientes.
+- Permitir la inasistencia únicamente cuando el horario de la cita haya comenzado o transcurrido.
+- Cambiar el estado de la cita de PROGRAMADA a NO_ASISTIO.
+- Registrar fecha, hora, usuario responsable y comentario opcional de inasistencia.
+- Mantener ocupado el bloque de agenda al confirmar llegada o registrar inasistencia.
+- Bloquear pesimistamente la cita durante transiciones de estado.
+- Impedir transiciones duplicadas o incompatibles.
 
 Estados funcionales implementados:
 PROGRAMADA
@@ -1072,6 +1092,7 @@ HU-10
 HU-12
 HU-13
 HU-14
+HU-15
 
 Estado:
 
@@ -1227,7 +1248,7 @@ Pruebas identificadas:
 | BackendApplicationTests.java      | Validación de carga del contexto de Spring Boot.           |
 | DoctorServiceImplTest.java        | Validación del servicio de médicos.                        |
 | AgendaServiceImplTest.java        | Validación del servicio de agenda y disponibilidad médica. |
-| AppointmentServiceImplTest.java   | Validación de creación de citas, prevención de conflictos de horario y consulta de la agenda del consultorio. |
+| AppointmentServiceImplTest.java   | Validación de creación, consulta, cancelación, reprogramación, confirmación de llegada y registro de inasistencia de citas. |
 
 La prueba del servicio de citas cubre actualmente:
 
@@ -1241,10 +1262,30 @@ La prueba del servicio de citas cubre actualmente:
 - consulta de citas filtradas por estado;
 - consulta de citas combinando médico y estado;
 - construcción de la respuesta de agenda con la información de paciente, médico, horario y estado.
+- cancelación de citas Programadas y Confirmadas;
+- exigencia de motivo al cancelar citas Confirmadas;
+- rechazo de cancelaciones en estados finales;
+- reprogramación exitosa y conservación del identificador;
+- liberación del bloque anterior y reserva del nuevo bloque;
+- trazabilidad de reprogramaciones;
+- rechazo de reprogramaciones en estados inválidos;
+- confirmación de llegada para citas Programadas;
+- registro de `confirmedAt` y `confirmedBy`;
+- rechazo de confirmaciones en estados incompatibles;
+- registro exitoso de inasistencia con y sin comentario;
+- normalización del comentario opcional;
+- validación temporal para impedir inasistencias anticipadas;
+- registro de `noShowAt`, `noShowBy` y `noShowComment`;
+- conservación del bloque ocupado al registrar inasistencia;
+- rechazo de inasistencia en estados incompatibles;
+- tratamiento de citas inexistentes.
 
 Estado:
 
-**Cobertura inicial**
+Cobertura ampliada y validada.
+
+Resultado actual:
+45 pruebas ejecutadas, 0 fallos, 0 errores y 0 omitidas.
 
 La cobertura automatizada deberá ampliarse progresivamente en las nuevas Historias de Usuario.
 
@@ -1252,25 +1293,27 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 
 ## 6.9 Estado General del Backend
 
-| Elemento                           | Estado       |
-|------------------------------------|--------------|
-| Aplicación Spring Boot             | Operativa    |
-| Compilación Maven                  | Exitosa      |
-| PostgreSQL                         | Integrado    |
-| Flyway                             | Operativo    |
-| Manejo global de excepciones       | Implementado |
-| Autenticación inicial              | Implementada |
-| JWT End-to-End                     | Pendiente    |
-| Contexto autenticado               | Pendiente    |
-| Registro de médicos                | Implementado |
-| Registro y búsqueda de pacientes   | Implementado |
-| Creación de bloques de agenda      | Implementada |
-| Consulta de disponibilidad médica  | Implementada |
-| Gestión de citas                   | Implementada |
-| Consulta de agenda del consultorio | Implementada |
-| Cancelación de citas               | Implementada |
-| Reprogramación de citas            | Implementada |
-
+| Elemento                            | Estado       |
+|-------------------------------------|--------------|
+| Aplicación Spring Boot              | Operativa    |
+| Compilación Maven                   | Exitosa      |
+| PostgreSQL                          | Integrado    |
+| Flyway                              | Operativo    |
+| Manejo global de excepciones        | Implementado |
+| Autenticación inicial               | Implementada |
+| JWT End-to-End                      | Pendiente    |
+| Contexto autenticado                | Pendiente    |
+| Registro de médicos                 | Implementado |
+| Registro y búsqueda de pacientes    | Implementado |
+| Creación de bloques de agenda       | Implementada |
+| Consulta de disponibilidad médica   | Implementada |
+| Gestión de citas                    | Implementada |
+| Consulta de agenda del consultorio  | Implementada |
+| Cancelación de citas                | Implementada |
+| Reprogramación de citas             | Implementada |
+| Confirmación de llegada             | Implementada |
+| Registro de inasistencia            | Implementado |
+| Pruebas automatizadas               | 45 exitosas  |
 ---
 
 **Última actualización**
@@ -1279,7 +1322,7 @@ Sprint:
 Sprint 3
 
 Sesión:
-Implementación completa de HU-14 — Reprogramar cita
+Implementación completa de HU-15 — Registrar resultado de asistencia
 
 ---
 
@@ -1552,24 +1595,31 @@ validation
 
 Responsabilidad:
 
-Crear citas médicas desde recepción.
-Buscar y seleccionar un paciente.
-Seleccionar el médico.
-Consultar y seleccionar un bloque disponible.
-Registrar el motivo y las observaciones de la cita.
-Consumir la API de creación de citas médicas.
-Consultar la agenda general del consultorio.
-Filtrar las citas por fecha, médico y estado.
-Mostrar la información de paciente, médico, horario y estado de cada cita.
-Gestionar estados de carga, error y ausencia de resultados.
-Mostrar mensajes de éxito y error.
-Limpiar el formulario después de una creación exitosa.
-Presentar al usuario los conflictos de horario detectados por el Backend.
-Cancelar citas médicas.
-Reprogramar citas médicas.
-Actualizar automáticamente la agenda luego de cancelar.
-Actualizar automáticamente la agenda luego de reprogramar.
-Mostrar mensajes de éxito y error durante ambos procesos.
+- Crear citas médicas desde recepción.
+- Buscar y seleccionar un paciente.
+- Seleccionar el médico.
+- Consultar y seleccionar un bloque disponible.
+- Registrar el motivo y las observaciones de la cita.
+- Consumir la API de creación de citas médicas.
+- Consultar la agenda general del consultorio.
+- Filtrar las citas por fecha, médico y estado.
+- Mostrar la información de paciente, médico, horario y estado de cada cita.
+- Gestionar estados de carga, error y ausencia de resultados.
+- Mostrar mensajes de éxito y error.
+- Limpiar el formulario después de una creación exitosa.
+- Presentar al usuario los conflictos de horario detectados por el Backend.
+- Cancelar citas médicas.
+- Reprogramar citas médicas.
+- Actualizar automáticamente la agenda luego de cancelar.
+- Actualizar automáticamente la agenda luego de reprogramar.
+- Mostrar mensajes de éxito y error durante ambos procesos.
+- Confirmar la llegada del paciente.
+- Registrar la inasistencia del paciente.
+- Aplicar validación visual para mostrar la inasistencia cuando la cita ya comenzó.
+- Solicitar un comentario opcional al registrar la inasistencia.
+- Actualizar automáticamente la agenda luego de confirmar llegada.
+- Actualizar automáticamente la agenda luego de registrar inasistencia.
+- Bloquear operaciones concurrentes durante las transiciones de estado.
 
 Pantallas implementadas:
 
@@ -1581,6 +1631,8 @@ Servicios implementados:
 - createAppointment()
 - findAppointments()
 - cancelAppointment()
+- confirmAppointmentArrival()
+- registerAppointmentNoShow()
 - rescheduleAppointment()
 
 Contratos principales:
@@ -1589,6 +1641,9 @@ Contratos principales:
 - AppointmentAgendaResponse.
 - AppointmentResponse.
 - CreateAppointmentRequest.
+- CancelAppointmentRequest.
+- RegisterAppointmentNoShowRequest.
+- RescheduleAppointmentRequest.
 
 Historias relacionadas:
 
@@ -1596,6 +1651,7 @@ Historias relacionadas:
 - HU-12
 - HU-13
 - HU-14
+- HU-15
 
 Estado:
 
@@ -1725,16 +1781,18 @@ La estructura de branding deberá mantenerse alineada con el UI Design Guide.
 | Consulta de agenda del consultorio | Implementada  |
 | Cancelación de citas               | Implementada  |
 | Reprogramación de citas            | Implementada  |
+| Confirmación de llegada            | Implementada  |
+| Registro de inasistencia           | Implementado  |
 
 ---
 
 **Última actualización**
 
 Sprint:
-Sprint 4
+Sprint 3
 
 Sesión:
-Implementación completa de HU-14
+Implementación completa de HU-15
 
 ---
 
@@ -1838,7 +1896,8 @@ migration
 ├── V7__create_medical_agenda_schema.sql
 ├── V8__create_appointments_schema.sql
 ├── V9__add_appointment_cancellation_fields.sql
-└── V10__create_appointment_reschedule_history.sql
+├── V10__create_appointment_reschedule_history.sql
+└── V11__add_appointment_attendance_fields.sql
 ```
 
 ---
@@ -1857,7 +1916,7 @@ Las modificaciones posteriores deberán implementarse mediante nuevas versiones.
 
 ## 9.5 Estado Actual del Esquema
 
-Durante el Sprint 2, el esquema de Base de Datos implementa los elementos necesarios para soportar:
+Al cierre del Sprint 3, el esquema de Base de Datos implementa los elementos necesarios para soportar:
 
 - autenticación;
 - usuarios;
@@ -1867,36 +1926,51 @@ Durante el Sprint 2, el esquema de Base de Datos implementa los elementos necesa
 - especialidades médicas;
 - pacientes;
 - agenda médica;
-- bloques de agenda.
+- bloques de agenda;
 - citas médicas;
-- estados del ciclo de vida de las citas.
+- estados del ciclo de vida de las citas;
+- trazabilidad de cancelaciones;
+- historial de reprogramaciones;
+- confirmación de llegada;
+- registro de inasistencia.
 
 Las estructuras correspondientes a citas médicas ya forman parte del esquema mediante la migración V8.
+
+La migración V11 incorporó a `appointments` los campos de trazabilidad para confirmación de llegada e inasistencia:
+
+- confirmed_at;
+- confirmed_by;
+- no_show_at;
+- no_show_by;
+- no_show_comment.
 
 ---
 
 ## 9.6 Estado General
 
-| Elemento           | Estado                     |
-|--------------------|----------------------------|
-| PostgreSQL         | Operativo                  |
-| Flyway             | Operativo                  |
-| Migraciones        | Versionadas                |
-| Seed inicial       | Implementado               |
-| Esquema Foundation | Implementado               |
-| Esquema Sprint 1   | Implementado               |
-| Esquema Sprint 2   | Implementado               |
-| Citas médicas      | Implementadas              |
+| Elemento                   | Estado        |
+|----------------------------|---------------|
+| PostgreSQL                 | Operativo     |
+| Flyway                     | Operativo     |
+| Migraciones                | Versionadas   |
+| Seed inicial               | Implementado  |
+| Esquema Foundation         | Implementado  |
+| Esquema Sprint 1           | Implementado  |
+| Esquema Sprint 2           | Implementado  |
+| Citas médicas              | Implementadas |
+| Esquema Sprint 3           | Implementado  |
+| Migraciones aplicadas      | V1 a V11      |
+| Trazabilidad de asistencia | Implementada  |
 
 ---
 
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 3
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Implementación completa de HU-15
 
 ---
 
@@ -1935,26 +2009,31 @@ Cada Controller representa el punto de entrada oficial para un módulo del siste
 
 ## 10.4 Inventario de Endpoints
 
-| Módulo         | Endpoint                         | Historia | Estado               |
-|----------------|----------------------------------|----------|----------------------|
-| Authentication | Login                            | HU-01    | Implementado         |
-| Authentication | Logout                           | HU-02    | Implementado         |
-| Doctor         | Registrar médico                 | HU-04    | Implementado         |
-| Doctor         | Consultar especialidades médicas | HU-04    | Implementado         |
-| Patient        | Registrar paciente               | HU-05    | Implementado         |
-| Patient        | Buscar paciente                  | HU-06    | Implementado         |
-| Agenda         | Crear bloques de agenda          | HU-07    | Implementado         |
-| Agenda         | Consultar disponibilidad médica  | HU-08    | Implementado         |
-| Appointment    | Crear cita médica                | HU-10    | Implementado         |
-| Appointment    | Consultar agenda del consultorio | HU-12    | Implementado         |
-| Appointment    | Cancelar cita                    | HU-13    | Implementado         |
-| Appointment    | Reprogramar cita                 | HU-14    | Implementado         |
+| Módulo         | Endpoint                         | Historia | Estado        |
+|----------------|----------------------------------|----------|---------------|
+| Authentication | Login                            | HU-01    | Implementado  |
+| Authentication | Logout                           | HU-02    | Implementado  |
+| Doctor         | Registrar médico                 | HU-04    | Implementado  |
+| Doctor         | Consultar especialidades médicas | HU-04    | Implementado  |
+| Patient        | Registrar paciente               | HU-05    | Implementado  |
+| Patient        | Buscar paciente                  | HU-06    | Implementado  |
+| Agenda         | Crear bloques de agenda          | HU-07    | Implementado  |
+| Agenda         | Consultar disponibilidad médica  | HU-08    | Implementado  |
+| Appointment    | Crear cita médica                | HU-10    | Implementado  |
+| Appointment    | Consultar agenda del consultorio | HU-12    | Implementado  |
+| Appointment    | Cancelar cita                    | HU-13    | Implementado  |
+| Appointment    | Reprogramar cita                 | HU-14    | Implementado  |
+| Appointment    | Confirmar llegada del paciente   | HU-15    | Implementado  |
+| Appointment    | Registrar inasistencia           | HU-15    | Implementado  |
+
+PATCH /api/v1/appointments/{appointmentId}/confirm-arrival
+PATCH /api/v1/appointments/{appointmentId}/no-show
 
 ---
 
 ## 10.5 APIs Pendientes
 
-No existen APIs funcionales pendientes dentro de las Historias de Usuario implementadas hasta HU-12.
+No existen APIs funcionales pendientes dentro de las Historias de Usuario completadas hasta HU-15.
 
 Las próximas APIs serán incorporadas conforme avance el backlog oficial del producto.
 
@@ -1968,17 +2047,17 @@ Las próximas APIs serán incorporadas conforme avance el backlog oficial del pr
 | APIs Foundation | Implementadas |
 | APIs Sprint 1   | Implementadas |
 | APIs Sprint 2   | Implementadas |
-| APIs Sprint 3   | Implementadas hasta HU-14 |
+| APIs Sprint 3   | Implementadas hasta HU-15 |
 
 ---
 
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 3
 
 Sesión:
-Implementación completa de HU-12 — Consultar agenda del consultorio
+Implementación completa de HU-15
 
 ---
 
@@ -2079,34 +2158,35 @@ La planificación funcional continúa siendo responsabilidad del AgenDoc Project
 
 ## 12.3 Sprint 1
 
-| Historia | Backend | Frontend Web | Mobile | QA | Estado |
-|----------|---------|--------------|--------|----|--------|
-| HU-01 — Iniciar sesión | ✅ | ✅ | ⚪ | ✅ | Completada |
-| HU-02 — Cerrar sesión | ✅ | ✅ | ⚪ | ✅ | Completada |
-| HU-03 — Consultorio base | ✅ | ✅ | ⚪ | ✅ | Completada |
-| HU-04 — Registrar médico | ✅ | ✅ | ⚪ | ✅ | Completada |
-| HU-05 — Registrar paciente | ✅ | ✅ | ⚪ | ✅ | Completada |
-| HU-06 — Buscar paciente | ✅ | ✅ | ⚪ | ✅ | Completada |
-| HU-07 — Crear bloques de agenda médica | ✅ | ✅ | ⚪ | ✅ | Completada |
+| Historia                               | Backend | Frontend | Mobile | QA  | Estado     |
+|----------------------------------------|---------|----------|--------|-----|------------|
+| HU-01 — Iniciar sesión                 | ✅      | ✅       | ⚪     | ✅  | Completada |
+| HU-02 — Cerrar sesión                  | ✅      | ✅       | ⚪     | ✅  | Completada |
+| HU-03 — Consultorio base               | ✅      | ✅       | ⚪     | ✅  | Completada |
+| HU-04 — Registrar médico               | ✅      | ✅       | ⚪     | ✅  | Completada |
+| HU-05 — Registrar paciente             | ✅      | ✅       | ⚪     | ✅  | Completada |
+| HU-06 — Buscar paciente                | ✅      | ✅       | ⚪     | ✅  | Completada |
+| HU-07 — Crear bloques de agenda médica | ✅      | ✅       | ⚪     | ✅  | Completada |
 
 ---
 
 ## 12.4 Sprint 2
 
-| Historia                                 | Backend | Frontend Web | Mobile | QA | Estado             |
-|------------------------------------------|---------|--------------|--------|----|--------------------|
-| HU-08 — Consultar disponibilidad médica  | ✅      | ✅           | ⚪     | ✅ | Completada         |
-| HU-10 — Crear cita desde recepción       | ✅      | ✅           | ⚪     | ✅ | Completada         |
-| HU-12 — Consultar agenda del consultorio | ✅      | ✅           | ⚪     | ✅ | Completada         |
+| Historia                                 | Backend | Frontend | Mobile | QA | Estado             |
+|------------------------------------------|---------|----------|--------|----|--------------------|
+| HU-08 — Consultar disponibilidad médica  | ✅      | ✅       | ⚪     | ✅ | Completada         |
+| HU-10 — Crear cita desde recepción       | ✅      | ✅       | ⚪     | ✅ | Completada         |
+| HU-12 — Consultar agenda del consultorio | ✅      | ✅       | ⚪     | ✅ | Completada         |
 
 ---
 
 ## 12.5 Sprint 3
 
-| Historia                                 | Backend | Frontend Web | Mobile | QA | Estado             |
-|------------------------------------------|---------|--------------|--------|----|--------------------|
-| HU-13 — Cancelar cita desde recepción    | ✅      | ✅           | ⚪     | ✅ | Completada         |
-| HU-14 — Reprogramar cita desde recepcion | ✅      | ✅           | ⚪     | ✅ | Completada         |
+| Historia                                  | Backend | Frontend | Mobile | QA | Estado      |
+|-------------------------------------------|---------|----------|--------|----|-------------|
+| HU-13 — Cancelar cita desde recepción     | ✅      | ✅       | ⚪     | ✅ | Completada  |
+| HU-14 — Reprogramar cita desde recepcion  | ✅      | ✅       | ⚪     | ✅ | Completada  |
+| HU-15 — Registrar resultado de asistencia | ✅      | ✅       | ⚪     | ✅ | Completada  |
 
 ---
 
@@ -2138,20 +2218,22 @@ Historias implementadas:
 - HU-12
 - HU-13
 - HU-14
+- HU-15
 
 Historias pendientes:
-
-- Por definir conforme al backlog oficial del producto.
+- HU-09 — Reservar cita como paciente.
+- HU-11 — Consultar mis citas como paciente.
+- HU-16 a HU-19 — Atención médica básica.
 
 ---
 
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 3
 
 Sesión:
-Implementación completa de HU-12 — Consultar agenda del consultorio
+Implementación completa de HU-15
 
 ---
 
@@ -2325,7 +2407,11 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 | Conflicto de horario del paciente  | ✅           |
 | Consulta de agenda del consultorio | ✅           |
 | Cancelación de citas               | ✅           |
-| Reprogrmación de citas             | ✅           |
+| Reprogramación de citas            | ✅           |
+| Confirmación de llegada            | ✅           |
+| Registro de inasistencia           | ✅           |
+| Trazabilidad de asistencia         | ✅           |
+| Pruebas automatizadas, 45 casos    | ✅           |
 
 ---
 
@@ -2333,25 +2419,27 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 
 | Elemento                           | Estado |
 |------------------------------------|--------|
-| Proyecto compila                   | ✅ |
-| Vite inicia correctamente          | ✅ |
-| React Router                       | ✅ |
-| Integración con Backend            | ✅ |
-| Design Tokens                      | ✅ |
-| Componentes base                   | ✅ |
-| Flujo de creación de citas         | ✅ |
-| Consulta de agenda del consultorio | ✅ |
-| Cancelación de citas               | ✅ |
-| Reprogrmación de citas             | ✅ |
+| Proyecto compila                   | ✅     |
+| Vite inicia correctamente          | ✅     |
+| React Router                       | ✅     |
+| Integración con Backend            | ✅     |
+| Design Tokens                      | ✅     |
+| Componentes base                   | ✅     |
+| Flujo de creación de citas         | ✅     |
+| Consulta de agenda del consultorio | ✅     |
+| Cancelación de citas               | ✅     |
+| Reprogrmación de citas             | ✅     |
+| Confirmación de llegada            | ✅     |
+| Registro de inasistencia           | ✅     |
 
 ---
 
 ## 15.4 Mobile
 
-| Elemento | Estado |
-|----------|--------|
-| Proyecto Expo | ✅ |
-| Compilación inicial | ✅ |
+| Elemento                | Estado       |
+|-------------------------|--------------|
+| Proyecto Expo           | ✅           |
+| Compilación inicial     | ✅           |
 | Integración con Backend | ⚪ Pendiente |
 | Funcionalidades del MVP | ⚪ Pendiente |
 
@@ -2359,32 +2447,34 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 
 ## 15.5 Base de Datos
 
-| Elemento | Estado |
-|----------|--------|
-| PostgreSQL | ✅ |
-| Migraciones Flyway | ✅ |
-| Seed inicial | ✅ |
-| Esquema Sprint 1 | ✅ |
-| Esquema de citas médicas | ✅ |
+| Elemento                 | Estado |
+|--------------------------|--------|
+| PostgreSQL               | ✅     |
+| Migraciones Flyway       | ✅     |
+| Seed inicial             | ✅     |
+| Esquema Sprint 1         | ✅     |
+| Esquema de citas médicas | ✅     |
+| Esquema Sprint 3         | ✅     |
+| Migración V11            | ✅     |
 
 ---
 
 ## 15.6 Repositorio
 
-| Elemento | Estado |
-|----------|--------|
-| Git | ✅ |
-| GitHub | ✅ |
-| GitHub Actions | ✅ |
-| GitHub CLI | ✅ |
+| Elemento                  | Estado |
+|---------------------------|--------|
+| Git                       | ✅     |
+| GitHub                    | ✅     |
+| GitHub Actions            | ✅     |
+| GitHub CLI                | ✅     |
 | Rama develop sincronizada | Por verificar antes del versionado |
-| Working Tree limpio | ⚪ Cambios pendientes |
+| Working Tree limpio       | ⚪ Cambios pendientes |
 
 ---
 
 ## 15.7 Estado General
 
-El proyecto mantiene un estado técnico estable y cuenta con HU-08, HU-10, HU-12, HU-13 y HU-14 implementadas y validadas.
+El proyecto mantiene un estado técnico estable y cuenta con HU-08, HU-10, HU-12, HU-13, HU-14 y HU-15 implementadas y validadas. El Sprint 3 se encuentra funcionalmente completado.
 
 ---
 
@@ -2698,6 +2788,66 @@ AppointmentEntity
 
 ---
 
+### HU-15 — Confirmar llegada del paciente
+
+AppointmentAgendaPage
+
+↓
+
+appointmentService.ts
+
+↓
+
+AppointmentController
+
+↓
+
+AppointmentService
+
+↓
+
+AppointmentRepository
+
+↓
+
+AppointmentEntity
+
+↓
+
+AppointmentStatusRepository
+
+---
+
+### HU-15 — Registrar inasistencia
+
+AppointmentAgendaPage
+
+↓
+
+appointmentService.ts
+
+↓
+
+AppointmentController
+
+↓
+
+AppointmentService
+
+↓
+
+AppointmentRepository
+
+↓
+
+AppointmentEntity
+
+↓
+
+AppointmentStatusRepository
+
+---
+
 
 ## 16.4 Convenciones
 
@@ -2740,10 +2890,10 @@ Los nuevos flujos serán incorporados conforme avance el desarrollo del producto
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 3
 
 Sesión:
-Implementación completa de HU-12 — Consultar agenda del consultorio
+Implementación completa de HU-15
 
 ---
 
@@ -2886,11 +3036,11 @@ Esta información deberá actualizarse al cierre de cada Sprint.
 
 Sprint actual
 
-Sprint 3
+Sprint 4
 
 Estado
 
-En desarrollo
+Preparación del Sprint 4
 
 ---
 
@@ -2901,9 +3051,10 @@ En desarrollo
 | HU-08 — Consultar disponibilidad médica  | Completada |
 | HU-10 — Crear cita desde recepción       | Completada |
 | HU-12 — Consultar agenda del consultorio | Completada |
-| HU-13 — Cancelar cita desde recepción    | Completada |
-| HU-14 — Reprogramar cita desde recepción | Completada |
-| Próxima Historia de Usuario              | Por definir conforme al AgenDoc Project Blueprint vigente |
+| HU-13 — Cancelar cita desde recepción        | Completada |
+| HU-14 — Reprogramar cita desde recepción     | Completada |
+| HU-15 — Registrar resultado de asistencia    | Completada |
+| HU-09 — Reservar cita como paciente           | Siguiente historia |
 
 ---
 
@@ -2914,12 +3065,14 @@ En desarrollo
 | TS-01 — Habilitar desarrollo y pruebas multidispositivo | En desarrollo |
 | TS-02 — Completar autenticación JWT End-to-End | Pendiente |
 | TS-03 — Implementar contexto del usuario autenticado | Pendiente |
+| TS-04 —
+| TS-05 —
 
 ---
 
 ## 18.5 Dependencias
 
-Para continuar el Sprint 2 deberán mantenerse las siguientes condiciones:
+Para iniciar el Sprint 4 deberán mantenerse las siguientes condiciones:
 
 - rama `develop` sincronizada con `origin/develop`;
 - Working Tree limpio;
@@ -2928,28 +3081,32 @@ Para continuar el Sprint 2 deberán mantenerse las siguientes condiciones:
 - migraciones Flyway aplicadas;
 - HU-12 validada funcionalmente;
 - documentación oficial sincronizada.
+- HU-15 validada funcionalmente;
+- Sprint 3 documentado;
+- 45 pruebas Backend exitosas;
+- cambios del Sprint 3 versionados en `develop`.
 
 ---
 
 ## 18.6 Objetivo del Incremento
 
-Preparar el siguiente incremento del Sprint 3.
+Iniciar HU-09 — Reservar cita como paciente.
 
 ---
 
 ## 18.7 Estado General
 
-El proyecto cuenta con HU-08, HU-10 y HU-12 completadas y se encuentra preparado para continuar el Sprint 2 una vez actualizada la documentación oficial y versionados los cambios correspondientes a HU-12.
+El proyecto cuenta con Sprint 3 funcionalmente completado y está preparado para iniciar el Sprint 4 con el flujo de autogestión del paciente.
 
 ---
 
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 3
 
 Sesión:
-Cierre de HU-12 — Consultar agenda del consultorio
+Cierre de HU-15
 
 ---
 
@@ -2972,7 +3129,7 @@ El historial se mantiene a nivel de Sprint y no pretende reemplazar el historial
 | Foundation | ✅ Completado | Configuración inicial del proyecto, arquitectura base, Backend, Frontend Web, Mobile, Base de Datos, seguridad, Flyway, GitHub Actions y estructura oficial del repositorio. |
 | Sprint 1 | ✅ Completado | Implementación de autenticación inicial, gestión de médicos, gestión de pacientes y creación de bloques de agenda médica. |
 | Sprint 2 | ✅ Completado | Consulta de disponibilidad médica, creación de citas desde recepción y consulta de la agenda del consultorio implementadas y validadas. |
-| Sprint 3 | En desarrollo | HU-13 y HU-14 implementadas.
+| Sprint 3 | ✅ Completado | Implementación de cancelación, reprogramación, confirmación de llegada y registro de inasistencia. Se incorporó trazabilidad de reprogramaciones y asistencia, actualización automática de la agenda y validación funcional de extremo a extremo. |
 
 ---
 
@@ -2997,10 +3154,10 @@ El historial refleja la evolución funcional y técnica del proyecto desde la Fo
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 3
 
 Sesión:
-Cierre de HU-12 — Consultar agenda del consultorio
+Cierre funcional del Sprint 3
 
 ---
 

@@ -6,9 +6,16 @@
 |-----------|--------------------------------------|
 | Proyecto  | AgenDoc                              |
 | Documento | UI Design Guide                      |
-| Versión   | v1.0                                 |
+| Versión   | v1.1                                 |
 | Estado    | Borrador aprobado para diseño visual |
 | Ubicación | docs/ux/UI Design Guide.md           |
+
+Historial del Documento
+
+| Versión | Fecha | Descripción |
+|----------|------------|------------------------------------------------|
+| v1.0 | 2026-07-14 | Creación inicial del UI Design Guide. |
+| v1.1 | 2026-07-31 | Incorporación de lineamientos para estados operativos de citas médicas y consistencia visual del Sprint 3. |
 
 ---
 
@@ -431,6 +438,25 @@ Todo componente interactivo deberá contemplar:
 * loading
 * error
 * success cuando aplique
+
+Estados operativos de citas
+
+Las pantallas relacionadas con la gestión de citas deberán representar visualmente los estados del ciclo de vida mediante un tratamiento consistente de color, iconografía y etiquetas.
+
+Estados actualmente soportados:
+
+- PROGRAMADA
+- CONFIRMADA
+- ATENDIDA
+- CANCELADA
+- NO_ASISTIO
+
+Reglas:
+
+- Cada estado utilizará un color claramente diferenciable.
+- El significado del estado no dependerá únicamente del color; deberá acompañarse de texto visible.
+- Las acciones disponibles para el usuario deberán mostrarse u ocultarse según el estado funcional de la cita.
+- Las transiciones de estado deberán proporcionar retroalimentación inmediata mediante mensajes de éxito o error consistentes con el Design System.
 
 El foco visible es obligatorio en Web.
 

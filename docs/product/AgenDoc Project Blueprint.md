@@ -10,7 +10,7 @@
 | Blueprint Version    | v1.8                                              |
 | Sprint Actual        | Sprint 3                                          |
 | Estado               | Sprint 3 en ejecución                             |
-| Última actualización | Sprint 3 — HU-14 completada                       |
+| Última actualización | Sprint 3 — HU-15 completada                       |
 
 ---
 
@@ -469,15 +469,15 @@ Creación o reserva
 
 Transiciones permitidas:
 
-| Estado actual | Acción | Nuevo estado | Actor autorizado |
-|---|---|---|---|
-| Sin cita | Crear o reservar cita | Programada | Paciente o recepcionista |
-| Programada | Reprogramar | Programada | Recepcionista |
-| Programada | Cancelar | Cancelada | Paciente o recepcionista |
-| Programada | Confirmar llegada | Confirmada | Recepcionista |
-| Programada | Registrar inasistencia | No asistió | Recepcionista |
-| Confirmada | Cancelar excepcionalmente | Cancelada | Recepcionista |
-| Confirmada | Marcar como atendida | Atendida | Médico |
+| Estado actual | Acción                    | Nuevo estado | Actor autorizado         |
+|---------------|---------------------------|--------------|--------------------------|
+| Sin cita      | Crear o reservar cita     | Programada   | Paciente o recepcionista |
+| Programada    | Reprogramar               | Programada   | Recepcionista            |
+| Programada    | Cancelar                  | Cancelada    | Paciente o recepcionista |
+| Programada    | Confirmar llegada         | Confirmada   | Recepcionista            |
+| Programada    | Registrar inasistencia    | No asistió   | Recepcionista            |
+| Confirmada    | Cancelar excepcionalmente | Cancelada    | Recepcionista            |
+| Confirmada    | Marcar como atendida      | Atendida     | Médico                   |
 
 Estados finales:
 
@@ -3977,9 +3977,20 @@ Avance
 
 ✅ HU-14 — Reprogramar cita
 
+✅ HU-15 — Registrar resultado de asistencia
+
 ### Estado
 
-En ejecución.
+✅ Completado.
+
+Resultado funcional
+
+- Cancelación de citas implementada.
+- Reprogramación de citas implementada.
+- Confirmación de llegada del paciente implementada.
+- Registro de inasistencia implementado respetando las reglas temporales del dominio.
+- Agenda del consultorio actualizada automáticamente después de cada operación.
+- Flujo operativo completo de la recepcionista validado de extremo a extremo.
 
 ---
 
@@ -4277,7 +4288,7 @@ Se mantuvo la autenticación temporal prevista hasta completar TS-02 y TS-03.
 
 Sprint 3
 
-Sesión 1 — Cancelación y reprogramación de citas
+Sesión 1 — Gestión operativa del ciclo de la cita
 
 Estado
 
@@ -4289,16 +4300,19 @@ HU-13 — Cancelar cita.
 
 HU-14 — Reprogramar cita.
 
+HU-15 — Registrar resultado de asistencia.
+
 Decisiones tomadas
 
 - Se implementó la cancelación de citas respetando las reglas del dominio.
 - Se implementó la reprogramación conservando el identificador de la cita.
+- Se implementó la confirmación de llegada del paciente mediante la transición de Programada a Confirmada.
+- Se implementó el registro de inasistencia respetando la restricción de que la hora de inicio de la cita debe haber comenzado o transcurrido.
+- Se incorporó la validación de estados permitidos para confirmar llegada, registrar inasistencia, cancelar y reprogramar.
 - Se liberan automáticamente los bloques de agenda al cancelar una cita cuando corresponde.
-- Se actualiza automáticamente la agenda del consultorio después de cancelar o reprogramar.
-- Se implementó la validación de estados permitidos para ambas operaciones.
-- Se incorporó la trazabilidad básica de reprogramaciones.
+- Se actualiza automáticamente la agenda del consultorio después de cada operación.
 - Se mantuvo el Backend como fuente oficial de reglas de negocio.
-- Se completó la integración Backend–Frontend.
-- Se validó el flujo funcional completo mediante pruebas manuales.
+- Se completó la integración Backend–Frontend para el ciclo operativo de la recepcionista.
+- Se validó funcionalmente el flujo completo mediante pruebas manuales y pruebas automatizadas.
 
 ---

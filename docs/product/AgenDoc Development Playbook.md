@@ -1050,23 +1050,23 @@ Todos los Sprints futuros deberán seguir este Playbook.
 
 # Próxima Sesión
 
-Sprint 1 — Fase B
+Sprint 4 — Autogestión del paciente
 
 Objetivo:
 
-Iniciar el desarrollo funcional del Sprint 1 con la primera Historia de Usuario aprobada.
+Implementar el primer flujo funcional del paciente, permitiéndole consultar la disponibilidad médica y reservar citas utilizando la infraestructura y reglas de negocio ya implementadas para recepción.
 
 Historia objetivo:
 
-HU-01 — Iniciar sesión
+HU-09 — Reservar cita como paciente
 
 Antes de iniciar:
 
-- Validar rama `develop` actualizada.
-- Crear rama `feature/sprint1-authentication` desde `develop`.
-- Confirmar que Backend y Frontend Web compilan.
-- Confirmar que la Foundation quedó integrada correctamente.
-- Mantener el desarrollo dentro del alcance aprobado para Sprint 1.
+- Validar que la rama `develop` se encuentre sincronizada con el repositorio remoto.
+- Confirmar que Backend y Frontend Web compilan correctamente.
+- Crear una nueva rama `feature/sprint4-hu09-patient-appointment`.
+- Revisar las reglas de negocio de disponibilidad, creación de citas y autorización definidas en el Blueprint.
+- Mantener el desarrollo dentro del alcance aprobado para el Sprint 4.
 
 ---
 

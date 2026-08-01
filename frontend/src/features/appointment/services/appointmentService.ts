@@ -11,6 +11,7 @@ import type {
   AppointmentResponse,
   CancelAppointmentRequest,
   CreateAppointmentRequest,
+  RegisterAppointmentNoShowRequest,
   RescheduleAppointmentRequest,
 } from "../types/appointment.types";
 
@@ -34,6 +35,8 @@ type AppointmentOperation =
   | "create"
   | "find"
   | "cancel"
+  | "confirmArrival"
+  | "registerNoShow"
   | "reschedule";
 
 function getUserMessage(
@@ -78,6 +81,47 @@ function getUserMessage(
 
       default:
         return "No fue posible cancelar la cita médica. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "confirmArrival") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 403:
+        return "No tienes autorización para confirmar la llegada del paciente.";
+
+      case 404:
+        return "La cita seleccionada no se encuentra disponible.";
+
+      case 409:
+        return "La llegada del paciente no puede confirmarse en el estado actual de la cita.";
+
+      default:
+        return "No fue posible confirmar la llegada del paciente. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "registerNoShow") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "La cita solo puede marcarse como no asistida cuando haya comenzado su horario.";
+
+      case 403:
+        return "No tienes autorización para registrar la inasistencia del paciente.";
+
+      case 404:
+        return "La cita seleccionada no se encuentra disponible.";
+
+      case 409:
+        return "La inasistencia no puede registrarse en el estado actual de la cita.";
+
+      default:
+        return "No fue posible registrar la inasistencia del paciente. Inténtalo nuevamente.";
     }
   }
 
@@ -176,6 +220,39 @@ export async function cancelAppointment(
     );
   } catch (error) {
     throw mapServiceError(error, "cancel");
+  }
+}
+
+export async function confirmAppointmentArrival(
+  appointmentId: number,
+): Promise<AppointmentResponse> {
+  try {
+    return await apiPatch<
+      AppointmentResponse,
+      undefined
+    >(
+      `/api/v1/appointments/${appointmentId}/confirm-arrival`,
+      undefined,
+    );
+  } catch (error) {
+    throw mapServiceError(error, "confirmArrival");
+  }
+}
+
+export async function registerAppointmentNoShow(
+  appointmentId: number,
+  request: RegisterAppointmentNoShowRequest,
+): Promise<AppointmentResponse> {
+  try {
+    return await apiPatch<
+      AppointmentResponse,
+      RegisterAppointmentNoShowRequest
+    >(
+      `/api/v1/appointments/${appointmentId}/no-show`,
+      request,
+    );
+  } catch (error) {
+    throw mapServiceError(error, "registerNoShow");
   }
 }
 

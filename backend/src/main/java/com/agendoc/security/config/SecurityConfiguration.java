@@ -26,6 +26,8 @@ public class SecurityConfiguration {
         private static final String AGENDA_BLOCKS_ENDPOINT = "/api/v1/doctors/*/agenda-blocks";
         private static final String APPOINTMENTS_ENDPOINT = "/api/v1/appointments";
         private static final String APPOINTMENT_CANCELLATION_ENDPOINT = "/api/v1/appointments/*/cancel";
+        private static final String APPOINTMENT_CONFIRM_ARRIVAL_ENDPOINT = "/api/v1/appointments/*/confirm-arrival";
+        private static final String APPOINTMENT_NO_SHOW_ENDPOINT = "/api/v1/appointments/*/no-show";
         private static final String APPOINTMENT_RESCHEDULE_ENDPOINT = "/api/v1/appointments/*/reschedule";
         private final boolean permitDevelopmentEndpoints;
 
@@ -92,6 +94,14 @@ public class SecurityConfiguration {
                                                                         HttpMethod.PATCH,
                                                                         APPOINTMENT_CANCELLATION_ENDPOINT
                                                                 )
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                        HttpMethod.PATCH,
+                                                                        APPOINTMENT_CONFIRM_ARRIVAL_ENDPOINT)
+                                                                .permitAll()
+                                                                .requestMatchers(
+                                                                        HttpMethod.PATCH,
+                                                                        APPOINTMENT_NO_SHOW_ENDPOINT)
                                                                 .permitAll()
                                                                 .requestMatchers(
                                                                         HttpMethod.PATCH,

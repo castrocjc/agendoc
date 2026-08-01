@@ -11,6 +11,7 @@ import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
+import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
 import com.agendoc.modules.appointment.entity.AppointmentStatusCode;
 import com.agendoc.modules.appointment.entity.AppointmentStatusEntity;
@@ -27,6 +28,7 @@ import com.agendoc.modules.patient.repository.PatientRepository;
 import com.agendoc.modules.doctor.entity.MedicalSpecialtyEntity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Locale;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -62,13 +64,27 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         private static final String CANCELLATION_STATUS_NOT_AVAILABLE = "El estado de cancelación de la cita no está disponible.";
 
+        private static final String CONFIRMATION_STATUS_NOT_AVAILABLE = "El estado de confirmación de la cita no está disponible.";
+
+        private static final String NO_SHOW_STATUS_NOT_AVAILABLE = "El estado de inasistencia de la cita no está disponible.";
+
         private static final String APPOINTMENT_CANNOT_BE_CANCELLED = "La cita no puede ser cancelada en su estado actual.";
+
+        private static final String APPOINTMENT_CANNOT_BE_CONFIRMED = "La llegada del paciente no puede ser confirmada en el estado actual de la cita.";
+
+        private static final String APPOINTMENT_CANNOT_BE_MARKED_AS_NO_SHOW = "La inasistencia no puede registrarse en el estado actual de la cita.";
+
+        private static final String APPOINTMENT_HAS_NOT_STARTED = "La cita solo puede marcarse como no asistida cuando haya comenzado su horario.";
 
         private static final String CONFIRMED_CANCELLATION_REASON_REQUIRED = "El motivo de cancelación es obligatorio para una cita confirmada.";
 
         private static final String APPOINTMENT_CANNOT_BE_RESCHEDULED = "La cita no puede ser reprogramada en su estado actual.";
 
         private static final String SAME_AGENDA_BLOCK = "El nuevo bloque de agenda debe ser diferente al bloque actual.";
+
+        private static final String APPOINTMENT_STATUS_NOT_AVAILABLE = "El estado de la cita no está disponible.";
+
+        private static final String SYSTEM_USER = "SYSTEM";
 
         private final AppointmentRepository appointmentRepository;
         private final AppointmentRescheduleHistoryRepository appointmentRescheduleHistoryRepository;
@@ -145,8 +161,8 @@ public class AppointmentServiceImpl implements AppointmentService {
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 APPOINTMENT_NOT_AVAILABLE));
                 validateAppointmentClinic(
-                        appointment,
-                        clinic);
+                                appointment,
+                                clinic);
 
                 validateCancellation(
                                 appointment,
@@ -162,6 +178,85 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointment.getAgendaBlock().setAvailable(true);
 
                 AppointmentEntity savedAppointment = appointmentRepository.save(appointment);
+
+                return toResponse(savedAppointment);
+        }
+
+        @Override
+        @Transactional
+        public AppointmentResponse confirmArrival(
+                        Long appointmentId) {
+
+                ClinicEntity clinic = findActiveClinic();
+
+                /*
+                 * The appointment is locked to prevent concurrent state changes,
+                 * cancellation, rescheduling or duplicate arrival confirmation.
+                 */
+                AppointmentEntity appointment = appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                appointmentId,
+                                                RecordStatus.ACTIVE)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                APPOINTMENT_NOT_AVAILABLE));
+
+                validateAppointmentClinic(
+                                appointment,
+                                clinic);
+
+                validateArrivalConfirmationStatus(
+                                appointment);
+
+                AppointmentStatusEntity confirmedStatus = findAppointmentStatus(
+                                AppointmentStatusCode.CONFIRMADA);
+
+                appointment.setStatus(confirmedStatus);
+                appointment.setConfirmedAt(OffsetDateTime.now());
+                appointment.setConfirmedBy(SYSTEM_USER);
+
+                AppointmentEntity savedAppointment = appointmentRepository.save(
+                                appointment);
+
+                return toResponse(savedAppointment);
+        }
+
+        @Override
+        @Transactional
+        public AppointmentResponse registerNoShow(
+                        Long appointmentId,
+                        RegisterAppointmentNoShowRequest request) {
+
+                ClinicEntity clinic = findActiveClinic();
+
+                /*
+                 * The appointment is locked to prevent concurrent cancellation,
+                 * rescheduling, arrival confirmation or duplicate no-show registration.
+                 */
+                AppointmentEntity appointment = appointmentRepository
+                                .findByIdAndRecordStatusForUpdate(
+                                                appointmentId,
+                                                RecordStatus.ACTIVE)
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                                APPOINTMENT_NOT_AVAILABLE));
+
+                validateAppointmentClinic(
+                                appointment,
+                                clinic);
+
+                validateNoShowRegistration(
+                                appointment);
+
+                AppointmentStatusEntity noShowStatus = findAppointmentStatus(
+                                AppointmentStatusCode.NO_ASISTIO);
+
+                appointment.setStatus(noShowStatus);
+                appointment.setNoShowAt(OffsetDateTime.now());
+                appointment.setNoShowBy(SYSTEM_USER);
+                appointment.setNoShowComment(
+                                normalizeOptional(request.comment()));
+
+                AppointmentEntity savedAppointment = appointmentRepository.save(
+                                appointment);
 
                 return toResponse(savedAppointment);
         }
@@ -254,16 +349,16 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         private void validateAppointmentClinic(
-                AppointmentEntity appointment,
-                ClinicEntity clinic) {
+                        AppointmentEntity appointment,
+                        ClinicEntity clinic) {
 
-        if (!appointment.getClinic()
-                .getId()
-                .equals(clinic.getId())) {
+                if (!appointment.getClinic()
+                                .getId()
+                                .equals(clinic.getId())) {
 
-                throw new ResourceNotFoundException(
-                        APPOINTMENT_NOT_AVAILABLE);
-        }
+                        throw new ResourceNotFoundException(
+                                        APPOINTMENT_NOT_AVAILABLE);
+                }
         }
 
         private void validateCancellation(
@@ -292,119 +387,160 @@ public class AppointmentServiceImpl implements AppointmentService {
                 }
         }
 
-        private void validateReschedulingStatus(
-                AppointmentEntity appointment) {
+        private void validateArrivalConfirmationStatus(
+                        AppointmentEntity appointment) {
 
-        String currentStatusCode =
-                appointment.getStatus().getCode();
+                String currentStatusCode = appointment
+                                .getStatus()
+                                .getCode();
 
-        boolean scheduled =
-                AppointmentStatusCode.PROGRAMADA
-                        .name()
-                        .equals(currentStatusCode);
+                boolean scheduled = AppointmentStatusCode.PROGRAMADA
+                                .name()
+                                .equals(currentStatusCode);
 
-        if (!scheduled) {
-                throw new ConflictException(
-                        APPOINTMENT_CANNOT_BE_RESCHEDULED);
+                if (!scheduled) {
+                        throw new ConflictException(
+                                        APPOINTMENT_CANNOT_BE_CONFIRMED);
+                }
         }
+
+        private void validateNoShowRegistration(
+                        AppointmentEntity appointment) {
+
+                String currentStatusCode = appointment
+                                .getStatus()
+                                .getCode();
+
+                boolean scheduled = AppointmentStatusCode.PROGRAMADA
+                                .name()
+                                .equals(currentStatusCode);
+
+                if (!scheduled) {
+                        throw new ConflictException(
+                                        APPOINTMENT_CANNOT_BE_MARKED_AS_NO_SHOW);
+                }
+
+                AgendaBlockEntity agendaBlock = appointment.getAgendaBlock();
+
+                LocalDateTime appointmentStart = LocalDateTime.of(
+                                agendaBlock.getAppointmentDate(),
+                                agendaBlock.getStartTime());
+
+                if (appointmentStart.isAfter(LocalDateTime.now())) {
+                        throw new BadRequestException(
+                                        APPOINTMENT_HAS_NOT_STARTED);
+                }
+        }
+
+        private void validateReschedulingStatus(
+                        AppointmentEntity appointment) {
+
+                String currentStatusCode = appointment.getStatus().getCode();
+
+                boolean scheduled = AppointmentStatusCode.PROGRAMADA
+                                .name()
+                                .equals(currentStatusCode);
+
+                if (!scheduled) {
+                        throw new ConflictException(
+                                        APPOINTMENT_CANNOT_BE_RESCHEDULED);
+                }
         }
 
         private void validateRescheduleAgendaBlock(
-                AppointmentEntity appointment,
-                AgendaBlockEntity previousAgendaBlock,
-                AgendaBlockEntity newAgendaBlock,
-                ClinicEntity clinic) {
+                        AppointmentEntity appointment,
+                        AgendaBlockEntity previousAgendaBlock,
+                        AgendaBlockEntity newAgendaBlock,
+                        ClinicEntity clinic) {
 
-        validateDifferentAgendaBlock(
-                previousAgendaBlock,
-                newAgendaBlock);
+                validateDifferentAgendaBlock(
+                                previousAgendaBlock,
+                                newAgendaBlock);
 
-        validateAgendaBlockClinic(
-                newAgendaBlock,
-                clinic);
+                validateAgendaBlockClinic(
+                                newAgendaBlock,
+                                clinic);
 
-        validateAgendaBlockDoctor(
-                newAgendaBlock,
-                appointment.getDoctor());
+                validateAgendaBlockDoctor(
+                                newAgendaBlock,
+                                appointment.getDoctor());
 
-        validateAgendaBlockAvailability(
-                newAgendaBlock);
+                validateAgendaBlockAvailability(
+                                newAgendaBlock);
 
-        validateAppointmentDateTime(
-                newAgendaBlock);
+                validateAppointmentDateTime(
+                                newAgendaBlock);
         }
 
         private void validateDifferentAgendaBlock(
-                AgendaBlockEntity previousAgendaBlock,
-                AgendaBlockEntity newAgendaBlock) {
+                        AgendaBlockEntity previousAgendaBlock,
+                        AgendaBlockEntity newAgendaBlock) {
 
-        if (previousAgendaBlock
-                .getId()
-                .equals(newAgendaBlock.getId())) {
+                if (previousAgendaBlock
+                                .getId()
+                                .equals(newAgendaBlock.getId())) {
 
-                throw new BadRequestException(
-                        SAME_AGENDA_BLOCK);
-        }
+                        throw new BadRequestException(
+                                        SAME_AGENDA_BLOCK);
+                }
         }
 
         private void validatePatientScheduleConflictExcludingAppointment(
-                AppointmentEntity appointment,
-                AgendaBlockEntity newAgendaBlock) {
+                        AppointmentEntity appointment,
+                        AgendaBlockEntity newAgendaBlock) {
 
-        boolean conflict =
-                appointmentRepository
-                        .existsPatientScheduleConflictExcludingAppointment(
-                                appointment.getId(),
-                                appointment.getPatient().getId(),
-                                newAgendaBlock.getAppointmentDate(),
-                                newAgendaBlock.getStartTime(),
-                                newAgendaBlock.getEndTime(),
-                                List.of(
-                                        AppointmentStatusCode.PROGRAMADA.name(),
-                                        AppointmentStatusCode.CONFIRMADA.name()),
-                                RecordStatus.ACTIVE);
+                boolean conflict = appointmentRepository
+                                .existsPatientScheduleConflictExcludingAppointment(
+                                                appointment.getId(),
+                                                appointment.getPatient().getId(),
+                                                newAgendaBlock.getAppointmentDate(),
+                                                newAgendaBlock.getStartTime(),
+                                                newAgendaBlock.getEndTime(),
+                                                List.of(
+                                                                AppointmentStatusCode.PROGRAMADA.name(),
+                                                                AppointmentStatusCode.CONFIRMADA.name()),
+                                                RecordStatus.ACTIVE);
 
-        if (conflict) {
-                throw new ConflictException(
-                        PATIENT_ALREADY_HAS_APPOINTMENT);
-        }
+                if (conflict) {
+                        throw new ConflictException(
+                                        PATIENT_ALREADY_HAS_APPOINTMENT);
+                }
         }
 
         private AppointmentRescheduleHistoryEntity createRescheduleHistory(
-                AppointmentEntity appointment,
-                AgendaBlockEntity previousAgendaBlock,
-                AgendaBlockEntity newAgendaBlock) {
+                        AppointmentEntity appointment,
+                        AgendaBlockEntity previousAgendaBlock,
+                        AgendaBlockEntity newAgendaBlock) {
 
-        AppointmentRescheduleHistoryEntity history =
-                new AppointmentRescheduleHistoryEntity();
+                AppointmentRescheduleHistoryEntity history = new AppointmentRescheduleHistoryEntity();
 
-        history.setAppointment(appointment);
+                history.setAppointment(appointment);
 
-        history.setPreviousAgendaBlock(
-                previousAgendaBlock);
+                history.setPreviousAgendaBlock(
+                                previousAgendaBlock);
 
-        history.setNewAgendaBlock(
-                newAgendaBlock);
+                history.setNewAgendaBlock(
+                                newAgendaBlock);
 
-        history.setPreviousAppointmentDate(
-                previousAgendaBlock.getAppointmentDate());
+                history.setPreviousAppointmentDate(
+                                previousAgendaBlock.getAppointmentDate());
 
-        history.setPreviousStartTime(
-                previousAgendaBlock.getStartTime());
+                history.setPreviousStartTime(
+                                previousAgendaBlock.getStartTime());
 
-        history.setPreviousEndTime(
-                previousAgendaBlock.getEndTime());
+                history.setPreviousEndTime(
+                                previousAgendaBlock.getEndTime());
 
-        history.setNewAppointmentDate(
-                newAgendaBlock.getAppointmentDate());
+                history.setNewAppointmentDate(
+                                newAgendaBlock.getAppointmentDate());
 
-        history.setNewStartTime(
-                newAgendaBlock.getStartTime());
+                history.setNewStartTime(
+                                newAgendaBlock.getStartTime());
 
-        history.setNewEndTime(
-                newAgendaBlock.getEndTime());
+                history.setNewEndTime(
+                                newAgendaBlock.getEndTime());
 
-        return history;
+                return history;
         }
 
         private ClinicEntity findActiveClinic() {
@@ -553,14 +689,26 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         private AppointmentStatusEntity findAppointmentStatus(
                         AppointmentStatusCode statusCode) {
+
                 return appointmentStatusRepository
                                 .findByCodeAndRecordStatus(
                                                 statusCode.name(),
                                                 RecordStatus.ACTIVE)
                                 .orElseThrow(() -> new ResourceNotFoundException(
-                                                statusCode == AppointmentStatusCode.PROGRAMADA
-                                                                ? INITIAL_STATUS_NOT_AVAILABLE
-                                                                : CANCELLATION_STATUS_NOT_AVAILABLE));
+                                                getAppointmentStatusNotAvailableMessage(
+                                                                statusCode)));
+        }
+
+        private String getAppointmentStatusNotAvailableMessage(
+                        AppointmentStatusCode statusCode) {
+
+                return switch (statusCode) {
+                        case PROGRAMADA -> INITIAL_STATUS_NOT_AVAILABLE;
+                        case CONFIRMADA -> CONFIRMATION_STATUS_NOT_AVAILABLE;
+                        case CANCELADA -> CANCELLATION_STATUS_NOT_AVAILABLE;
+                        case NO_ASISTIO -> NO_SHOW_STATUS_NOT_AVAILABLE;
+                        default -> APPOINTMENT_STATUS_NOT_AVAILABLE;
+                };
         }
 
         private AppointmentEntity createEntity(

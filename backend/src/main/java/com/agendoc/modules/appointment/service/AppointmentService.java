@@ -2,9 +2,10 @@ package com.agendoc.modules.appointment.service;
 
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.AppointmentResponse;
-import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
+import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,9 +21,16 @@ public interface AppointmentService {
                         Long appointmentId,
                         CancelAppointmentRequest request);
 
+        AppointmentResponse confirmArrival(
+                        Long appointmentId);
+
+        AppointmentResponse registerNoShow(
+                        Long appointmentId,
+                        RegisterAppointmentNoShowRequest request);
+
         AppointmentResponse rescheduleAppointment(
-                Long appointmentId,
-                RescheduleAppointmentRequest request);
+                        Long appointmentId,
+                        RescheduleAppointmentRequest request);
 
         List<AppointmentAgendaResponse> findAppointments(
                         LocalDate appointmentDate,

@@ -16,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 /**
  * Persistent representation of a medical appointment.
@@ -58,4 +59,19 @@ public class AppointmentEntity extends BaseEntity {
 
         @Column(name = "cancelled_at")
         private LocalDateTime cancelledAt;
+
+        @Column(name = "confirmed_at")
+        private OffsetDateTime confirmedAt;
+
+        @Column(name = "confirmed_by", length = 100)
+        private String confirmedBy;
+
+        @Column(name = "no_show_at")
+        private OffsetDateTime noShowAt;
+
+        @Column(name = "no_show_by", length = 100)
+        private String noShowBy;
+
+        @Column(name = "no_show_comment", length = 500)
+        private String noShowComment;        
 }
