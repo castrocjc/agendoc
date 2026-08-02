@@ -7,10 +7,10 @@
 | Proyecto             | AgenDoc                                           |
 | Tipo                 | Plataforma Web + Mobile                           |
 | Metodología          | Scrum                                             |
-| Blueprint Version    | v1.9                                              |
+| Blueprint Version    | v1.10                                             |
 | Sprint Actual        | Sprint 4                                          |
 | Estado               | Sprint 4 en ejecución                             |
-| Última actualización | Sprint 4 — Inicio con HU-09                       |
+| Última actualización | Sprint 4 — Cierre de TS-03                        |
 
 ---
 
@@ -3268,11 +3268,23 @@ Dependencias
 
 Estado
 
-Pendiente.
+Completada.
 
 Sprint previsto
 
 Sprint 4.
+
+Sprint ejecutado
+
+Sprint 4.
+
+Resultado
+
+- Se implementó un servicio centralizado para obtener el contexto del usuario autenticado desde Spring Security.
+- El Backend puede obtener el usuario autenticado, su rol y su consultorio sin recibir dichos identificadores desde el Frontend.
+- El contexto autenticado quedó disponible para ser reutilizado por los módulos funcionales del sistema.
+- Se incorporó validación para detectar usuarios sin rol o sin consultorio asociado.
+- La infraestructura quedó preparada para implementar la autorización por dominio mediante TS-04.
 
 ---
 
@@ -4069,7 +4081,7 @@ Avance
 
 - ✅ TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
 - ✅ TS-02 — Completar autenticación JWT End-to-End
-- ⏳ TS-03 — Implementar contexto del usuario autenticado
+- ✅ TS-03 — Implementar contexto del usuario autenticado
 - ⏳ TS-04 — Implementar autorización por dominio
 - ⏳ HU-09 — Reservar cita como paciente
 - ⏳ HU-11 — Consultar mis citas como paciente
@@ -4413,5 +4425,29 @@ Decisiones tomadas
 - Se eliminaron los mecanismos temporales de autenticación utilizados durante el desarrollo.
 - La plataforma quedó preparada para implementar TS-03 (Contexto del usuario autenticado) y TS-04 (Autorización por dominio).
 - Se validó el flujo completo mediante pruebas automatizadas y pruebas funcionales.
+
+---
+
+Sprint 4
+
+Sesión 3 — Cierre de TS-03
+
+Estado
+
+✅ Completada
+
+Technical Stories completadas
+
+- TS-03 — Implementar contexto del usuario autenticado.
+
+Decisiones tomadas
+
+- Se implementó un proveedor centralizado del contexto del usuario autenticado.
+- El Backend obtiene el usuario autenticado directamente desde Spring Security.
+- El contexto autenticado expone el usuario, el rol y el consultorio para reutilización en los módulos del dominio.
+- Se incorporaron validaciones para usuarios sin rol o sin consultorio asociado.
+- Se eliminaron dependencias de identificadores enviados por el Frontend cuando estos pueden derivarse del contexto autenticado.
+- La infraestructura quedó preparada para implementar TS-04 (Autorización por dominio).
+- La implementación fue validada mediante pruebas automatizadas y pruebas funcionales.
 
 ---

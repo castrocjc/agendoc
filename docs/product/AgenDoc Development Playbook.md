@@ -1069,17 +1069,30 @@ Sprint 4 — Autogestión del paciente
 
 Objetivo:
 
-Implementar el contexto del usuario autenticado y la autorización por dominio para habilitar de forma segura HU-09 — Reservar cita como paciente y HU-11 — Consultar mis citas.
+Implementar la autorización por dominio para habilitar de forma segura HU-09 — Reservar cita como paciente y HU-11 — Consultar mis citas.
 
-Technical Story activa:
+Technical Story completada:
 
 TS-03 — Implementar contexto del usuario autenticado.
 
+Resultado:
+
+- Se implementó un contexto centralizado del usuario autenticado.
+- El Backend puede obtener el usuario, rol y consultorio desde Spring Security.
+- Los perfiles de negocio Paciente y Médico pueden resolverse desde el usuario autenticado cuando corresponda.
+- El rol Recepcionista utiliza el contexto de usuario y consultorio sin requerir actualmente una entidad de negocio independiente.
+- La implementación fue validada con 65 pruebas automatizadas exitosas.
+- El flujo JWT End-to-End permanece operativo.
+- Backend y Frontend fueron validados sin regresiones.
+
+Technical Story activa:
+
+TS-04 — Implementar autorización por dominio.
+
 Siguientes incrementos:
 
-- TS-04 — Implementar autorización por dominio.
 - HU-09 — Reservar cita como paciente.
-- HU-11 — Consultar mis citas.
+- HU-11 — Consultar mis citas como paciente.
 
 Antes de iniciar:
 
@@ -1087,8 +1100,9 @@ Antes de iniciar:
 - Confirmar que Backend y Frontend compilan correctamente.
 - Confirmar que todas las pruebas automatizadas finalizan exitosamente.
 - Confirmar que el flujo JWT End-to-End permanece operativo.
-- Revisar el uso de SecurityContext y JwtAuthenticationFilter.
-- Mantener el desarrollo exclusivamente dentro del alcance de TS-03.
+- Revisar el uso de `AuthenticatedUserContextProvider` en los casos de uso del dominio.
+- Analizar las restricciones por rol, consultorio y propiedad del recurso.
+- Mantener el desarrollo exclusivamente dentro del alcance de TS-04.
 
 Estado:
 

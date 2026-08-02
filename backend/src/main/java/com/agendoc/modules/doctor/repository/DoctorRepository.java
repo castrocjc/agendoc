@@ -23,6 +23,12 @@ public interface DoctorRepository extends JpaRepository<DoctorEntity, Long> {
                         Long id,
                         RecordStatus recordStatus);
 
+        Optional<DoctorEntity> findByUserIdAndClinicIdAndRecordStatus(
+                Long userId,
+                Long clinicId,
+                RecordStatus recordStatus
+        );
+
         @EntityGraph(attributePaths = { "specialty" })
         List<DoctorEntity> findAllByClinicIdAndRecordStatusOrderByLastNameAscFirstNameAsc(
                         Long clinicId,

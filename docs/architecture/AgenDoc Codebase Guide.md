@@ -7,7 +7,7 @@
 |-----------|---------------------------------------------|
 | Proyecto  | AgenDoc                                     |
 | Documento | Codebase Guide                              |
-| Versión   | v1.5                                        |
+| Versión   | v1.6                                        |
 | Estado    | Vigente                                     |
 | Ubicación | docs/architecture/AgenDoc Codebase Guide.md |
 
@@ -23,6 +23,7 @@ Historial del Documento
 | v1.3     | 2026-07-30 | Actualización Codebase Guide completa HU-13 (Cancelar cita) y HU-14 (Reprogramar cita). |
 | v1.4     | 2026-07-31 | Actualización Codebase Guide completa HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
 | v1.5     | 2026-08-01 | Actualización Codebase Guide completa TS-02, autenticación JWT End-to-End, protección de APIs y cierre técnico de la autenticación. |
+| v1.6     | 2026-08-02 | Actualización Codebase Guide completa TS-03, implementación del contexto del usuario autenticado mediante SecurityContext y resolución del usuario autenticado en el Backend. |
 
 ---
 
@@ -127,7 +128,8 @@ El Codebase Guide se rige por los siguientes principios:
 | Sprint 3            | Completado                  |
 
 Sprint 4: 🚧 En ejecución
-Incremento activo: TS-03 — Implementar contexto del usuario autenticado
+Incremento activo:
+TS-04 — Implementar autorización por dominio
 Historia funcional objetivo: HU-09 — Reservar cita como paciente
 
 ---
@@ -214,7 +216,7 @@ Total implementado:
 |-------|--------------------------------------------------------------------|------------|
 | TS-01 | Configurar entorno de desarrollo multidispositivo y multiambiente  | Completada |
 | TS-02 | Completar autenticación JWT End-to-End                             | Completada |
-| TS-03 | Implementar contexto del usuario autenticado                       | Pendiente  |
+| TS-03 | Implementar contexto del usuario autenticado                       | Completada |
 | TS-04 | Implementar autorización por dominio                               | Pendiente  |
 | TS-05 | Endurecer seguridad y manejo de accesos no autorizados             | Pendiente  |
 
@@ -224,6 +226,9 @@ Total implementado:
 
 Historia objetivo
 
+TS-04 — Implementar autorización por dominio.
+
+Historia funcional objetivo:
 HU-09 — Reservar cita como paciente.
 
 Estado actual
@@ -534,9 +539,12 @@ La autenticación se implementa mediante Spring Security y JSON Web Token (JWT).
 
 El Backend protege los endpoints mediante autenticación basada en JWT y el Frontend Web administra la sesión del usuario almacenando el token de acceso para consumir las APIs protegidas.
 
+La autenticación utiliza Spring Security, JWT y el SecurityContext para resolver el usuario autenticado durante la ejecución de cada solicitud protegida.
+
+El contexto autenticado constituye la base para las reglas de autorización por dominio y las futuras funcionalidades de autogestión del paciente.
+
 Las siguientes etapas de evolución corresponden a:
 
-- TS-03: Implementar el contexto del usuario autenticado.
 - TS-04: Implementar autorización por dominio.
 - TS-05: Endurecer seguridad y manejo de accesos no autorizados.
 
@@ -761,6 +769,10 @@ Estado:
 
 Implementado
 
+La infraestructura de seguridad incorpora además la resolución del usuario autenticado utilizando SecurityContext y componentes compartidos para obtener la identidad del usuario durante la ejecución de los servicios de negocio.
+
+Esta infraestructura será utilizada por las reglas de autorización implementadas en TS-04.
+
 ---
 
 ## 6.5 Módulos Funcionales
@@ -808,9 +820,11 @@ Estado:
 
 Implementado
 
-Pendiente:
+La autenticación proporciona el contexto del usuario autenticado para los servicios del Backend mediante Spring Security y SecurityContext.
 
-- Implementar el contexto completo del usuario autenticado mediante TS-03.
+Estado:
+
+Implementado.
 
 ---
 
@@ -1308,7 +1322,7 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 | Manejo global de excepciones        | Implementado |
 | Autenticación inicial               | Implementada |
 | JWT End-to-End                      | Implementado |
-| Contexto autenticado                | Pendiente    |
+| Contexto autenticado                | Implementado |
 | Registro de médicos                 | Implementado |
 | Registro y búsqueda de pacientes    | Implementado |
 | Creación de bloques de agenda       | Implementada |
@@ -2261,7 +2275,7 @@ La definición funcional y la planificación de las Technical Stories se mantien
 |-----------------|-------------------------------------------------------------------|------------|
 | TS-01           | Configurar entorno de desarrollo multidispositivo y multiambiente | Completada |
 | TS-02           | Completar autenticación JWT End-to-End                            | Completada |
-| TS-03           | Implementar contexto del usuario autenticado                      | Pendiente  |
+| TS-03           | Implementar contexto del usuario autenticado                      | Completada |
 | TS-04           | Implementar autorización por dominio                              | Pendiente  |
 | TS-05           | Endurecer seguridad y manejo de accesos no autorizados            | Pendiente  |
 
@@ -2279,9 +2293,9 @@ Su propósito es fortalecer la arquitectura, la seguridad, la mantenibilidad y l
 
 | Elemento                        | Estado |
 |---------------------------------|--------|
-| Technical Stories implementadas | 2      |
+| Technical Stories implementadas | 3      |
 | Technical Stories en desarrollo | 0      |
-| Technical Stories pendientes    | 3      |
+| Technical Stories pendientes    | 2      |
 
 ---
 
@@ -2409,6 +2423,8 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 | Spring Security                    | ✅           |
 | Consulta de disponibilidad médica  | ✅           |
 | JWT End-to-End                     | ✅           |
+| Contexto autenticado               | ✅           |
+| SecurityContext                    | ✅           |
 | Creación de citas médicas          | ✅           |
 | Conflicto de horario del paciente  | ✅           |
 | Consulta de agenda del consultorio | ✅           |
@@ -3040,13 +3056,13 @@ Esta información deberá actualizarse al cierre de cada Sprint.
 
 ## 18.2 Estado Actual
 
-Sprint actual
-
 Sprint 4
 
-Estado
+Incremento activo:
+TS-04 — Implementar autorización por dominio
 
-Sprint 4 en ejecución
+Historia funcional objetivo:
+HU-09 — Reservar cita como paciente
 
 ---
 
@@ -3070,7 +3086,7 @@ Sprint 4 en ejecución
 |---------------------------------------------------------------------------|------------|
 | TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente | Completada |
 | TS-02 — Completar autenticación JWT End-to-End                            | Completada |
-| TS-03 — Implementar contexto del usuario autenticado                      | Pendiente  |
+| TS-03 — Implementar contexto del usuario autenticado                      | Completada |
 | TS-04 — Implementar autorización por dominio                              | Pendiente  |
 | TS-05 — Endurecer seguridad y manejo de accesos no autorizados            | Pendiente  |
 
