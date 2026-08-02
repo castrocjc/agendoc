@@ -1,6 +1,5 @@
 agendoc:
   security:
-    permit-development-endpoints: true
   cors:
     allowed-origins: http://localhost:5173,http://127.0.0.1:5173,http://192.168.68.112:5173
 

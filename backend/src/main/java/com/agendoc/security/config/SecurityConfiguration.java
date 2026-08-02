@@ -1,7 +1,8 @@
 package com.agendoc.security.config;
 
 import java.util.List;
-
+import com.agendoc.security.jwt.JwtAuthenticationFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -19,26 +21,16 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @Configuration
 public class SecurityConfiguration {
         private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
-        private static final String DOCTORS_ENDPOINT = "/api/v1/doctors";
-        private static final String MEDICAL_SPECIALTIES_ENDPOINT = "/api/v1/medical-specialties";
-        private static final String PATIENTS_ENDPOINT = "/api/v1/patients";
-        private static final String PATIENT_SEARCH_ENDPOINT = "/api/v1/patients/search";
-        private static final String AGENDA_BLOCKS_ENDPOINT = "/api/v1/doctors/*/agenda-blocks";
-        private static final String APPOINTMENTS_ENDPOINT = "/api/v1/appointments";
-        private static final String APPOINTMENT_CANCELLATION_ENDPOINT = "/api/v1/appointments/*/cancel";
-        private static final String APPOINTMENT_CONFIRM_ARRIVAL_ENDPOINT = "/api/v1/appointments/*/confirm-arrival";
-        private static final String APPOINTMENT_NO_SHOW_ENDPOINT = "/api/v1/appointments/*/no-show";
-        private static final String APPOINTMENT_RESCHEDULE_ENDPOINT = "/api/v1/appointments/*/reschedule";
-        private final boolean permitDevelopmentEndpoints;
         private final List<String> allowedOrigins;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
         public SecurityConfiguration(
-                        @Value("${agendoc.security.permit-development-endpoints:false}")
-                        boolean permitDevelopmentEndpoints,
-                        @Value("${agendoc.cors.allowed-origins}")
-                        List<String> allowedOrigins) {
-                this.permitDevelopmentEndpoints = permitDevelopmentEndpoints;
-                this.allowedOrigins = List.copyOf(allowedOrigins);
+                @Value("${agendoc.cors.allowed-origins}")
+                List<String> allowedOrigins,
+                JwtAuthenticationFilter jwtAuthenticationFilter) {
+
+        this.allowedOrigins = List.copyOf(allowedOrigins);
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         }
 
         @Bean
@@ -50,76 +42,30 @@ public class SecurityConfiguration {
                                 .csrf(csrf -> csrf.disable())
                                 .sessionManagement(session -> session.sessionCreationPolicy(
                                                 SessionCreationPolicy.STATELESS))
+                                .exceptionHandling(exception -> exception
+                                        .authenticationEntryPoint(
+                                                (request, response, authenticationException) ->
+                                                        response.sendError(
+                                                                HttpServletResponse.SC_UNAUTHORIZED
+                                                        )
+                                        )
+                                )
                                 .authorizeHttpRequests(authorize -> {
                                         authorize
                                                         .requestMatchers(
                                                                         HttpMethod.POST,
                                                                         LOGIN_ENDPOINT)
                                                         .permitAll();
-
-                                        if (permitDevelopmentEndpoints) {
-                                                authorize
-                                                                .requestMatchers(
-                                                                                HttpMethod.GET,
-                                                                                MEDICAL_SPECIALTIES_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.GET,
-                                                                        DOCTORS_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                                HttpMethod.POST,
-                                                                                DOCTORS_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                                HttpMethod.POST,
-                                                                                PATIENTS_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                                HttpMethod.GET,
-                                                                                PATIENT_SEARCH_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.POST,
-                                                                        AGENDA_BLOCKS_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.GET,
-                                                                        AGENDA_BLOCKS_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.POST,
-                                                                        APPOINTMENTS_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.GET,
-                                                                        APPOINTMENTS_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.PATCH,
-                                                                        APPOINTMENT_CANCELLATION_ENDPOINT
-                                                                )
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.PATCH,
-                                                                        APPOINTMENT_CONFIRM_ARRIVAL_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.PATCH,
-                                                                        APPOINTMENT_NO_SHOW_ENDPOINT)
-                                                                .permitAll()
-                                                                .requestMatchers(
-                                                                        HttpMethod.PATCH,
-                                                                        APPOINTMENT_RESCHEDULE_ENDPOINT
-                                                                )
-                                                                .permitAll();
-                                        }
                                         authorize
                                                         .anyRequest()
                                                         .authenticated();
                                 })
                                 .formLogin(form -> form.disable())
-                                .httpBasic(basic -> basic.disable());
+                                .httpBasic(basic -> basic.disable())
+                                .addFilterBefore(
+                                        jwtAuthenticationFilter,
+                                        UsernamePasswordAuthenticationFilter.class
+                                );
 
                 return http.build();
         }

@@ -7,7 +7,7 @@
 |-----------|---------------------------------------------|
 | Proyecto  | AgenDoc                                     |
 | Documento | Codebase Guide                              |
-| Versión   | v1.4                                        |
+| Versión   | v1.5                                        |
 | Estado    | Vigente                                     |
 | Ubicación | docs/architecture/AgenDoc Codebase Guide.md |
 
@@ -22,6 +22,7 @@ Historial del Documento
 | v1.2     | 2026-07-30 | Actualización Codebase Guide completa HU-12, consulta de la agenda del consultorio. |
 | v1.3     | 2026-07-30 | Actualización Codebase Guide completa HU-13 (Cancelar cita) y HU-14 (Reprogramar cita). |
 | v1.4     | 2026-07-31 | Actualización Codebase Guide completa HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
+| v1.5     | 2026-08-01 | Actualización Codebase Guide completa TS-02, autenticación JWT End-to-End, protección de APIs y cierre técnico de la autenticación. |
 
 ---
 
@@ -126,8 +127,8 @@ El Codebase Guide se rige por los siguientes principios:
 | Sprint 3            | Completado                  |
 
 Sprint 4: 🚧 En ejecución
-Incremento activo: TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
-Siguiente historia funcional: HU-09 — Reservar cita como paciente
+Incremento activo: TS-03 — Implementar contexto del usuario autenticado
+Historia funcional objetivo: HU-09 — Reservar cita como paciente
 
 ---
 
@@ -148,7 +149,7 @@ Siguiente historia funcional: HU-09 — Reservar cita como paciente
 |-----------------------------------------|-----------------------|
 | Rama principal de trabajo               | develop               |
 | develop sincronizada con origin/develop | Sí                    |
-| Working Tree                            | Con cambios pendientes de versionar |
+| Working Tree                            | Limpio                |
 | Estrategia de ramas                     | Git Flow simplificado |
 
 ---
@@ -209,13 +210,13 @@ Total implementado:
 
 ## Technical Stories
 
-| ID    | Nombre                                                 | Estado        |
-|-------|--------------------------------------------------------|---------------|
-| TS-01 | Configurar entorno de desarrollo multidispositivo y multiambiente        | En desarrollo |
-| TS-02 | Completar autenticación JWT End-to-End                 | Pendiente     |
-| TS-03 | Implementar contexto del usuario autenticado           | Pendiente     |
-| TS-04 | Implementar autorización por dominio                   | Pendiente     |
-| TS-05 | Endurecer seguridad y manejo de accesos no autorizados | Pendiente     |
+| ID    | Nombre                                                             | Estado     |
+|-------|--------------------------------------------------------------------|------------|
+| TS-01 | Configurar entorno de desarrollo multidispositivo y multiambiente  | Completada |
+| TS-02 | Completar autenticación JWT End-to-End                             | Completada |
+| TS-03 | Implementar contexto del usuario autenticado                       | Pendiente  |
+| TS-04 | Implementar autorización por dominio                               | Pendiente  |
+| TS-05 | Endurecer seguridad y manejo de accesos no autorizados             | Pendiente  |
 
 ---
 
@@ -231,7 +232,7 @@ Estado actual
 - HU-13, HU-14 y HU-15 completadas.
 - Backend compilando correctamente.
 - Frontend compilando correctamente.
-- 45 pruebas automatizadas exitosas.
+- Pruebas automatizadas exitosas.
 - Validación funcional de extremo a extremo completada.
 
 Objetivo
@@ -529,11 +530,15 @@ El control de versiones del esquema se realiza mediante Flyway, garantizando que
 
 ## Seguridad
 
-La autenticación se implementa mediante Spring Security.
+La autenticación se implementa mediante Spring Security y JSON Web Token (JWT).
 
-Al cierre del Sprint 1 se encuentra disponible la infraestructura inicial de autenticación.
+El Backend protege los endpoints mediante autenticación basada en JWT y el Frontend Web administra la sesión del usuario almacenando el token de acceso para consumir las APIs protegidas.
 
-La implementación completa basada en JSON Web Token (JWT) permanece pendiente mediante TS-02, junto con el contexto autenticado y la autorización por dominio.
+Las siguientes etapas de evolución corresponden a:
+
+- TS-03: Implementar el contexto del usuario autenticado.
+- TS-04: Implementar autorización por dominio.
+- TS-05: Endurecer seguridad y manejo de accesos no autorizados.
 
 ---
 
@@ -750,13 +755,11 @@ Responsabilidad:
 
 Estado actual:
 
-El paquete se encuentra creado, pero no se identificaron clases JWT implementadas dentro de él durante la revisión posterior al Sprint 1.
-
-La implementación JWT End-to-End será completada mediante TS-02.
+El paquete contiene la implementación utilizada para la generación, validación y procesamiento de JSON Web Tokens (JWT), integrada con Spring Security para proteger las APIs del sistema.
 
 Estado:
 
-**Implementación inicial**
+Implementado
 
 ---
 
@@ -803,11 +806,10 @@ Historia relacionada:
 
 Estado:
 
-**Implementado de forma inicial**
+Implementado
 
 Pendiente:
 
-- Completar JWT End-to-End mediante TS-02.
 - Implementar el contexto completo del usuario autenticado mediante TS-03.
 
 ---
@@ -1289,7 +1291,7 @@ Estado:
 Cobertura ampliada y validada.
 
 Resultado actual:
-45 pruebas ejecutadas, 0 fallos, 0 errores y 0 omitidas.
+Pruebas ejecutadas, 0 fallos, 0 errores y 0 omitidas.
 
 La cobertura automatizada deberá ampliarse progresivamente en las nuevas Historias de Usuario.
 
@@ -1305,7 +1307,7 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 | Flyway                              | Operativo    |
 | Manejo global de excepciones        | Implementado |
 | Autenticación inicial               | Implementada |
-| JWT End-to-End                      | Pendiente    |
+| JWT End-to-End                      | Implementado |
 | Contexto autenticado                | Pendiente    |
 | Registro de médicos                 | Implementado |
 | Registro y búsqueda de pacientes    | Implementado |
@@ -1317,7 +1319,7 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 | Reprogramación de citas             | Implementada |
 | Confirmación de llegada             | Implementada |
 | Registro de inasistencia            | Implementado |
-| Pruebas automatizadas               | 45 exitosas  |
+| Pruebas automatizadas               | Exitosas     |
 ---
 
 **Última actualización**
@@ -1773,7 +1775,7 @@ La estructura de branding deberá mantenerse alineada con el UI Design Guide.
 | TypeScript                         | Operativo     |
 | Vite                               | Operativo     |
 | React Router                       | Operativo     |
-| Axios                              | Operativo     |
+| Fetch API mediante apiClient.ts    | Operativo     |
 | Componentes base                   | Implementados |
 | Autenticación                      | Implementada  |
 | Dashboard                          | Implementado  |
@@ -2255,13 +2257,13 @@ La definición funcional y la planificación de las Technical Stories se mantien
 
 ## 13.2 Estado de Implementación
 
-| Technical Story | Descripción | Estado |
-|-----------------|-------------|--------|
-| TS-01 | Configurar entorno de desarrollo multidispositivo y multiambiente | En desarrollo |
-| TS-02 | Completar autenticación JWT End-to-End | Pendiente |
-| TS-03 | Implementar contexto del usuario autenticado | Pendiente |
-| TS-04 | Implementar autorización por dominio | Pendiente |
-| TS-05 | Endurecer seguridad y manejo de accesos no autorizados | Pendiente |
+| Technical Story | Descripción                                                       | Estado     |
+|-----------------|-------------------------------------------------------------------|------------|
+| TS-01           | Configurar entorno de desarrollo multidispositivo y multiambiente | Completada |
+| TS-02           | Completar autenticación JWT End-to-End                            | Completada |
+| TS-03           | Implementar contexto del usuario autenticado                      | Pendiente  |
+| TS-04           | Implementar autorización por dominio                              | Pendiente  |
+| TS-05           | Endurecer seguridad y manejo de accesos no autorizados            | Pendiente  |
 
 ---
 
@@ -2275,11 +2277,11 @@ Su propósito es fortalecer la arquitectura, la seguridad, la mantenibilidad y l
 
 ## 13.4 Estado General
 
-| Elemento | Estado |
-|----------|--------|
-| Technical Stories implementadas | 0 |
-| Technical Stories en desarrollo | 1 |
-| Technical Stories pendientes | 4 |
+| Elemento                        | Estado |
+|---------------------------------|--------|
+| Technical Stories implementadas | 2      |
+| Technical Stories en desarrollo | 0      |
+| Technical Stories pendientes    | 3      |
 
 ---
 
@@ -2406,7 +2408,7 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 | Manejo global de excepciones       | ✅           |
 | Spring Security                    | ✅           |
 | Consulta de disponibilidad médica  | ✅           |
-| JWT End-to-End                     | ⚪ Pendiente |
+| JWT End-to-End                     | ✅           |
 | Creación de citas médicas          | ✅           |
 | Conflicto de horario del paciente  | ✅           |
 | Consulta de agenda del consultorio | ✅           |
@@ -2415,7 +2417,7 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 | Confirmación de llegada            | ✅           |
 | Registro de inasistencia           | ✅           |
 | Trazabilidad de asistencia         | ✅           |
-| Pruebas automatizadas, 45 casos    | ✅           |
+| Pruebas automatizadas              | ✅           |
 
 ---
 
@@ -2471,8 +2473,8 @@ Este checklist deberá revisarse al cierre de cada Sprint y actualizarse cuando 
 | GitHub                    | ✅     |
 | GitHub Actions            | ✅     |
 | GitHub CLI                | ✅     |
-| Rama develop sincronizada | Por verificar antes del versionado |
-| Working Tree limpio       | ⚪ Cambios pendientes |
+| Rama develop sincronizada | Sí     |
+| Working Tree limpio       | ✅     |
 
 ---
 
@@ -3044,7 +3046,7 @@ Sprint 4
 
 Estado
 
-Preparación del Sprint 4
+Sprint 4 en ejecución
 
 ---
 
@@ -3064,13 +3066,13 @@ Preparación del Sprint 4
 
 ## 18.4 Technical Stories
 
-| Technical Story | Estado |
-|-----------------|--------|
-| TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente | En desarrollo |
-| TS-02 — Completar autenticación JWT End-to-End | Pendiente |
-| TS-03 — Implementar contexto del usuario autenticado | Pendiente |
-| TS-04 — Implementar autorización por dominio | Pendiente |
-| TS-05 — Endurecer seguridad y manejo de accesos no autorizados | Pendiente |
+| Technical Story                                                           | Estado     |
+|---------------------------------------------------------------------------|------------|
+| TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente | Completada |
+| TS-02 — Completar autenticación JWT End-to-End                            | Completada |
+| TS-03 — Implementar contexto del usuario autenticado                      | Pendiente  |
+| TS-04 — Implementar autorización por dominio                              | Pendiente  |
+| TS-05 — Endurecer seguridad y manejo de accesos no autorizados            | Pendiente  |
 
 ---
 
@@ -3087,7 +3089,7 @@ Para iniciar el Sprint 4 deberán mantenerse las siguientes condiciones:
 - documentación oficial sincronizada.
 - HU-15 validada funcionalmente;
 - Sprint 3 documentado;
-- 45 pruebas Backend exitosas;
+- Pruebas Backend exitosas;
 - cambios del Sprint 3 versionados en `develop`.
 
 ---
@@ -3095,8 +3097,8 @@ Para iniciar el Sprint 4 deberán mantenerse las siguientes condiciones:
 ## 18.6 Objetivo del Incremento
 
 Sprint 4: 🚧 En ejecución
-Incremento activo: TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
-Siguiente historia funcional: HU-09 — Reservar cita como paciente
+Incremento activo: TS-03 — Implementar contexto del usuario autenticado
+Historia funcional objetivo: HU-09 — Reservar cita como paciente
 
 ---
 

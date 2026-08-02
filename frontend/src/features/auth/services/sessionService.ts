@@ -24,6 +24,16 @@ export function getSession(): LoginResponse | null {
   }
 }
 
+export function getAccessToken(): string | null {
+  const session = getSession();
+
+  if (!session?.accessToken) {
+    return null;
+  }
+
+  return session.accessToken;
+}
+
 export function clearSession(): void {
   sessionStorage.removeItem(SESSION_STORAGE_KEY);
 }

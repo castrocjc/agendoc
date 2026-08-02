@@ -1,4 +1,7 @@
-export type UserRole = "PACIENTE" | "RECEPCIONISTA" | "MEDICO";
+export type UserRole =
+  | "PACIENTE"
+  | "RECEPCIONISTA"
+  | "MEDICO";
 
 export interface LoginRequest {
   identifier: string;
@@ -10,11 +13,12 @@ export interface AuthenticatedUser {
   username: string;
   email: string;
   role: UserRole;
-  consultorioId: number;
+  clinicId: number;
 }
 
 export interface LoginResponse {
-  token: string;
+  accessToken: string;
   tokenType: "Bearer";
+  expiresIn: number;
   user: AuthenticatedUser;
 }

@@ -1,6 +1,5 @@
 agendoc:
   security:
-    permit-development-endpoints: false
   cors:
     allowed-origins: ${AGENDOC_CORS_ALLOWED_ORIGINS}
 

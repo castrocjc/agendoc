@@ -6,6 +6,7 @@ import com.agendoc.modules.auth.dto.LoginResponse;
 import com.agendoc.modules.auth.exception.InvalidCredentialsException;
 import com.agendoc.modules.user.entity.UserEntity;
 import com.agendoc.modules.user.repository.UserRepository;
+import com.agendoc.security.jwt.JwtTokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,8 +18,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
 
+    private static final String TOKEN_TYPE = "Bearer";
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenService jwtTokenService;
 
     @Override
     public LoginResponse authenticate(LoginRequest request) {
@@ -28,8 +31,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         validatePassword(request.password(), user.getPasswordHash());
 
         AuthenticatedUser authenticatedUser = createAuthenticatedUser(user);
+        String accessToken = jwtTokenService.generateToken(authenticatedUser);
 
-        return createResponse(authenticatedUser);
+        return createResponse(
+                accessToken,
+                authenticatedUser
+        );
     }
 
     private UserEntity findUser(String identifier) {
@@ -71,12 +78,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     private LoginResponse createResponse(
+            String accessToken,
             AuthenticatedUser authenticatedUser
     ) {
         return new LoginResponse(
-                null,
-                null,
-                0L,
+                accessToken,
+                TOKEN_TYPE,
+                jwtTokenService.getExpirationSeconds(),
                 authenticatedUser
         );
     }

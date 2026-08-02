@@ -3226,11 +3226,25 @@ Dependencias
 
 Estado
 
-Pendiente.
+Completada.
 
 Sprint previsto
 
 Sprint 4.
+
+Sprint ejecutado
+
+Sprint 4.
+
+Resultado
+
+- Backend genera JWT firmado durante el proceso de autenticación.
+- El Frontend almacena la sesión autenticada utilizando Session Storage.
+- Todas las solicitudes protegidas incluyen automáticamente el encabezado Authorization Bearer.
+- Spring Security valida el JWT en cada solicitud protegida.
+- El usuario autenticado queda disponible mediante el SecurityContext.
+- Se eliminaron los mecanismos temporales de autenticación utilizados durante el desarrollo inicial.
+- La autenticación quedó preparada para soportar TS-03 y TS-04.
 
 ---
 
@@ -4054,6 +4068,9 @@ La capacidad del paciente para cancelar sus propias citas utilizará la funciona
 Avance
 
 - ✅ TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
+- ✅ TS-02 — Completar autenticación JWT End-to-End
+- ⏳ TS-03 — Implementar contexto del usuario autenticado
+- ⏳ TS-04 — Implementar autorización por dominio
 - ⏳ HU-09 — Reservar cita como paciente
 - ⏳ HU-11 — Consultar mis citas como paciente
 
@@ -4371,5 +4388,30 @@ Decisiones tomadas
 - Se selecciona HU-09 como primera Historia del Sprint.
 - Se inicia el refinamiento funcional de HU-09.
 - Se revisa y sincroniza la documentación oficial antes del desarrollo.
+
+---
+
+Sprint 4
+
+Sesión 2 — Cierre de TS-02
+
+Estado
+
+✅ Completada
+
+Technical Stories completadas
+
+- TS-02 — Completar autenticación JWT End-to-End.
+
+Decisiones tomadas
+
+- Se implementó autenticación JWT de extremo a extremo.
+- El Backend genera el token durante el inicio de sesión.
+- Spring Security valida el JWT en todas las solicitudes protegidas.
+- El Frontend almacena la sesión autenticada utilizando Session Storage.
+- El cliente incorpora automáticamente el encabezado Authorization Bearer en todas las llamadas protegidas.
+- Se eliminaron los mecanismos temporales de autenticación utilizados durante el desarrollo.
+- La plataforma quedó preparada para implementar TS-03 (Contexto del usuario autenticado) y TS-04 (Autorización por dominio).
+- Se validó el flujo completo mediante pruebas automatizadas y pruebas funcionales.
 
 ---

@@ -388,6 +388,7 @@ Reglas:
 - No se utilizarán archivos `.env` para la configuración del Backend.
 - No se incorporarán librerías adicionales para interpretar archivos `.env`.
 - La configuración de los ambientes de integración y producción utilizará variables de entorno estándar de Spring Boot cuando corresponda.
+- Las propiedades sensibles, como secretos JWT y credenciales de base de datos, deberán obtenerse exclusivamente mediante variables de entorno o mecanismos equivalentes del ambiente de ejecución.
 
 ### Frontend Web (React + Vite)
 
@@ -713,6 +714,7 @@ Cuando una Historia de Usuario incluya implementación en el Backend, deberá va
 - Contrato de entrada y salida definido mediante DTOs.
 - Bean Validation implementada para los datos de entrada.
 - Configuración de Spring Security actualizada cuando corresponda.
+- El flujo de autenticación JWT fue validado cuando la Historia involucre endpoints protegidos.
 - Manejo global de excepciones actualizado cuando corresponda.
 - Respuestas HTTP y estructura de errores consistentes.
 - Caso funcional exitoso validado.
@@ -1067,23 +1069,30 @@ Sprint 4 — Autogestión del paciente
 
 Objetivo:
 
-Implementar TS-01 para habilitar el entorno multidispositivo y multiambiente requerido antes de continuar con el flujo funcional del paciente.
+Implementar el contexto del usuario autenticado y la autorización por dominio para habilitar de forma segura HU-09 — Reservar cita como paciente y HU-11 — Consultar mis citas.
 
 Technical Story activa:
 
-TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
+TS-03 — Implementar contexto del usuario autenticado.
+
+Siguientes incrementos:
+
+- TS-04 — Implementar autorización por dominio.
+- HU-09 — Reservar cita como paciente.
+- HU-11 — Consultar mis citas.
 
 Antes de iniciar:
 
 - Validar que `develop` se encuentre sincronizada con `origin/develop`.
 - Confirmar que Backend y Frontend compilan correctamente.
-- Trabajar directamente sobre `develop` conforme a la excepción aprobada para desarrollo individual, o utilizar `feature/sprint4-ts01-multienvironment` si se retoma el flujo de ramas.
-- Revisar la configuración actual del Backend, Frontend y CORS.
-- Mantener el desarrollo exclusivamente dentro del alcance de TS-01.
+- Confirmar que todas las pruebas automatizadas finalizan exitosamente.
+- Confirmar que el flujo JWT End-to-End permanece operativo.
+- Revisar el uso de SecurityContext y JwtAuthenticationFilter.
+- Mantener el desarrollo exclusivamente dentro del alcance de TS-03.
 
 Estado:
 
-En ejecución
+En ejecución.
 
 ---
 

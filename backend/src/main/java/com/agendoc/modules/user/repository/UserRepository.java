@@ -15,4 +15,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
             String username,
             String email
     );
+
+    @EntityGraph(attributePaths = {"clinic", "role"})
+    Optional<UserEntity> findWithClinicAndRoleById(Long id);
 }

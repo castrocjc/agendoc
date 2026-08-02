@@ -1,3 +1,5 @@
+import { getAccessToken } from "../../features/auth/services/sessionService";
+
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8081";
 
@@ -27,6 +29,21 @@ export class ApiClientError extends Error {
     this.code = code;
     this.apiMessage = apiMessage;
   }
+}
+
+function buildHeaders(options: RequestInit): Headers {
+  const headers = new Headers(options.headers);
+  const accessToken = getAccessToken();
+
+  if (!headers.has("Accept")) {
+    headers.set("Accept", "application/json");
+  }
+
+  if (accessToken && !headers.has("Authorization")) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
+  }
+
+  return headers;
 }
 
 async function readErrorResponse(
@@ -63,10 +80,7 @@ export async function apiRequest<T>(
   try {
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
-      headers: {
-        Accept: "application/json",
-        ...options.headers,
-      },
+      headers: buildHeaders(options),
     });
   } catch {
     throw new ApiClientError(
