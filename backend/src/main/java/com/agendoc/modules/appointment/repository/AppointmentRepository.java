@@ -28,16 +28,36 @@ public interface AppointmentRepository
          * The lock prevents concurrent transactions from modifying the same
          * appointment while a state transition is being processed.
          */
+
         @Lock(LockModeType.PESSIMISTIC_WRITE)
         @Query("""
-                        SELECT a
-                        FROM AppointmentEntity a
-                        WHERE a.id = :id
-                        AND a.recordStatus = :recordStatus
-                        """)
-        Optional<AppointmentEntity> findByIdAndRecordStatusForUpdate(
-                        Long id,
-                        RecordStatus recordStatus);
+                SELECT a
+                FROM AppointmentEntity a
+                WHERE a.id = :id
+                AND a.clinic.id = :clinicId
+                AND a.recordStatus = :recordStatus
+                """)
+        Optional<AppointmentEntity> findByIdAndClinicIdAndRecordStatusForUpdate(
+                Long id,
+                Long clinicId,
+                RecordStatus recordStatus
+        );
+
+        @Lock(LockModeType.PESSIMISTIC_WRITE)
+        @Query("""
+                SELECT a
+                FROM AppointmentEntity a
+                WHERE a.id = :id
+                AND a.clinic.id = :clinicId
+                AND a.patient.id = :patientId
+                AND a.recordStatus = :recordStatus
+                """)
+        Optional<AppointmentEntity> findByIdAndClinicIdAndPatientIdAndRecordStatusForUpdate(
+                Long id,
+                Long clinicId,
+                Long patientId,
+                RecordStatus recordStatus
+        );
 
         boolean existsByAgendaBlockIdAndRecordStatus(
                         Long agendaBlockId,

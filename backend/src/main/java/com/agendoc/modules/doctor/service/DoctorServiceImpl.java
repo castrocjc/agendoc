@@ -13,6 +13,9 @@ import com.agendoc.modules.doctor.entity.DoctorEntity;
 import com.agendoc.modules.doctor.entity.MedicalSpecialtyEntity;
 import com.agendoc.modules.doctor.repository.DoctorRepository;
 import com.agendoc.modules.doctor.repository.MedicalSpecialtyRepository;
+import com.agendoc.security.authorization.AuthenticatedUserAuthorization;
+import com.agendoc.security.authorization.SecurityRoleCode;
+import com.agendoc.security.context.AuthenticatedUserContext;
 import java.util.Locale;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -38,18 +41,25 @@ public class DoctorServiceImpl implements DoctorService {
         private final DoctorRepository doctorRepository;
         private final MedicalSpecialtyRepository medicalSpecialtyRepository;
         private final ClinicRepository clinicRepository;
+        private final AuthenticatedUserAuthorization authenticatedUserAuthorization;
 
         @Override
         @Transactional
         public DoctorResponse createDoctor(CreateDoctorRequest request) {
 
+                AuthenticatedUserContext context =
+                                authenticatedUserAuthorization.requireRole(
+                                                SecurityRoleCode.RECEPTIONIST);
+
+                ClinicEntity clinic = findActiveClinic(
+                                context.clinicId());
+
                 NormalizedDoctorData data = normalize(request);
 
                 validateDuplicates(data);
 
-                ClinicEntity clinic = findActiveClinic();
-
-                MedicalSpecialtyEntity specialty = findActiveSpecialty(data.specialtyId());
+                MedicalSpecialtyEntity specialty = findActiveSpecialty(
+                                data.specialtyId());
 
                 DoctorEntity doctor = createEntity(
                                 data,
@@ -65,11 +75,14 @@ public class DoctorServiceImpl implements DoctorService {
         @Transactional(readOnly = true)
         public List<DoctorResponse> findDoctors() {
 
-                ClinicEntity clinic = findActiveClinic();
+                AuthenticatedUserContext context =
+                                authenticatedUserAuthorization.requireAnyRole(
+                                                SecurityRoleCode.PATIENT,
+                                                SecurityRoleCode.RECEPTIONIST);
 
                 return doctorRepository
                                 .findAllByClinicIdAndRecordStatusOrderByLastNameAscFirstNameAsc(
-                                                clinic.getId(),
+                                                context.clinicId(),
                                                 RecordStatus.ACTIVE)
                                 .stream()
                                 .map(this::toResponse)
@@ -122,9 +135,12 @@ public class DoctorServiceImpl implements DoctorService {
                 }
         }
 
-        private ClinicEntity findActiveClinic() {
+        private ClinicEntity findActiveClinic(
+                        Long clinicId) {
+
                 return clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
+                                .findByIdAndRecordStatus(
+                                                clinicId,
                                                 RecordStatus.ACTIVE)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 CLINIC_NOT_AVAILABLE));

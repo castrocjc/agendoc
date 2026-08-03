@@ -22,6 +22,9 @@ import com.agendoc.modules.agenda.repository.AgendaBlockRepository;
 import com.agendoc.modules.agenda.repository.MedicalAgendaRepository;
 import com.agendoc.modules.clinic.repository.ClinicRepository;
 import com.agendoc.modules.doctor.repository.DoctorRepository;
+import com.agendoc.security.authorization.AuthenticatedUserAuthorization;
+import com.agendoc.security.authorization.SecurityRoleCode;
+import com.agendoc.security.context.AuthenticatedUserContext;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -46,14 +49,27 @@ public class AgendaServiceImpl implements AgendaService {
         private final AgendaBlockRepository agendaBlockRepository;
         private final DoctorRepository doctorRepository;
         private final ClinicRepository clinicRepository;
+        private final AuthenticatedUserAuthorization authenticatedUserAuthorization;
 
         @Override
         @Transactional
         public CreateAgendaBlocksResponse createAgendaBlocks(
-                        Long doctorId,
-                        CreateAgendaBlocksRequest request) {
-                ClinicEntity clinic = findActiveClinic();
-                DoctorEntity doctor = findActiveDoctor(doctorId, clinic);
+                Long doctorId,
+                CreateAgendaBlocksRequest request) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST
+                        );
+
+                ClinicEntity clinic =
+                        findActiveClinic(context.clinicId());
+
+                DoctorEntity doctor =
+                        findActiveDoctor(
+                                doctorId,
+                                context.clinicId()
+                        );
 
                 MedicalAgendaEntity medicalAgenda = findOrCreateMedicalAgenda(doctor, clinic);
 
@@ -81,12 +97,22 @@ public class AgendaServiceImpl implements AgendaService {
         @Override
         @Transactional(readOnly = true)
         public List<AgendaBlockResponse> findAgendaBlocks(
-                        Long doctorId,
-                        LocalDate appointmentDate) {
+                Long doctorId,
+                LocalDate appointmentDate) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireAnyRole(
+                                SecurityRoleCode.PATIENT,
+                                SecurityRoleCode.RECEPTIONIST
+                        );
+
                 validateAvailabilityDate(appointmentDate);
 
-                ClinicEntity clinic = findActiveClinic();
-                DoctorEntity doctor = findActiveDoctor(doctorId, clinic);
+                DoctorEntity doctor =
+                        findActiveDoctor(
+                                doctorId,
+                                context.clinicId()
+                        );
 
                 return medicalAgendaRepository
                                 .findByDoctorIdAndRecordStatus(
@@ -111,30 +137,32 @@ public class AgendaServiceImpl implements AgendaService {
                 }
         }
 
-        private ClinicEntity findActiveClinic() {
+        private ClinicEntity findActiveClinic(
+                Long clinicId) {
+
                 return clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                CLINIC_NOT_AVAILABLE));
+                        .findByIdAndRecordStatus(
+                                clinicId,
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                CLINIC_NOT_AVAILABLE
+                        ));
         }
 
         private DoctorEntity findActiveDoctor(
-                        Long doctorId,
-                        ClinicEntity clinic) {
-                DoctorEntity doctor = doctorRepository
-                                .findByIdAndRecordStatus(
-                                                doctorId,
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                DOCTOR_NOT_AVAILABLE));
+                Long doctorId,
+                Long clinicId) {
 
-                if (!doctor.getClinic().getId().equals(clinic.getId())) {
-                        throw new ResourceNotFoundException(
-                                        DOCTOR_NOT_AVAILABLE);
-                }
-
-                return doctor;
+                return doctorRepository
+                        .findByIdAndClinicIdAndRecordStatus(
+                                doctorId,
+                                clinicId,
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                DOCTOR_NOT_AVAILABLE
+                        ));
         }
 
         private MedicalAgendaEntity findOrCreateMedicalAgenda(

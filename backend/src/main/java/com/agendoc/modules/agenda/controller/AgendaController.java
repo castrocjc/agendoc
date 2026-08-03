@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * REST controller for medical agenda management operations.
@@ -27,39 +28,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class AgendaController {
 
-    private final AgendaService agendaService;
+        private final AgendaService agendaService;
 
-    @PostMapping("/{doctorId}/agenda-blocks")
-    public ResponseEntity<CreateAgendaBlocksResponse> createAgendaBlocks(
-            @PathVariable Long doctorId,
-            @Valid @RequestBody CreateAgendaBlocksRequest request
-    ) {
+        @PreAuthorize("hasRole('RECEPTIONIST')")
+        @PostMapping("/{doctorId}/agenda-blocks")
+        public ResponseEntity<CreateAgendaBlocksResponse> createAgendaBlocks(
+                @PathVariable Long doctorId,
+                @Valid @RequestBody CreateAgendaBlocksRequest request
+        ) {
 
-        CreateAgendaBlocksResponse response =
-                agendaService.createAgendaBlocks(
-                        doctorId,
-                        request
-                );
+                CreateAgendaBlocksResponse response = agendaService.createAgendaBlocks(
+                                doctorId,
+                                request);
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
+                return ResponseEntity
+                                .status(HttpStatus.CREATED)
+                                .body(response);
+        }
 
-    @GetMapping("/{doctorId}/agenda-blocks")
-    public ResponseEntity<List<AgendaBlockResponse>> findAgendaBlocks(
-            @PathVariable Long doctorId,
-            @RequestParam
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            LocalDate appointmentDate
-    ) {
+        @PreAuthorize("hasAnyRole('PATIENT', 'RECEPTIONIST')")
+        @GetMapping("/{doctorId}/agenda-blocks")
+        public ResponseEntity<List<AgendaBlockResponse>> findAgendaBlocks(
+                @PathVariable Long doctorId,
+                @RequestParam
+                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                LocalDate appointmentDate
+        ) {
 
-        List<AgendaBlockResponse> response =
-                agendaService.findAgendaBlocks(
-                        doctorId,
-                        appointmentDate
-                );
+                List<AgendaBlockResponse> response = agendaService.findAgendaBlocks(
+                                doctorId,
+                                appointmentDate);
 
-        return ResponseEntity.ok(response);
-    }
+                return ResponseEntity.ok(response);
+        }
 }

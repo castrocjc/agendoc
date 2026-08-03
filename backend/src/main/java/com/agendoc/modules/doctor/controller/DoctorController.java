@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * REST controller for doctor management operations.
@@ -25,14 +26,16 @@ public class DoctorController {
 
         private final DoctorService doctorService;
 
+        @PreAuthorize("hasAnyRole('PATIENT', 'RECEPTIONIST')")
         @GetMapping
         public ResponseEntity<List<DoctorResponse>> findDoctors() {
 
-        return ResponseEntity.ok(
-                doctorService.findDoctors()
-        );
+                return ResponseEntity.ok(
+                        doctorService.findDoctors()
+                );
         }
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @PostMapping
         public ResponseEntity<DoctorResponse> createDoctor(
                         @Valid @RequestBody CreateDoctorRequest request) {
@@ -40,7 +43,7 @@ public class DoctorController {
                 DoctorResponse response = doctorService.createDoctor(request);
 
                 return ResponseEntity
-                                .status(HttpStatus.CREATED)
-                                .body(response);
+                        .status(HttpStatus.CREATED)
+                        .body(response);
         }
 }

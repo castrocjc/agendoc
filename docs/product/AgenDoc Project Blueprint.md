@@ -7,10 +7,10 @@
 | Proyecto             | AgenDoc                                           |
 | Tipo                 | Plataforma Web + Mobile                           |
 | Metodología          | Scrum                                             |
-| Blueprint Version    | v1.10                                             |
+| Blueprint Version    | v1.11                                             |
 | Sprint Actual        | Sprint 4                                          |
 | Estado               | Sprint 4 en ejecución                             |
-| Última actualización | Sprint 4 — Cierre de TS-03                        |
+| Última actualización | Sprint 4 — Cierre de TS-04                        |
 
 ---
 
@@ -3308,11 +3308,21 @@ Dependencias
 
 Estado
 
-Pendiente.
+Completada.
 
 Sprint previsto
 
 Sprint 4.
+
+Resultado
+
+- Se implementó autorización por dominio basada en el usuario autenticado.
+- La autorización se aplica utilizando Spring Security con anotaciones @PreAuthorize y validaciones de dominio.
+- Los pacientes únicamente pueden gestionar recursos que les pertenecen.
+- Las recepcionistas únicamente pueden operar sobre recursos del consultorio asociado a su contexto autenticado.
+- Los médicos únicamente pueden acceder a sus propias citas y registrar observaciones sobre ellas.
+- Se incorporó una capa de autorización reutilizable para validar propiedad del recurso y pertenencia al consultorio.
+- Se centralizaron las reglas de autorización para reducir duplicidad y facilitar futuras ampliaciones de seguridad.
 
 ---
 
@@ -4082,7 +4092,7 @@ Avance
 - ✅ TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
 - ✅ TS-02 — Completar autenticación JWT End-to-End
 - ✅ TS-03 — Implementar contexto del usuario autenticado
-- ⏳ TS-04 — Implementar autorización por dominio
+- ✅ TS-04 — Implementar autorización por dominio
 - ⏳ HU-09 — Reservar cita como paciente
 - ⏳ HU-11 — Consultar mis citas como paciente
 
@@ -4451,3 +4461,27 @@ Decisiones tomadas
 - La implementación fue validada mediante pruebas automatizadas y pruebas funcionales.
 
 ---
+
+Sprint 4
+
+Sesión 4 — Cierre de TS-04
+
+Estado
+
+✅ Completada
+
+Technical Stories completadas
+
+- TS-04 — Implementar autorización por dominio.
+
+Decisiones tomadas
+
+- Se implementó autorización basada en roles mediante Spring Security utilizando anotaciones @PreAuthorize.
+- Se incorporó una capa de autorización del dominio para validar la pertenencia de los recursos al consultorio del usuario autenticado.
+- Las operaciones sensibles dejaron de depender de identificadores enviados por el Frontend cuando estos pueden derivarse del contexto autenticado.
+- Se reforzó la protección de los módulos de pacientes, médicos, agendas y citas mediante validaciones de autorización centralizadas.
+- La implementación fue validada mediante pruebas automatizadas (95 pruebas exitosas) y pruebas funcionales de extremo a extremo.
+- La plataforma quedó preparada para iniciar las Historias de Usuario HU-09 y HU-11 sobre una base de autorización consistente.
+
+---
+

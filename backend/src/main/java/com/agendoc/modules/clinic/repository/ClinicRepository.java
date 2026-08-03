@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface ClinicRepository extends JpaRepository<ClinicEntity, Long> {
 
-    Optional<ClinicEntity> findFirstByRecordStatusOrderByIdAsc(
-            RecordStatus recordStatus
-    );
+        Optional<ClinicEntity> findByIdAndRecordStatus(
+                        Long id,
+                        RecordStatus recordStatus);
 }

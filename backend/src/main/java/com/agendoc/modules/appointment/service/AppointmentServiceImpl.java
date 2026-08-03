@@ -19,6 +19,10 @@ import com.agendoc.modules.appointment.entity.AppointmentRescheduleHistoryEntity
 import com.agendoc.modules.appointment.repository.AppointmentRepository;
 import com.agendoc.modules.appointment.repository.AppointmentStatusRepository;
 import com.agendoc.modules.appointment.repository.AppointmentRescheduleHistoryRepository;
+import com.agendoc.modules.appointment.authorization.AppointmentAuthorizationPolicy;
+import com.agendoc.security.authorization.AuthenticatedUserAuthorization;
+import com.agendoc.security.authorization.SecurityRoleCode;
+import com.agendoc.security.context.AuthenticatedUserContext;
 import com.agendoc.modules.clinic.entity.ClinicEntity;
 import com.agendoc.modules.clinic.repository.ClinicRepository;
 import com.agendoc.modules.doctor.entity.DoctorEntity;
@@ -84,8 +88,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         private static final String APPOINTMENT_STATUS_NOT_AVAILABLE = "El estado de la cita no está disponible.";
 
-        private static final String SYSTEM_USER = "SYSTEM";
-
         private final AppointmentRepository appointmentRepository;
         private final AppointmentRescheduleHistoryRepository appointmentRescheduleHistoryRepository;
         private final AppointmentStatusRepository appointmentStatusRepository;
@@ -93,56 +95,67 @@ public class AppointmentServiceImpl implements AppointmentService {
         private final PatientRepository patientRepository;
         private final DoctorRepository doctorRepository;
         private final ClinicRepository clinicRepository;
+        private final AuthenticatedUserAuthorization authenticatedUserAuthorization;
+        private final AppointmentAuthorizationPolicy appointmentAuthorizationPolicy;
 
         @Override
         @Transactional
         public AppointmentResponse createAppointment(
-                        CreateAppointmentRequest request) {
-                ClinicEntity clinic = findActiveClinic();
+                CreateAppointmentRequest request) {
 
-                PatientEntity patient = findActivePatient(
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST
+                        );
+
+                ClinicEntity clinic =
+                        findActiveClinic(context.clinicId());
+
+                PatientEntity patient =
+                        findActivePatient(
                                 request.patientId(),
-                                clinic);
+                                clinic
+                        );
 
-                DoctorEntity doctor = findActiveDoctor(
+                DoctorEntity doctor =
+                        findActiveDoctor(
                                 request.doctorId(),
-                                clinic);
+                                clinic
+                        );
 
-                /*
-                 * The block is retrieved using a pessimistic write lock.
-                 * This prevents two concurrent transactions from reserving
-                 * the same agenda block.
-                 */
-                AgendaBlockEntity agendaBlock = findAndLockActiveAgendaBlock(
-                                request.agendaBlockId());
+                AgendaBlockEntity agendaBlock =
+                        findAndLockActiveAgendaBlock(
+                                request.agendaBlockId()
+                        );
 
                 validateAgendaBlock(
-                                agendaBlock,
-                                doctor,
-                                clinic);
+                        agendaBlock,
+                        doctor,
+                        clinic
+                );
 
                 validatePatientScheduleConflict(
-                                patient,
-                                agendaBlock);
+                        patient,
+                        agendaBlock
+                );
 
-                AppointmentStatusEntity initialStatus = findInitialAppointmentStatus();
+                AppointmentStatusEntity initialStatus =
+                        findInitialAppointmentStatus();
 
-                AppointmentEntity appointment = createEntity(
+                AppointmentEntity appointment =
+                        createEntity(
                                 request,
                                 clinic,
                                 patient,
                                 doctor,
                                 agendaBlock,
-                                initialStatus);
+                                initialStatus
+                        );
 
-                /*
-                 * The block remains unavailable after the appointment
-                 * is successfully created. The update and appointment insert
-                 * are committed in the same transaction.
-                 */
                 agendaBlock.setAvailable(false);
 
-                AppointmentEntity savedAppointment = appointmentRepository.save(appointment);
+                AppointmentEntity savedAppointment =
+                        appointmentRepository.save(appointment);
 
                 return toResponse(savedAppointment);
         }
@@ -150,34 +163,58 @@ public class AppointmentServiceImpl implements AppointmentService {
         @Override
         @Transactional
         public AppointmentResponse cancelAppointment(
-                        Long appointmentId,
-                        CancelAppointmentRequest request) {
-                ClinicEntity clinic = findActiveClinic();
+                Long appointmentId,
+                CancelAppointmentRequest request) {
 
-                AppointmentEntity appointment = appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                appointmentId,
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                APPOINTMENT_NOT_AVAILABLE));
-                validateAppointmentClinic(
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireAnyRole(
+                                SecurityRoleCode.RECEPTIONIST,
+                                SecurityRoleCode.PATIENT
+                        );
+
+                SecurityRoleCode currentRole =
+                        SecurityRoleCode.from(context.roleCode());
+
+                AppointmentEntity appointment =
+                        findAppointmentForCancellation(
+                                appointmentId,
+                                context,
+                                currentRole
+                        );
+
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        appointment
+                );
+
+                if (currentRole == SecurityRoleCode.PATIENT) {
+                        appointmentAuthorizationPolicy.requirePatientOwnership(
+                                context,
+                                appointment
+                        );
+
+                        validatePatientCancellation(appointment);
+                } else {
+                        validateCancellation(
                                 appointment,
-                                clinic);
+                                request
+                        );
+                }
 
-                validateCancellation(
-                                appointment,
-                                request);
-
-                AppointmentStatusEntity cancelledStatus = findAppointmentStatus(
-                                AppointmentStatusCode.CANCELADA);
+                AppointmentStatusEntity cancelledStatus =
+                        findAppointmentStatus(
+                                AppointmentStatusCode.CANCELADA
+                        );
 
                 appointment.setStatus(cancelledStatus);
                 appointment.setCancellationReason(
-                                normalizeOptional(request.reason()));
+                        normalizeOptional(request.reason())
+                );
                 appointment.setCancelledAt(LocalDateTime.now());
                 appointment.getAgendaBlock().setAvailable(true);
 
-                AppointmentEntity savedAppointment = appointmentRepository.save(appointment);
+                AppointmentEntity savedAppointment =
+                        appointmentRepository.save(appointment);
 
                 return toResponse(savedAppointment);
         }
@@ -185,37 +222,43 @@ public class AppointmentServiceImpl implements AppointmentService {
         @Override
         @Transactional
         public AppointmentResponse confirmArrival(
-                        Long appointmentId) {
+                Long appointmentId) {
 
-                ClinicEntity clinic = findActiveClinic();
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST
+                        );
 
-                /*
-                 * The appointment is locked to prevent concurrent state changes,
-                 * cancellation, rescheduling or duplicate arrival confirmation.
-                 */
                 AppointmentEntity appointment = appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                appointmentId,
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                APPOINTMENT_NOT_AVAILABLE));
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                appointmentId,
+                                context.clinicId(),
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                APPOINTMENT_NOT_AVAILABLE
+                        ));
 
-                validateAppointmentClinic(
-                                appointment,
-                                clinic);
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        appointment
+                );
 
                 validateArrivalConfirmationStatus(
-                                appointment);
+                        appointment
+                );
 
-                AppointmentStatusEntity confirmedStatus = findAppointmentStatus(
-                                AppointmentStatusCode.CONFIRMADA);
+                AppointmentStatusEntity confirmedStatus =
+                        findAppointmentStatus(
+                                AppointmentStatusCode.CONFIRMADA
+                        );
 
                 appointment.setStatus(confirmedStatus);
                 appointment.setConfirmedAt(OffsetDateTime.now());
-                appointment.setConfirmedBy(SYSTEM_USER);
+                appointment.setConfirmedBy(context.username());
 
-                AppointmentEntity savedAppointment = appointmentRepository.save(
-                                appointment);
+                AppointmentEntity savedAppointment =
+                        appointmentRepository.save(appointment);
 
                 return toResponse(savedAppointment);
         }
@@ -223,40 +266,45 @@ public class AppointmentServiceImpl implements AppointmentService {
         @Override
         @Transactional
         public AppointmentResponse registerNoShow(
-                        Long appointmentId,
-                        RegisterAppointmentNoShowRequest request) {
+                Long appointmentId,
+                RegisterAppointmentNoShowRequest request) {
 
-                ClinicEntity clinic = findActiveClinic();
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST
+                        );
 
-                /*
-                 * The appointment is locked to prevent concurrent cancellation,
-                 * rescheduling, arrival confirmation or duplicate no-show registration.
-                 */
                 AppointmentEntity appointment = appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                appointmentId,
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                APPOINTMENT_NOT_AVAILABLE));
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                appointmentId,
+                                context.clinicId(),
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                APPOINTMENT_NOT_AVAILABLE
+                        ));
 
-                validateAppointmentClinic(
-                                appointment,
-                                clinic);
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        appointment
+                );
 
-                validateNoShowRegistration(
-                                appointment);
+                validateNoShowRegistration(appointment);
 
-                AppointmentStatusEntity noShowStatus = findAppointmentStatus(
-                                AppointmentStatusCode.NO_ASISTIO);
+                AppointmentStatusEntity noShowStatus =
+                        findAppointmentStatus(
+                                AppointmentStatusCode.NO_ASISTIO
+                        );
 
                 appointment.setStatus(noShowStatus);
                 appointment.setNoShowAt(OffsetDateTime.now());
-                appointment.setNoShowBy(SYSTEM_USER);
+                appointment.setNoShowBy(context.username());
                 appointment.setNoShowComment(
-                                normalizeOptional(request.comment()));
+                        normalizeOptional(request.comment())
+                );
 
-                AppointmentEntity savedAppointment = appointmentRepository.save(
-                                appointment);
+                AppointmentEntity savedAppointment =
+                        appointmentRepository.save(appointment);
 
                 return toResponse(savedAppointment);
         }
@@ -264,62 +312,68 @@ public class AppointmentServiceImpl implements AppointmentService {
         @Override
         @Transactional
         public AppointmentResponse rescheduleAppointment(
-                        Long appointmentId,
-                        RescheduleAppointmentRequest request) {
+                Long appointmentId,
+                RescheduleAppointmentRequest request) {
 
-                ClinicEntity clinic = findActiveClinic();
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST
+                        );
 
-                /*
-                 * The appointment is locked to prevent concurrent state changes,
-                 * cancellation or another reschedule operation.
-                 */
                 AppointmentEntity appointment = appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                appointmentId,
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                APPOINTMENT_NOT_AVAILABLE));
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                appointmentId,
+                                context.clinicId(),
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                APPOINTMENT_NOT_AVAILABLE
+                        ));
 
-                validateAppointmentClinic(
-                                appointment,
-                                clinic);
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        appointment
+                );
 
                 validateReschedulingStatus(appointment);
 
-                AgendaBlockEntity previousAgendaBlock = appointment.getAgendaBlock();
+                AgendaBlockEntity previousAgendaBlock =
+                        appointment.getAgendaBlock();
 
-                /*
-                 * The destination block is locked to prevent another transaction
-                 * from reserving it during the reschedule operation.
-                 */
-                AgendaBlockEntity newAgendaBlock = findAndLockActiveAgendaBlock(
-                                request.agendaBlockId());
+                AgendaBlockEntity newAgendaBlock =
+                        findAndLockActiveAgendaBlock(
+                                request.agendaBlockId()
+                        );
+
+                ClinicEntity clinic =
+                        findActiveClinic(context.clinicId());
 
                 validateRescheduleAgendaBlock(
-                                appointment,
-                                previousAgendaBlock,
-                                newAgendaBlock,
-                                clinic);
+                        appointment,
+                        previousAgendaBlock,
+                        newAgendaBlock,
+                        clinic
+                );
 
                 validatePatientScheduleConflictExcludingAppointment(
-                                appointment,
-                                newAgendaBlock);
+                        appointment,
+                        newAgendaBlock
+                );
 
-                /*
-                 * The history record is built before changing the appointment,
-                 * preserving a snapshot of both blocks.
-                 */
-                AppointmentRescheduleHistoryEntity history = createRescheduleHistory(
+                AppointmentRescheduleHistoryEntity history =
+                        createRescheduleHistory(
                                 appointment,
                                 previousAgendaBlock,
-                                newAgendaBlock);
+                                newAgendaBlock
+                        );
 
                 previousAgendaBlock.setAvailable(true);
                 newAgendaBlock.setAvailable(false);
 
                 appointment.setAgendaBlock(newAgendaBlock);
 
-                AppointmentEntity savedAppointment = appointmentRepository.save(appointment);
+                AppointmentEntity savedAppointment =
+                        appointmentRepository.save(appointment);
 
                 appointmentRescheduleHistoryRepository.save(history);
 
@@ -329,35 +383,75 @@ public class AppointmentServiceImpl implements AppointmentService {
         @Override
         @Transactional(readOnly = true)
         public List<AppointmentAgendaResponse> findAppointments(
-                        LocalDate appointmentDate,
-                        Long doctorId,
-                        String statusCode) {
-                ClinicEntity clinic = findActiveClinic();
+                LocalDate appointmentDate,
+                Long doctorId,
+                String statusCode) {
 
-                String normalizedStatusCode = normalizeStatusCode(statusCode);
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST
+                        );
+
+                String normalizedStatusCode =
+                        normalizeStatusCode(statusCode);
 
                 return appointmentRepository
-                                .findClinicAppointments(
-                                                clinic.getId(),
-                                                appointmentDate,
-                                                doctorId,
-                                                normalizedStatusCode,
-                                                RecordStatus.ACTIVE)
-                                .stream()
-                                .map(this::toAppointmentAgendaResponse)
-                                .toList();
+                        .findClinicAppointments(
+                                context.clinicId(),
+                                appointmentDate,
+                                doctorId,
+                                normalizedStatusCode,
+                                RecordStatus.ACTIVE
+                        )
+                        .stream()
+                        .map(this::toAppointmentAgendaResponse)
+                        .toList();
         }
 
-        private void validateAppointmentClinic(
-                        AppointmentEntity appointment,
-                        ClinicEntity clinic) {
+        private AppointmentEntity findAppointmentForCancellation(
+                Long appointmentId,
+                AuthenticatedUserContext context,
+                SecurityRoleCode currentRole) {
 
-                if (!appointment.getClinic()
-                                .getId()
-                                .equals(clinic.getId())) {
+                if (currentRole == SecurityRoleCode.PATIENT) {
+                        return appointmentRepository
+                                .findByIdAndClinicIdAndPatientIdAndRecordStatusForUpdate(
+                                        appointmentId,
+                                        context.clinicId(),
+                                        context.patientId(),
+                                        RecordStatus.ACTIVE
+                                )
+                                .orElseThrow(() -> new ResourceNotFoundException(
+                                        APPOINTMENT_NOT_AVAILABLE
+                                ));
+                }
 
-                        throw new ResourceNotFoundException(
-                                        APPOINTMENT_NOT_AVAILABLE);
+                return appointmentRepository
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                appointmentId,
+                                context.clinicId(),
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                APPOINTMENT_NOT_AVAILABLE
+                        ));
+        }
+
+        private void validatePatientCancellation(
+                AppointmentEntity appointment) {
+
+                String currentStatusCode =
+                        appointment.getStatus().getCode();
+
+                boolean scheduled =
+                        AppointmentStatusCode.PROGRAMADA
+                                .name()
+                                .equals(currentStatusCode);
+
+                if (!scheduled) {
+                        throw new ConflictException(
+                                APPOINTMENT_CANNOT_BE_CANCELLED
+                        );
                 }
         }
 
@@ -543,12 +637,17 @@ public class AppointmentServiceImpl implements AppointmentService {
                 return history;
         }
 
-        private ClinicEntity findActiveClinic() {
+        private ClinicEntity findActiveClinic(
+                Long clinicId) {
+
                 return clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                CLINIC_NOT_AVAILABLE));
+                        .findByIdAndRecordStatus(
+                                clinicId,
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                CLINIC_NOT_AVAILABLE
+                        ));
         }
 
         private PatientEntity findActivePatient(
@@ -570,21 +669,18 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         private DoctorEntity findActiveDoctor(
-                        Long doctorId,
-                        ClinicEntity clinic) {
-                DoctorEntity doctor = doctorRepository
-                                .findByIdAndRecordStatus(
-                                                doctorId,
-                                                RecordStatus.ACTIVE)
-                                .orElseThrow(() -> new ResourceNotFoundException(
-                                                DOCTOR_NOT_AVAILABLE));
+                Long doctorId,
+                ClinicEntity clinic) {
 
-                if (!doctor.getClinic().getId().equals(clinic.getId())) {
-                        throw new ResourceNotFoundException(
-                                        DOCTOR_NOT_AVAILABLE);
-                }
-
-                return doctor;
+                return doctorRepository
+                        .findByIdAndClinicIdAndRecordStatus(
+                                doctorId,
+                                clinic.getId(),
+                                RecordStatus.ACTIVE
+                        )
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                DOCTOR_NOT_AVAILABLE
+                        ));
         }
 
         private AgendaBlockEntity findAndLockActiveAgendaBlock(

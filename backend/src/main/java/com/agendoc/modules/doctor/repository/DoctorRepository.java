@@ -23,6 +23,12 @@ public interface DoctorRepository extends JpaRepository<DoctorEntity, Long> {
                         Long id,
                         RecordStatus recordStatus);
 
+        Optional<DoctorEntity> findByIdAndClinicIdAndRecordStatus(
+                Long id,
+                Long clinicId,
+                RecordStatus recordStatus
+        );
+
         Optional<DoctorEntity> findByUserIdAndClinicIdAndRecordStatus(
                 Long userId,
                 Long clinicId,

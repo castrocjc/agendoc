@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * REST controller for patient management operations.
@@ -25,9 +26,10 @@ public class PatientController {
 
         private final PatientService patientService;
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @PostMapping
         public ResponseEntity<PatientResponse> createPatient(
-                        @Valid @RequestBody CreatePatientRequest request) {
+                @Valid @RequestBody CreatePatientRequest request) {
                 PatientResponse response = patientService.createPatient(request);
 
                 return ResponseEntity
@@ -35,9 +37,10 @@ public class PatientController {
                                 .body(response);
         }
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @GetMapping("/search")
         public ResponseEntity<List<PatientResponse>> searchPatients(
-                        @RequestParam(name = "query") String query) {
+                @RequestParam String query) {
                 List<PatientResponse> response = patientService.searchPatients(query);
 
                 return ResponseEntity.ok(response);

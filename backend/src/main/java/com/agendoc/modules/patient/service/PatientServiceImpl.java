@@ -14,6 +14,9 @@ import com.agendoc.modules.patient.dto.CreatePatientRequest;
 import com.agendoc.modules.patient.dto.PatientResponse;
 import com.agendoc.modules.patient.entity.PatientEntity;
 import com.agendoc.modules.patient.repository.PatientRepository;
+import com.agendoc.security.authorization.AuthenticatedUserAuthorization;
+import com.agendoc.security.authorization.SecurityRoleCode;
+import com.agendoc.security.context.AuthenticatedUserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +37,7 @@ public class PatientServiceImpl implements PatientService {
 
         private final PatientRepository patientRepository;
         private final ClinicRepository clinicRepository;
+        private final AuthenticatedUserAuthorization authenticatedUserAuthorization;
 
         private static final int MINIMUM_SEARCH_LENGTH = 2;
         private static final int MAXIMUM_SEARCH_RESULTS = 20;
@@ -45,32 +49,47 @@ public class PatientServiceImpl implements PatientService {
         public PatientResponse createPatient(
                         CreatePatientRequest request) {
 
+                AuthenticatedUserContext context =
+                                authenticatedUserAuthorization.requireRole(
+                                                SecurityRoleCode.RECEPTIONIST);
+
+                ClinicEntity clinic =
+                                findActiveClinic(context.clinicId());
+
                 NormalizedPatientData data = normalize(request);
 
                 validateDuplicates(data);
 
-                ClinicEntity clinic = findActiveClinic();
+                PatientEntity patient = createEntity(
+                                data,
+                                clinic);
 
-                PatientEntity patient = createEntity(data, clinic);
-
-                PatientEntity savedPatient = patientRepository.save(patient);
+                PatientEntity savedPatient =
+                                patientRepository.save(patient);
 
                 return toResponse(savedPatient);
         }
 
         @Override
         @Transactional(readOnly = true)
-        public List<PatientResponse> searchPatients(String query) {
-                String searchTerm = normalizeSearchTerm(query);
+        public List<PatientResponse> searchPatients(
+                        String query) {
 
-                ClinicEntity clinic = findActiveClinic();
+                AuthenticatedUserContext context =
+                                authenticatedUserAuthorization.requireRole(
+                                                SecurityRoleCode.RECEPTIONIST);
+
+                String searchTerm =
+                                normalizeSearchTerm(query);
 
                 return patientRepository
                                 .searchByClinicAndTerm(
-                                                clinic.getId(),
+                                                context.clinicId(),
                                                 RecordStatus.ACTIVE,
                                                 searchTerm,
-                                                PageRequest.of(0, MAXIMUM_SEARCH_RESULTS))
+                                                PageRequest.of(
+                                                                0,
+                                                                MAXIMUM_SEARCH_RESULTS))
                                 .stream()
                                 .map(this::toResponse)
                                 .toList();
@@ -125,9 +144,12 @@ public class PatientServiceImpl implements PatientService {
                 }
         }
 
-        private ClinicEntity findActiveClinic() {
+        private ClinicEntity findActiveClinic(
+                        Long clinicId) {
+
                 return clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
+                                .findByIdAndRecordStatus(
+                                                clinicId,
                                                 RecordStatus.ACTIVE)
                                 .orElseThrow(() -> new ResourceNotFoundException(
                                                 CLINIC_NOT_AVAILABLE));

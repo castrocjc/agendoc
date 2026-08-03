@@ -7,7 +7,7 @@
 |-----------|----------------------|
 | Proyecto  | AgenDoc              |
 | Documento | Development Playbook |
-| Versión   | v1.4                 |
+| Versión   | v1.5                 |
 | Estado    | Aprobado             |
 | Vigencia  | Desde Sprint 1       |
 
@@ -715,6 +715,7 @@ Cuando una Historia de Usuario incluya implementación en el Backend, deberá va
 - Bean Validation implementada para los datos de entrada.
 - Configuración de Spring Security actualizada cuando corresponda.
 - El flujo de autenticación JWT fue validado cuando la Historia involucre endpoints protegidos.
+- La autorización por rol, consultorio y propiedad del recurso fue validada cuando la Historia involucre operaciones protegidas.
 - Manejo global de excepciones actualizado cuando corresponda.
 - Respuestas HTTP y estructura de errores consistentes.
 - Caso funcional exitoso validado.
@@ -1071,23 +1072,21 @@ Objetivo:
 
 Implementar la autorización por dominio para habilitar de forma segura HU-09 — Reservar cita como paciente y HU-11 — Consultar mis citas.
 
-Technical Story completada:
+Technical Stories completadas:
 
-TS-03 — Implementar contexto del usuario autenticado.
+- TS-03 — Implementar contexto del usuario autenticado.
+- TS-04 — Implementar autorización por dominio.
 
 Resultado:
 
-- Se implementó un contexto centralizado del usuario autenticado.
-- El Backend puede obtener el usuario, rol y consultorio desde Spring Security.
-- Los perfiles de negocio Paciente y Médico pueden resolverse desde el usuario autenticado cuando corresponda.
-- El rol Recepcionista utiliza el contexto de usuario y consultorio sin requerir actualmente una entidad de negocio independiente.
-- La implementación fue validada con 65 pruebas automatizadas exitosas.
-- El flujo JWT End-to-End permanece operativo.
+- Se implementó el contexto centralizado del usuario autenticado.
+- Se implementó autorización por dominio utilizando Spring Security y validaciones de negocio.
+- Los endpoints protegidos validan el rol antes de ejecutar la operación.
+- Las operaciones del dominio validan la pertenencia del recurso al consultorio del usuario autenticado cuando corresponde.
+- Los recursos propiedad del paciente se validan utilizando el contexto autenticado y no información enviada por el Frontend.
+- Se incorporó una infraestructura reutilizable para autorización del dominio.
+- La implementación fue validada mediante 95 pruebas automatizadas exitosas.
 - Backend y Frontend fueron validados sin regresiones.
-
-Technical Story activa:
-
-TS-04 — Implementar autorización por dominio.
 
 Siguientes incrementos:
 
@@ -1096,17 +1095,16 @@ Siguientes incrementos:
 
 Antes de iniciar:
 
-- Validar que `develop` se encuentre sincronizada con `origin/develop`.
+- Validar que develop se encuentre sincronizada con origin/develop.
 - Confirmar que Backend y Frontend compilan correctamente.
 - Confirmar que todas las pruebas automatizadas finalizan exitosamente.
-- Confirmar que el flujo JWT End-to-End permanece operativo.
-- Revisar el uso de `AuthenticatedUserContextProvider` en los casos de uso del dominio.
-- Analizar las restricciones por rol, consultorio y propiedad del recurso.
-- Mantener el desarrollo exclusivamente dentro del alcance de TS-04.
+- Confirmar que la autorización por dominio permanece operativa.
+- Iniciar la implementación de HU-09 utilizando el contexto autenticado y la infraestructura de autorización ya disponible.
 
 Estado:
 
-En ejecución.
+TS-04 completada.
+Preparado para iniciar HU-09.
 
 ---
 

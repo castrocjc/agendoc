@@ -27,6 +27,10 @@ import com.agendoc.modules.appointment.entity.AppointmentRescheduleHistoryEntity
 import com.agendoc.modules.appointment.repository.AppointmentRepository;
 import com.agendoc.modules.appointment.repository.AppointmentRescheduleHistoryRepository;
 import com.agendoc.modules.appointment.repository.AppointmentStatusRepository;
+import com.agendoc.modules.appointment.authorization.AppointmentAuthorizationPolicy;
+import com.agendoc.security.authorization.AuthenticatedUserAuthorization;
+import com.agendoc.security.authorization.SecurityRoleCode;
+import com.agendoc.security.context.AuthenticatedUserContext;
 import com.agendoc.modules.clinic.entity.ClinicEntity;
 import com.agendoc.modules.clinic.repository.ClinicRepository;
 import com.agendoc.modules.doctor.entity.DoctorEntity;
@@ -70,10 +74,21 @@ class AppointmentServiceImplTest {
         @Mock
         private AppointmentRescheduleHistoryRepository appointmentRescheduleHistoryRepository;
 
+        @Mock
+        private AuthenticatedUserAuthorization authenticatedUserAuthorization;
+
+        @Mock
+        private AppointmentAuthorizationPolicy appointmentAuthorizationPolicy;
+
+        private AuthenticatedUserContext receptionistContext;
+
+        private AuthenticatedUserContext patientContext;
+
         private AppointmentServiceImpl appointmentService;
 
         @BeforeEach
         void setUp() {
+
                 appointmentService = new AppointmentServiceImpl(
                                 appointmentRepository,
                                 appointmentRescheduleHistoryRepository,
@@ -81,7 +96,26 @@ class AppointmentServiceImplTest {
                                 agendaBlockRepository,
                                 patientRepository,
                                 doctorRepository,
-                                clinicRepository);
+                                clinicRepository,
+                                authenticatedUserAuthorization,
+                                appointmentAuthorizationPolicy);
+
+                receptionistContext = new AuthenticatedUserContext(
+                                100L,
+                                "receptionist.user",
+                                1L,
+                                SecurityRoleCode.RECEPTIONIST.name(),
+                                null,
+                                null);
+
+                patientContext = new AuthenticatedUserContext(
+                        200L,
+                        "patient.user",
+                        1L,
+                        SecurityRoleCode.PATIENT.name(),
+                        1L,
+                        null
+                );
         }
 
         @Test
@@ -100,20 +134,26 @@ class AppointmentServiceImplTest {
                 AgendaBlockEntity agendaBlock = createAgendaBlock(clinic, doctor);
                 AppointmentStatusEntity appointmentStatus = createAppointmentStatus();
 
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.RECEPTIONIST
+                )).thenReturn(receptionistContext);
+
                 when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                        .findByIdAndRecordStatus(
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(clinic));
 
                 when(patientRepository.findByIdAndRecordStatus(
                                 1L,
                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(patient));
 
-                when(doctorRepository.findByIdAndRecordStatus(
-                                2L,
-                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(doctor));
+                when(doctorRepository.findByIdAndClinicIdAndRecordStatus(
+                        2L,
+                        receptionistContext.clinicId(),
+                        RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(doctor));
 
                 when(agendaBlockRepository
                                 .findByIdAndRecordStatusForUpdate(
@@ -205,9 +245,13 @@ class AppointmentServiceImplTest {
 
                 assertThat(agendaBlock.getAvailable()).isFalse();
 
+                verify(authenticatedUserAuthorization)
+                        .requireRole(SecurityRoleCode.RECEPTIONIST);
+
                 verify(clinicRepository)
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE);
+                        .findByIdAndRecordStatus(
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE);
 
                 verify(patientRepository)
                                 .findByIdAndRecordStatus(
@@ -215,9 +259,10 @@ class AppointmentServiceImplTest {
                                                 RecordStatus.ACTIVE);
 
                 verify(doctorRepository)
-                                .findByIdAndRecordStatus(
-                                                2L,
-                                                RecordStatus.ACTIVE);
+                        .findByIdAndClinicIdAndRecordStatus(
+                                2L,
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE);
 
                 verify(agendaBlockRepository)
                                 .findByIdAndRecordStatusForUpdate(
@@ -256,10 +301,15 @@ class AppointmentServiceImplTest {
                 DoctorEntity doctor = createDoctor(clinic);
                 AgendaBlockEntity agendaBlock = createAgendaBlock(clinic, doctor);
 
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.RECEPTIONIST
+                )).thenReturn(receptionistContext);
+
                 when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                        .findByIdAndRecordStatus(
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(clinic));
 
                 when(patientRepository
                                 .findByIdAndRecordStatus(
@@ -267,11 +317,11 @@ class AppointmentServiceImplTest {
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(patient));
 
-                when(doctorRepository
-                                .findByIdAndRecordStatus(
-                                                2L,
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(doctor));
+                when(doctorRepository.findByIdAndClinicIdAndRecordStatus(
+                        2L,
+                        receptionistContext.clinicId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(doctor));
 
                 when(agendaBlockRepository
                                 .findByIdAndRecordStatusForUpdate(
@@ -330,13 +380,12 @@ class AppointmentServiceImplTest {
                                 agendaBlock,
                                 appointmentStatus);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST))
+                                .thenReturn(receptionistContext);
 
                 when(appointmentRepository.findClinicAppointments(
-                                1L,
+                                receptionistContext.clinicId(),
                                 appointmentDate,
                                 null,
                                 null,
@@ -347,6 +396,9 @@ class AppointmentServiceImplTest {
                                 appointmentDate,
                                 null,
                                 null);
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.RECEPTIONIST);
 
                 assertThat(response).hasSize(1);
 
@@ -386,26 +438,24 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRepository)
                                 .findClinicAppointments(
-                                                1L,
+                                                receptionistContext.clinicId(),
                                                 appointmentDate,
                                                 null,
                                                 null,
                                                 RecordStatus.ACTIVE);
+
         }
 
         @Test
         void shouldFindAppointmentsUsingDoctorAndStatusFilters() {
                 LocalDate appointmentDate = LocalDate.of(2026, 7, 30);
 
-                ClinicEntity clinic = createClinic();
-
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST))
+                                .thenReturn(receptionistContext);
 
                 when(appointmentRepository.findClinicAppointments(
-                                1L,
+                                receptionistContext.clinicId(),
                                 appointmentDate,
                                 2L,
                                 "CONFIRMADA",
@@ -419,28 +469,29 @@ class AppointmentServiceImplTest {
 
                 assertThat(response).isEmpty();
 
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.RECEPTIONIST);
+
                 verify(appointmentRepository)
                                 .findClinicAppointments(
-                                                1L,
+                                                receptionistContext.clinicId(),
                                                 appointmentDate,
                                                 2L,
                                                 "CONFIRMADA",
                                                 RecordStatus.ACTIVE);
+
         }
 
         @Test
         void shouldReturnEmptyListWhenDateHasNoAppointments() {
                 LocalDate appointmentDate = LocalDate.of(2026, 7, 31);
 
-                ClinicEntity clinic = createClinic();
-
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST))
+                                .thenReturn(receptionistContext);
 
                 when(appointmentRepository.findClinicAppointments(
-                                1L,
+                                receptionistContext.clinicId(),
                                 appointmentDate,
                                 null,
                                 null,
@@ -453,10 +504,23 @@ class AppointmentServiceImplTest {
                                 null);
 
                 assertThat(response).isEmpty();
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.RECEPTIONIST);
+
+                verify(appointmentRepository)
+                                .findClinicAppointments(
+                                                receptionistContext.clinicId(),
+                                                appointmentDate,
+                                                null,
+                                                null,
+                                                RecordStatus.ACTIVE);
+
         }
 
         @Test
         void shouldCancelScheduledAppointment() {
+
                 ClinicEntity clinic = createClinic();
                 PatientEntity patient = createPatient(clinic);
                 DoctorEntity doctor = createDoctor(clinic);
@@ -466,13 +530,15 @@ class AppointmentServiceImplTest {
                                 doctor,
                                 LocalDate.now().plusDays(1));
 
-                AppointmentStatusEntity scheduledStatus = createAppointmentStatus(
-                                AppointmentStatusCode.PROGRAMADA,
-                                "Programada");
+                AppointmentStatusEntity scheduledStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.PROGRAMADA,
+                                                "Programada");
 
-                AppointmentStatusEntity cancelledStatus = createAppointmentStatus(
-                                AppointmentStatusCode.CANCELADA,
-                                "Cancelada");
+                AppointmentStatusEntity cancelledStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CANCELADA,
+                                                "Cancelada");
 
                 AppointmentEntity appointment = createAppointment(
                                 clinic,
@@ -484,17 +550,19 @@ class AppointmentServiceImplTest {
                 appointment.setReason("Consulta médica general");
                 appointment.setNotes("Primera cita del paciente");
 
-                CancelAppointmentRequest request = new CancelAppointmentRequest(
-                                "El paciente no podrá asistir");
+                CancelAppointmentRequest request =
+                                new CancelAppointmentRequest(
+                                                "El paciente no podrá asistir");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireAnyRole(
+                                SecurityRoleCode.RECEPTIONIST,
+                                SecurityRoleCode.PATIENT))
+                                .thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -507,9 +575,10 @@ class AppointmentServiceImplTest {
                 when(appointmentRepository.save(appointment))
                                 .thenReturn(appointment);
 
-                AppointmentResponse response = appointmentService.cancelAppointment(
-                                20L,
-                                request);
+                AppointmentResponse response =
+                                appointmentService.cancelAppointment(
+                                                20L,
+                                                request);
 
                 assertThat(response.id()).isEqualTo(20L);
                 assertThat(response.statusCode()).isEqualTo("CANCELADA");
@@ -527,19 +596,30 @@ class AppointmentServiceImplTest {
                 assertThat(appointment.getAgendaBlock().getAvailable())
                                 .isTrue();
 
-                /*
-                 * The original medical reason and notes must remain unchanged.
-                 */
                 assertThat(appointment.getReason())
                                 .isEqualTo("Consulta médica general");
 
                 assertThat(appointment.getNotes())
                                 .isEqualTo("Primera cita del paciente");
 
+                verify(authenticatedUserAuthorization)
+                                .requireAnyRole(
+                                                SecurityRoleCode.RECEPTIONIST,
+                                                SecurityRoleCode.PATIENT);
+
                 verify(appointmentRepository)
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy, never())
+                                .requirePatientOwnership(any(), any());
 
                 verify(appointmentStatusRepository)
                                 .findByCodeAndRecordStatus(
@@ -548,6 +628,7 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRepository)
                                 .save(appointment);
+
         }
 
         @Test
@@ -579,16 +660,17 @@ class AppointmentServiceImplTest {
                 CancelAppointmentRequest request = new CancelAppointmentRequest(
                                 "  El paciente solicitó la cancelación  ");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                20L,
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(appointment));
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                20L,
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(appointment));
 
                 when(appointmentStatusRepository
                                 .findByCodeAndRecordStatus(
@@ -602,6 +684,15 @@ class AppointmentServiceImplTest {
                 AppointmentResponse response = appointmentService.cancelAppointment(
                                 20L,
                                 request);
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                receptionistContext,
+                                appointment
+                        );
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requirePatientOwnership(any(), any());
 
                 assertThat(response.statusCode())
                                 .isEqualTo("CANCELADA");
@@ -643,16 +734,17 @@ class AppointmentServiceImplTest {
 
                 CancelAppointmentRequest request = new CancelAppointmentRequest("   ");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                20L,
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(appointment));
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                20L,
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(appointment));
 
                 assertThatThrownBy(
                                 () -> appointmentService.cancelAppointment(
@@ -661,6 +753,15 @@ class AppointmentServiceImplTest {
                                 .isInstanceOf(BadRequestException.class)
                                 .hasMessage(
                                                 "El motivo de cancelación es obligatorio para una cita confirmada.");
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                receptionistContext,
+                                appointment
+                        );
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requirePatientOwnership(any(), any());
 
                 assertThat(appointment.getStatus())
                                 .isSameAs(confirmedStatus);
@@ -706,21 +807,21 @@ class AppointmentServiceImplTest {
 
         @Test
         void shouldRejectUnknownAppointment() {
-                ClinicEntity clinic = createClinic();
 
                 CancelAppointmentRequest request = new CancelAppointmentRequest(
                                 "El paciente no podrá asistir");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                99L,
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.empty());
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                99L,
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.empty());
 
                 assertThatThrownBy(
                                 () -> appointmentService.cancelAppointment(
@@ -729,6 +830,12 @@ class AppointmentServiceImplTest {
                                 .isInstanceOf(ResourceNotFoundException.class)
                                 .hasMessage(
                                                 "La cita seleccionada no está disponible.");
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requireSameClinic(any(), any());
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requirePatientOwnership(any(), any());
 
                 verify(appointmentStatusRepository, never())
                                 .findByCodeAndRecordStatus(
@@ -767,14 +874,10 @@ class AppointmentServiceImplTest {
                                 agendaBlock,
                                 scheduledStatus);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
-
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -786,6 +889,9 @@ class AppointmentServiceImplTest {
 
                 when(appointmentRepository.save(appointment))
                                 .thenReturn(appointment);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 AppointmentResponse response = appointmentService.confirmArrival(
                                 20L);
@@ -806,7 +912,7 @@ class AppointmentServiceImplTest {
                                 .isNotNull();
 
                 assertThat(appointment.getConfirmedBy())
-                                .isEqualTo("SYSTEM");
+                                .isEqualTo(receptionistContext.username());
 
                 /*
                  * Confirming the patient's arrival must not release
@@ -818,10 +924,19 @@ class AppointmentServiceImplTest {
                 assertThat(appointment.getAgendaBlock())
                                 .isSameAs(agendaBlock);
 
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.RECEPTIONIST);
+
                 verify(appointmentRepository)
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
 
                 verify(appointmentStatusRepository)
                                 .findByCodeAndRecordStatus(
@@ -830,6 +945,7 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRepository)
                                 .save(appointment);
+
         }
 
         @Test
@@ -862,16 +978,14 @@ class AppointmentServiceImplTest {
 
         @Test
         void shouldRejectArrivalConfirmationForUnknownAppointment() {
-                ClinicEntity clinic = createClinic();
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 99L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.empty());
 
@@ -888,6 +1002,9 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRepository, never())
                                 .save(any(AppointmentEntity.class));
+
+                verify(appointmentAuthorizationPolicy, never())
+                                .requireSameClinic(any(), any());
         }
 
         @Test
@@ -921,14 +1038,13 @@ class AppointmentServiceImplTest {
                 RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(
                                 "  El paciente no se presentó  ");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -961,7 +1077,7 @@ class AppointmentServiceImplTest {
                                 .isNotNull();
 
                 assertThat(appointment.getNoShowBy())
-                                .isEqualTo("SYSTEM");
+                                .isEqualTo(receptionistContext.username());
 
                 assertThat(appointment.getNoShowComment())
                                 .isEqualTo("El paciente no se presentó");
@@ -977,8 +1093,9 @@ class AppointmentServiceImplTest {
                                 .isSameAs(agendaBlock);
 
                 verify(appointmentRepository)
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE);
 
                 verify(appointmentStatusRepository)
@@ -988,6 +1105,15 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRepository)
                                 .save(appointment);
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.RECEPTIONIST);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
+
         }
 
         @Test
@@ -1020,14 +1146,13 @@ class AppointmentServiceImplTest {
 
                 RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(null);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -1051,7 +1176,7 @@ class AppointmentServiceImplTest {
                                 .isNotNull();
 
                 assertThat(appointment.getNoShowBy())
-                                .isEqualTo("SYSTEM");
+                                .isEqualTo(receptionistContext.username());
 
                 assertThat(appointment.getNoShowComment())
                                 .isNull();
@@ -1061,6 +1186,15 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRepository)
                                 .save(appointment);
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.RECEPTIONIST);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
+
         }
 
         @Test
@@ -1068,6 +1202,9 @@ class AppointmentServiceImplTest {
                 ClinicEntity clinic = createClinic();
                 PatientEntity patient = createPatient(clinic);
                 DoctorEntity doctor = createDoctor(clinic);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 AgendaBlockEntity agendaBlock = createAgendaBlock(
                                 clinic,
@@ -1090,14 +1227,10 @@ class AppointmentServiceImplTest {
                 RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(
                                 "Registro anticipado");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
-
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -1108,6 +1241,11 @@ class AppointmentServiceImplTest {
                                 .isInstanceOf(BadRequestException.class)
                                 .hasMessage(
                                                 "La cita solo puede marcarse como no asistida cuando haya comenzado su horario.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
 
                 assertThat(appointment.getStatus())
                                 .isSameAs(scheduledStatus);
@@ -1163,18 +1301,16 @@ class AppointmentServiceImplTest {
 
         @Test
         void shouldRejectNoShowRegistrationForUnknownAppointment() {
-                ClinicEntity clinic = createClinic();
 
                 RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(null);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 99L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.empty());
 
@@ -1193,6 +1329,9 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRepository, never())
                                 .save(any(AppointmentEntity.class));
+
+                verify(appointmentAuthorizationPolicy, never())
+                                .requireSameClinic(any(), any());
         }
 
         @Test
@@ -1234,16 +1373,19 @@ class AppointmentServiceImplTest {
 
                 RescheduleAppointmentRequest request = new RescheduleAppointmentRequest(13L);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
+
+                when(clinicRepository.findByIdAndRecordStatus(
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE)).thenReturn(Optional.of(clinic));
 
                 when(agendaBlockRepository
                                 .findByIdAndRecordStatusForUpdate(
@@ -1274,6 +1416,25 @@ class AppointmentServiceImplTest {
                 AppointmentResponse response = appointmentService.rescheduleAppointment(
                                 20L,
                                 request);
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.RECEPTIONIST);
+
+                verify(appointmentRepository)
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                20L,
+                                                receptionistContext.clinicId(),
+                                                RecordStatus.ACTIVE);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
+
+                verify(clinicRepository)
+                                .findByIdAndRecordStatus(
+                                                receptionistContext.clinicId(),
+                                                RecordStatus.ACTIVE);
 
                 assertThat(response.id())
                                 .isEqualTo(20L);
@@ -1367,14 +1528,13 @@ class AppointmentServiceImplTest {
 
                 RescheduleAppointmentRequest request = new RescheduleAppointmentRequest(13L);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -1385,6 +1545,16 @@ class AppointmentServiceImplTest {
                                 .isInstanceOf(ConflictException.class)
                                 .hasMessage(
                                                 "La cita no puede ser reprogramada en su estado actual.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
+
+                verify(clinicRepository, never())
+                                .findByIdAndRecordStatus(
+                                                any(),
+                                                any());
 
                 verify(agendaBlockRepository, never())
                                 .findByIdAndRecordStatusForUpdate(
@@ -1425,14 +1595,13 @@ class AppointmentServiceImplTest {
 
                 RescheduleAppointmentRequest request = new RescheduleAppointmentRequest(12L);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -1441,6 +1610,10 @@ class AppointmentServiceImplTest {
                                                 12L,
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(agendaBlock));
+
+                when(clinicRepository.findByIdAndRecordStatus(
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE)).thenReturn(Optional.of(clinic));
 
                 assertThatThrownBy(
                                 () -> appointmentService.rescheduleAppointment(
@@ -1458,6 +1631,11 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRescheduleHistoryRepository, never())
                                 .save(any(AppointmentRescheduleHistoryEntity.class));
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
         }
 
         @Test
@@ -1495,22 +1673,27 @@ class AppointmentServiceImplTest {
 
                 RescheduleAppointmentRequest request = new RescheduleAppointmentRequest(13L);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.RECEPTIONIST
+                )).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                20L,
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(appointment));
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                20L,
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(appointment));
 
                 when(agendaBlockRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                13L,
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(newAgendaBlock));
+                        .findByIdAndRecordStatusForUpdate(
+                                13L,
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(newAgendaBlock));
+
+                when(clinicRepository.findByIdAndRecordStatus(
+                        receptionistContext.clinicId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(clinic));
 
                 when(appointmentRepository
                                 .existsPatientScheduleConflictExcludingAppointment(
@@ -1545,6 +1728,206 @@ class AppointmentServiceImplTest {
 
                 verify(appointmentRescheduleHistoryRepository, never())
                                 .save(any(AppointmentRescheduleHistoryEntity.class));
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                receptionistContext,
+                                appointment);
+        }
+
+        @Test
+        void shouldAllowPatientToCancelOwnScheduledAppointment() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                        clinic,
+                        doctor,
+                        LocalDate.now().plusDays(1));
+
+                AppointmentStatusEntity scheduledStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.PROGRAMADA,
+                                "Programada");
+
+                AppointmentStatusEntity cancelledStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.CANCELADA,
+                                "Cancelada");
+
+                AppointmentEntity appointment = createAppointment(
+                        clinic,
+                        patient,
+                        doctor,
+                        agendaBlock,
+                        scheduledStatus);
+
+                CancelAppointmentRequest request =
+                        new CancelAppointmentRequest(
+                                "No podré asistir");
+
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT))
+                        .thenReturn(patientContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndPatientIdAndRecordStatusForUpdate(
+                                20L,
+                                patientContext.clinicId(),
+                                patientContext.patientId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(appointment));
+
+                when(appointmentStatusRepository
+                        .findByCodeAndRecordStatus(
+                                AppointmentStatusCode.CANCELADA.name(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(cancelledStatus));
+
+                when(appointmentRepository.save(appointment))
+                        .thenReturn(appointment);
+
+                AppointmentResponse response =
+                        appointmentService.cancelAppointment(
+                                20L,
+                                request);
+
+                assertThat(response.statusCode())
+                        .isEqualTo("CANCELADA");
+
+                assertThat(appointment.getStatus())
+                        .isSameAs(cancelledStatus);
+
+                assertThat(appointment.getCancellationReason())
+                        .isEqualTo("No podré asistir");
+
+                assertThat(appointment.getAgendaBlock().getAvailable())
+                        .isTrue();
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                patientContext,
+                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                        .requirePatientOwnership(
+                                patientContext,
+                                appointment);
+
+                verify(appointmentRepository, never())
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                any(),
+                                any(),
+                                any());
+        }
+
+        @Test
+        void shouldRejectPatientCancellationForAnotherPatientAppointment() {
+
+                CancelAppointmentRequest request =
+                        new CancelAppointmentRequest(
+                                "No podré asistir");
+
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT))
+                        .thenReturn(patientContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndPatientIdAndRecordStatusForUpdate(
+                                20L,
+                                patientContext.clinicId(),
+                                patientContext.patientId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.empty());
+
+                assertThatThrownBy(
+                        () -> appointmentService.cancelAppointment(
+                                20L,
+                                request))
+                        .isInstanceOf(ResourceNotFoundException.class)
+                        .hasMessage(
+                                "La cita seleccionada no está disponible.");
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requireSameClinic(any(), any());
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requirePatientOwnership(any(), any());
+
+                verify(appointmentRepository, never())
+                        .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRejectPatientCancellationForConfirmedAppointment() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                        clinic,
+                        doctor,
+                        LocalDate.now().plusDays(1));
+
+                AppointmentStatusEntity confirmedStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.CONFIRMADA,
+                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                        clinic,
+                        patient,
+                        doctor,
+                        agendaBlock,
+                        confirmedStatus);
+
+                CancelAppointmentRequest request =
+                        new CancelAppointmentRequest(
+                                "No podré asistir");
+
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT))
+                        .thenReturn(patientContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndPatientIdAndRecordStatusForUpdate(
+                                20L,
+                                patientContext.clinicId(),
+                                patientContext.patientId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(
+                        () -> appointmentService.cancelAppointment(
+                                20L,
+                                request))
+                        .isInstanceOf(ConflictException.class)
+                        .hasMessage(
+                                "La cita no puede ser cancelada en su estado actual.");
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                patientContext,
+                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                        .requirePatientOwnership(
+                                patientContext,
+                                appointment);
+
+                verify(appointmentStatusRepository, never())
+                        .findByCodeAndRecordStatus(
+                                any(),
+                                any());
+
+                verify(appointmentRepository, never())
+                        .save(any(AppointmentEntity.class));
         }
 
         private void assertNoShowRegistrationRejectedForStatus(
@@ -1554,6 +1937,9 @@ class AppointmentServiceImplTest {
                 ClinicEntity clinic = createClinic();
                 PatientEntity patient = createPatient(clinic);
                 DoctorEntity doctor = createDoctor(clinic);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
 
                 AgendaBlockEntity agendaBlock = createAgendaBlock(
                                 clinic,
@@ -1576,14 +1962,10 @@ class AppointmentServiceImplTest {
                 RegisterAppointmentNoShowRequest request = new RegisterAppointmentNoShowRequest(
                                 "Paciente ausente");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
-
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -1594,6 +1976,11 @@ class AppointmentServiceImplTest {
                                 .isInstanceOf(ConflictException.class)
                                 .hasMessage(
                                                 "La inasistencia no puede registrarse en el estado actual de la cita.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
 
                 assertThat(appointment.getStatus())
                                 .isSameAs(currentStatus);
@@ -1627,6 +2014,9 @@ class AppointmentServiceImplTest {
                 PatientEntity patient = createPatient(clinic);
                 DoctorEntity doctor = createDoctor(clinic);
 
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.RECEPTIONIST)).thenReturn(receptionistContext);
+
                 AgendaBlockEntity agendaBlock = createAgendaBlock(
                                 clinic,
                                 doctor,
@@ -1645,14 +2035,10 @@ class AppointmentServiceImplTest {
                                 agendaBlock,
                                 currentStatus);
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
-
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
                                                 20L,
+                                                receptionistContext.clinicId(),
                                                 RecordStatus.ACTIVE))
                                 .thenReturn(Optional.of(appointment));
 
@@ -1661,6 +2047,11 @@ class AppointmentServiceImplTest {
                                 .isInstanceOf(ConflictException.class)
                                 .hasMessage(
                                                 "La llegada del paciente no puede ser confirmada en el estado actual de la cita.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                receptionistContext,
+                                                appointment);
 
                 assertThat(appointment.getStatus())
                                 .isSameAs(currentStatus);
@@ -1709,16 +2100,17 @@ class AppointmentServiceImplTest {
                 CancelAppointmentRequest request = new CancelAppointmentRequest(
                                 "Solicitud de cancelación");
 
-                when(clinicRepository
-                                .findFirstByRecordStatusOrderByIdAsc(
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(clinic));
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(receptionistContext);
 
                 when(appointmentRepository
-                                .findByIdAndRecordStatusForUpdate(
-                                                20L,
-                                                RecordStatus.ACTIVE))
-                                .thenReturn(Optional.of(appointment));
+                        .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                20L,
+                                receptionistContext.clinicId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(appointment));
 
                 assertThatThrownBy(
                                 () -> appointmentService.cancelAppointment(
@@ -1727,6 +2119,15 @@ class AppointmentServiceImplTest {
                                 .isInstanceOf(ConflictException.class)
                                 .hasMessage(
                                                 "La cita no puede ser cancelada en su estado actual.");
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                receptionistContext,
+                                appointment
+                        );
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requirePatientOwnership(any(), any());
 
                 assertThat(appointment.getStatus())
                                 .isSameAs(currentStatus);

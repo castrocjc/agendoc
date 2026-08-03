@@ -1,6 +1,7 @@
 package com.agendoc.common.exception;
 
 import com.agendoc.modules.auth.exception.InvalidCredentialsException;
+import com.agendoc.security.authorization.AuthorizationDeniedException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -143,6 +144,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(error);
+        }
+
+        @ExceptionHandler(AuthorizationDeniedException.class)
+        public ResponseEntity<ApiError> handleAuthorizationDenied(
+                AuthorizationDeniedException exception,
+                HttpServletRequest request) {
+
+                ApiError error = new ApiError(
+                        Instant.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        HttpStatus.FORBIDDEN.getReasonPhrase(),
+                        exception.getMessage(),
+                        request.getRequestURI());
+
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(error);
         }
 
         @ExceptionHandler(Exception.class)

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * REST controller for medical appointment management operations.
@@ -33,9 +34,10 @@ public class AppointmentController {
 
         private final AppointmentService appointmentService;
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @PostMapping
         public ResponseEntity<AppointmentResponse> createAppointment(
-                        @Valid @RequestBody CreateAppointmentRequest request) {
+                @Valid @RequestBody CreateAppointmentRequest request) {
                 AppointmentResponse response = appointmentService.createAppointment(request);
 
                 return ResponseEntity
@@ -43,6 +45,7 @@ public class AppointmentController {
                                 .body(response);
         }
 
+        @PreAuthorize("hasAnyRole('RECEPTIONIST', 'PATIENT')")
         @PatchMapping("/{appointmentId}/cancel")
         public ResponseEntity<AppointmentResponse> cancelAppointment(
                         @PathVariable Long appointmentId,
@@ -54,6 +57,7 @@ public class AppointmentController {
                 return ResponseEntity.ok(response);
         }
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @PatchMapping("/{appointmentId}/confirm-arrival")
         public ResponseEntity<AppointmentResponse> confirmArrival(
                         @PathVariable Long appointmentId) {
@@ -64,6 +68,7 @@ public class AppointmentController {
                 return ResponseEntity.ok(response);
         }
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @PatchMapping("/{appointmentId}/no-show")
         public ResponseEntity<AppointmentResponse> registerNoShow(
                         @PathVariable Long appointmentId,
@@ -76,6 +81,7 @@ public class AppointmentController {
                 return ResponseEntity.ok(response);
         }
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @PatchMapping("/{appointmentId}/reschedule")
         public ResponseEntity<AppointmentResponse> rescheduleAppointment(
                         @PathVariable Long appointmentId,
@@ -87,6 +93,7 @@ public class AppointmentController {
                 return ResponseEntity.ok(response);
         }
 
+        @PreAuthorize("hasRole('RECEPTIONIST')")
         @GetMapping
         public ResponseEntity<List<AppointmentAgendaResponse>> findAppointments(
                         @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,

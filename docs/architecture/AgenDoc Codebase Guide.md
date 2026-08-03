@@ -7,7 +7,7 @@
 |-----------|---------------------------------------------|
 | Proyecto  | AgenDoc                                     |
 | Documento | Codebase Guide                              |
-| Versión   | v1.6                                        |
+| Versión   | v1.7                                        |
 | Estado    | Vigente                                     |
 | Ubicación | docs/architecture/AgenDoc Codebase Guide.md |
 
@@ -24,6 +24,7 @@ Historial del Documento
 | v1.4     | 2026-07-31 | Actualización Codebase Guide completa HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
 | v1.5     | 2026-08-01 | Actualización Codebase Guide completa TS-02, autenticación JWT End-to-End, protección de APIs y cierre técnico de la autenticación. |
 | v1.6     | 2026-08-02 | Actualización Codebase Guide completa TS-03, implementación del contexto del usuario autenticado mediante SecurityContext y resolución del usuario autenticado en el Backend. |
+| v1.7 | 2026-08-03 | Sincronización completa de la documentación posterior al cierre de TS-03. Se actualizó el estado del proyecto para iniciar TS-04 y se alinearon referencias internas del Codebase Guide. |
 
 ---
 
@@ -141,7 +142,7 @@ Historia funcional objetivo: HU-09 — Reservar cita como paciente
 | AgenDoc Project Blueprint    | v1.9    | Aprobado       |
 | AgenDoc Development Playbook | v1.4    | Aprobado       |
 | UI Design Guide              | v1.1    | Aprobado       |
-| AgenDoc Codebase Guide       | v1.4    | Vigente        |
+| AgenDoc Codebase Guide       | v1.7    | Vigente        |
 
 ---
 
@@ -217,7 +218,7 @@ Total implementado:
 | TS-01 | Configurar entorno de desarrollo multidispositivo y multiambiente  | Completada |
 | TS-02 | Completar autenticación JWT End-to-End                             | Completada |
 | TS-03 | Implementar contexto del usuario autenticado                       | Completada |
-| TS-04 | Implementar autorización por dominio                               | Pendiente  |
+| TS-04 | Implementar autorización por dominio                               | Completada |
 | TS-05 | Endurecer seguridad y manejo de accesos no autorizados             | Pendiente  |
 
 ---
@@ -543,9 +544,17 @@ La autenticación utiliza Spring Security, JWT y el SecurityContext para resolve
 
 El contexto autenticado constituye la base para las reglas de autorización por dominio y las futuras funcionalidades de autogestión del paciente.
 
-Las siguientes etapas de evolución corresponden a:
+La autorización por dominio se encuentra implementada mediante dos niveles complementarios:
 
-- TS-04: Implementar autorización por dominio.
+- autorización declarativa de endpoints utilizando `@PreAuthorize`;
+- validaciones de dominio basadas en rol, consultorio y propiedad del recurso.
+
+El usuario autenticado se resuelve desde `SecurityContext` y proporciona el identificador de usuario, rol, consultorio y perfil de negocio asociado cuando corresponde.
+
+La infraestructura de autorización evita depender de identificadores enviados libremente por el Frontend cuando estos pueden derivarse del contexto autenticado.
+
+La siguiente etapa de evolución corresponde a:
+
 - TS-05: Endurecer seguridad y manejo de accesos no autorizados.
 
 ---
@@ -737,11 +746,32 @@ Estructura actual:
 
 ```text
 security
+├── authorization
+│   ├── AuthenticatedUserAuthorization.java
+│   ├── AuthorizationDeniedException.java
+│   └── SecurityRoleCode.java
 ├── config
 │   ├── PasswordConfiguration.java
 │   └── SecurityConfiguration.java
+├── context
+│   ├── AuthenticatedUserContext.java
+│   ├── AuthenticatedUserContextProvider.java
+│   └── SecurityAuthenticatedUserContextProvider.java
 └── jwt
 ```
+
+authorization
+
+- Validar roles requeridos para cada caso de uso.
+- Validar uno entre varios roles autorizados.
+- Centralizar los códigos de rol reconocidos por la seguridad.
+- Generar errores uniformes cuando el usuario no tiene autorización.
+
+context
+
+- Resolver el usuario autenticado desde Spring Security.
+- Exponer usuario, rol, consultorio, paciente y médico asociados.
+- Rechazar contextos incompletos o inconsistentes.
 
 #### PasswordConfiguration.java
 
@@ -903,6 +933,9 @@ Responsabilidad:
 - Consultar médicos disponibles para la operación.
 - Gestionar la consulta de especialidades médicas.
 - Asociar al médico con su consultorio y especialidad.
+- Restringir el registro de médicos al rol Recepcionista.
+- Permitir la consulta de médicos a Paciente y Recepcionista.
+- Limitar registros y consultas al consultorio autenticado.
 
 Historia relacionada:
 
@@ -951,6 +984,9 @@ Responsabilidad:
 - Consultar pacientes registrados.
 - Buscar pacientes mediante datos básicos.
 - Proporcionar pacientes para los futuros flujos de creación de citas.
+- Restringir el registro y la búsqueda de pacientes al rol Recepcionista.
+- Limitar registros y búsquedas al consultorio autenticado.
+- Exponer la búsqueda mediante GET /api/v1/patients/search.
 
 Historias relacionadas:
 
@@ -1000,6 +1036,9 @@ Responsabilidad:
 - Validar fechas y rangos horarios.
 - Persistir los bloques disponibles.
 - Consultar disponibilidad médica por médico y fecha.
+- Restringir la creación de bloques al rol Recepcionista.
+- Permitir consultar disponibilidad a Paciente y Recepcionista.
+- Limitar médicos, agendas y bloques al consultorio autenticado.
 
 Historia relacionada:
 
@@ -1036,6 +1075,8 @@ Estructura:
 
 ```text
 appointment
+├── authorization
+│   └── AppointmentAuthorizationPolicy.java
 ├── controller
 │   └── AppointmentController.java
 ├── dto
@@ -1093,6 +1134,11 @@ Responsabilidad:
 - Mantener ocupado el bloque de agenda al confirmar llegada o registrar inasistencia.
 - Bloquear pesimistamente la cita durante transiciones de estado.
 - Impedir transiciones duplicadas o incompatibles.
+- Validar que la cita pertenezca al consultorio del usuario autenticado.
+- Validar que el paciente autenticado sea propietario de la cita cuando corresponda.
+- Restringir las operaciones según el rol autenticado.
+- Obtener y bloquear citas utilizando también el identificador del consultorio.
+- Registrar al usuario autenticado como responsable de confirmaciones e inasistencias.
 
 Estados funcionales implementados:
 PROGRAMADA
@@ -1248,17 +1294,23 @@ Estructura actual:
 
 ```text
 com/agendoc
-├── BackendApplicationTests.java
-└── modules
-    ├── agenda
-    │   └── service
-    │       └── AgendaServiceImplTest.java
-    ├── appointment
-    │   └── service
-    │       └── AppointmentServiceImplTest.java
-    └── doctor
-        └── service
-            └── DoctorServiceImplTest.java
+├── common
+│   └── exception
+│       └── GlobalExceptionHandlerTest.java
+├── modules
+│   ├── agenda/service/AgendaServiceImplTest.java
+│   ├── appointment
+│   │   ├── authorization/AppointmentAuthorizationPolicyTest.java
+│   │   └── service/AppointmentServiceImplTest.java
+│   ├── doctor/service/DoctorServiceImplTest.java
+│   └── patient/service/PatientServiceImplTest.java
+└── security
+    ├── authorization
+    │   ├── AuthenticatedUserAuthorizationTest.java
+    │   ├── AuthorizationDeniedExceptionTest.java
+    │   └── SecurityRoleCodeTest.java
+    ├── context/SecurityAuthenticatedUserContextProviderTest.java
+    └── jwt/JwtTokenServiceImplTest.java
 ```
 
 Pruebas identificadas:
@@ -1305,7 +1357,10 @@ Estado:
 Cobertura ampliada y validada.
 
 Resultado actual:
-Pruebas ejecutadas, 0 fallos, 0 errores y 0 omitidas.
+95 pruebas ejecutadas
+0 fallos
+0 errores
+0 omitidas
 
 La cobertura automatizada deberá ampliarse progresivamente en las nuevas Historias de Usuario.
 
@@ -1313,27 +1368,32 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 
 ## 6.9 Estado General del Backend
 
-| Elemento                            | Estado       |
-|-------------------------------------|--------------|
-| Aplicación Spring Boot              | Operativa    |
-| Compilación Maven                   | Exitosa      |
-| PostgreSQL                          | Integrado    |
-| Flyway                              | Operativo    |
-| Manejo global de excepciones        | Implementado |
-| Autenticación inicial               | Implementada |
-| JWT End-to-End                      | Implementado |
-| Contexto autenticado                | Implementado |
-| Registro de médicos                 | Implementado |
-| Registro y búsqueda de pacientes    | Implementado |
-| Creación de bloques de agenda       | Implementada |
-| Consulta de disponibilidad médica   | Implementada |
-| Gestión de citas                    | Implementada |
-| Consulta de agenda del consultorio  | Implementada |
-| Cancelación de citas                | Implementada |
-| Reprogramación de citas             | Implementada |
-| Confirmación de llegada             | Implementada |
-| Registro de inasistencia            | Implementado |
-| Pruebas automatizadas               | Exitosas     |
+| Elemento                               | Estado       |
+|----------------------------------------|--------------|
+| Aplicación Spring Boot                 | Operativa    |
+| Compilación Maven                      | Exitosa      |
+| PostgreSQL                             | Integrado    |
+| Flyway                                 | Operativo    |
+| Manejo global de excepciones           | Implementado |
+| Autenticación inicial                  | Implementada |
+| JWT End-to-End                         | Implementado |
+| Contexto autenticado                   | Implementado |
+| Registro de médicos                    | Implementado |
+| Registro y búsqueda de pacientes       | Implementado |
+| Creación de bloques de agenda          | Implementada |
+| Consulta de disponibilidad médica      | Implementada |
+| Gestión de citas                       | Implementada |
+| Consulta de agenda del consultorio     | Implementada |
+| Cancelación de citas                   | Implementada |
+| Reprogramación de citas                | Implementada |
+| Confirmación de llegada                | Implementada |
+| Registro de inasistencia               | Implementado |
+| Pruebas automatizadas                  | Exitosas     |
+| Autorización declarativa por rol       | Implementada |
+| Autorización por consultorio           | Implementada |
+| Autorización por propiedad de cita     | Implementada |
+| Infraestructura reutilizable de acceso | Implementada |
+
 ---
 
 **Última actualización**
@@ -2048,6 +2108,18 @@ Cada Controller representa el punto de entrada oficial para un módulo del siste
 
 PATCH /api/v1/appointments/{appointmentId}/confirm-arrival
 PATCH /api/v1/appointments/{appointmentId}/no-show
+POST  /api/v1/doctors                         RECEPTIONIST
+GET   /api/v1/doctors                         PATIENT, RECEPTIONIST
+POST  /api/v1/patients                        RECEPTIONIST
+GET   /api/v1/patients/search                 RECEPTIONIST
+POST  endpoints de bloques de agenda          RECEPTIONIST
+GET   endpoints de disponibilidad             PATIENT, RECEPTIONIST
+POST  /api/v1/appointments                    RECEPTIONIST
+GET   /api/v1/appointments                    RECEPTIONIST
+PATCH /appointments/{id}/cancel               RECEPTIONIST, PATIENT
+PATCH /appointments/{id}/confirm-arrival      RECEPTIONIST
+PATCH /appointments/{id}/no-show              RECEPTIONIST
+PATCH /appointments/{id}/reschedule           RECEPTIONIST
 
 ---
 
@@ -2276,7 +2348,7 @@ La definición funcional y la planificación de las Technical Stories se mantien
 | TS-01           | Configurar entorno de desarrollo multidispositivo y multiambiente | Completada |
 | TS-02           | Completar autenticación JWT End-to-End                            | Completada |
 | TS-03           | Implementar contexto del usuario autenticado                      | Completada |
-| TS-04           | Implementar autorización por dominio                              | Pendiente  |
+| TS-04           | Implementar autorización por dominio                              | Completada |
 | TS-05           | Endurecer seguridad y manejo de accesos no autorizados            | Pendiente  |
 
 ---
@@ -2293,9 +2365,9 @@ Su propósito es fortalecer la arquitectura, la seguridad, la mantenibilidad y l
 
 | Elemento                        | Estado |
 |---------------------------------|--------|
-| Technical Stories implementadas | 3      |
+| Technical Stories implementadas | 4      |
 | Technical Stories en desarrollo | 0      |
-| Technical Stories pendientes    | 2      |
+| Technical Stories pendientes    | 1      |
 
 ---
 
@@ -3058,10 +3130,10 @@ Esta información deberá actualizarse al cierre de cada Sprint.
 
 Sprint 4
 
-Incremento activo:
+Incremento completado:
 TS-04 — Implementar autorización por dominio
 
-Historia funcional objetivo:
+Siguiente historia funcional:
 HU-09 — Reservar cita como paciente
 
 ---
@@ -3087,7 +3159,7 @@ HU-09 — Reservar cita como paciente
 | TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente | Completada |
 | TS-02 — Completar autenticación JWT End-to-End                            | Completada |
 | TS-03 — Implementar contexto del usuario autenticado                      | Completada |
-| TS-04 — Implementar autorización por dominio                              | Pendiente  |
+| TS-04 — Implementar autorización por dominio                              | Completada |
 | TS-05 — Endurecer seguridad y manejo de accesos no autorizados            | Pendiente  |
 
 ---
@@ -3113,8 +3185,11 @@ Para iniciar el Sprint 4 deberán mantenerse las siguientes condiciones:
 ## 18.6 Objetivo del Incremento
 
 Sprint 4: 🚧 En ejecución
-Incremento activo: TS-03 — Implementar contexto del usuario autenticado
-Historia funcional objetivo: HU-09 — Reservar cita como paciente
+Incremento completado:
+TS-04 — Implementar autorización por dominio
+
+Siguiente historia funcional:
+HU-09 — Reservar cita como paciente
 
 ---
 

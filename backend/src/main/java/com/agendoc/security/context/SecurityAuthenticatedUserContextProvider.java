@@ -4,6 +4,7 @@ import com.agendoc.common.entity.RecordStatus;
 import com.agendoc.modules.doctor.repository.DoctorRepository;
 import com.agendoc.modules.patient.repository.PatientRepository;
 import com.agendoc.modules.user.entity.UserEntity;
+import com.agendoc.security.authorization.SecurityRoleCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,10 +19,6 @@ import org.springframework.stereotype.Component;
 public class SecurityAuthenticatedUserContextProvider
         implements AuthenticatedUserContextProvider {
 
-    private static final String PATIENT_ROLE = "PATIENT";
-    private static final String DOCTOR_ROLE = "DOCTOR";
-    private static final String RECEPTIONIST_ROLE = "RECEPTIONIST";
-
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
 
@@ -31,39 +28,39 @@ public class SecurityAuthenticatedUserContextProvider
         UserEntity user = getAuthenticatedUser();
 
         Long clinicId = user.getClinic().getId();
-        String roleCode = user.getRole().getCode();
+
+        SecurityRoleCode roleCode =
+                SecurityRoleCode.from(
+                        user.getRole().getCode()
+                );
 
         Long patientId = null;
         Long doctorId = null;
 
         switch (roleCode) {
-            case PATIENT_ROLE ->
+            case PATIENT ->
                     patientId = resolvePatientId(
                             user.getId(),
                             clinicId
                     );
 
-            case DOCTOR_ROLE ->
+            case DOCTOR ->
                     doctorId = resolveDoctorId(
                             user.getId(),
                             clinicId
                     );
 
-            case RECEPTIONIST_ROLE -> {
+            case RECEPTIONIST -> {
                 // Receptionists currently use the authenticated user
                 // and clinic context without a separate business profile.
             }
-
-            default -> throw new IllegalStateException(
-                    "Authenticated user has an unsupported role"
-            );
         }
 
         return new AuthenticatedUserContext(
                 user.getId(),
                 user.getUsername(),
                 clinicId,
-                roleCode,
+                roleCode.name(),
                 patientId,
                 doctorId
         );
@@ -112,14 +109,6 @@ public class SecurityAuthenticatedUserContextProvider
         if (user.getClinic().getId() == null) {
             throw new IllegalStateException(
                     "Authenticated clinic does not have a valid identifier"
-            );
-        }
-
-        if (user.getRole().getCode() == null
-                || user.getRole().getCode().isBlank()) {
-
-            throw new IllegalStateException(
-                    "Authenticated user does not have a valid role code"
             );
         }
 
