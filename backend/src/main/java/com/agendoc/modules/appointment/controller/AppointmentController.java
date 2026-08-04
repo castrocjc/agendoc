@@ -2,10 +2,11 @@ package com.agendoc.modules.appointment.controller;
 
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.AppointmentResponse;
-import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
-import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.service.AppointmentService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -43,6 +44,19 @@ public class AppointmentController {
                 return ResponseEntity
                                 .status(HttpStatus.CREATED)
                                 .body(response);
+        }
+
+        @PreAuthorize("hasRole('PATIENT')")
+        @PostMapping("/patient")
+        public ResponseEntity<AppointmentResponse> createPatientAppointment(
+                @Valid @RequestBody CreatePatientAppointmentRequest request) {
+
+                AppointmentResponse response =
+                        appointmentService.createPatientAppointment(request);
+
+                return ResponseEntity
+                        .status(HttpStatus.CREATED)
+                        .body(response);
         }
 
         @PreAuthorize("hasAnyRole('RECEPTIONIST', 'PATIENT')")

@@ -774,6 +774,7 @@ El Blueprint únicamente se actualizará cuando exista una decisión aprobada qu
 - backlog
 - ADR
 - roadmap
+- estrategia comercial
 
 No se actualizará por:
 
@@ -1066,45 +1067,42 @@ Todos los Sprints futuros deberán seguir este Playbook.
 
 # Sesión actual
 
-Sprint 4 — Autogestión del paciente
+Sprint 4 — Portal Público y Captación Digital
 
 Objetivo:
 
-Implementar la autorización por dominio para habilitar de forma segura HU-09 — Reservar cita como paciente y HU-11 — Consultar mis citas.
+Iniciar la implementación del Portal Público de AgenDoc como punto de entrada para nuevos pacientes.
 
-Technical Stories completadas:
+La estrategia del producto evoluciona desde un sistema utilizado únicamente por pacientes registrados hacia una plataforma de captación digital donde cualquier persona podrá descubrir un consultorio, consultar disponibilidad y reservar una cita.
+
+La creación de la cuenta del paciente se realizará automáticamente como parte del proceso de reserva.
+
+Historias completadas:
 
 - TS-03 — Implementar contexto del usuario autenticado.
 - TS-04 — Implementar autorización por dominio.
 
 Resultado:
 
-- Se implementó el contexto centralizado del usuario autenticado.
-- Se implementó autorización por dominio utilizando Spring Security y validaciones de negocio.
-- Los endpoints protegidos validan el rol antes de ejecutar la operación.
-- Las operaciones del dominio validan la pertenencia del recurso al consultorio del usuario autenticado cuando corresponde.
-- Los recursos propiedad del paciente se validan utilizando el contexto autenticado y no información enviada por el Frontend.
-- Se incorporó una infraestructura reutilizable para autorización del dominio.
-- La implementación fue validada mediante 95 pruebas automatizadas exitosas.
-- Backend y Frontend fueron validados sin regresiones.
+- Infraestructura de autenticación consolidada.
+- Autorización por dominio implementada.
+- Plataforma preparada para incorporar flujos públicos y autenticados.
 
-Siguientes incrementos:
+Próximo incremento:
 
-- HU-09 — Reservar cita como paciente.
-- HU-11 — Consultar mis citas como paciente.
+HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público.
 
 Antes de iniciar:
 
-- Validar que develop se encuentre sincronizada con origin/develop.
-- Confirmar que Backend y Frontend compilan correctamente.
-- Confirmar que todas las pruebas automatizadas finalizan exitosamente.
-- Confirmar que la autorización por dominio permanece operativa.
-- Iniciar la implementación de HU-09 utilizando el contexto autenticado y la infraestructura de autorización ya disponible.
+- Validar sincronización de develop.
+- Validar compilación Backend y Frontend.
+- Confirmar pruebas automatizadas exitosas.
+- Confirmar funcionamiento de autenticación y autorización.
+- Iniciar HU-20.
 
 Estado:
 
-TS-04 completada.
-Preparado para iniciar HU-09.
+Sprint preparado para iniciar HU-20.
 
 ---
 

@@ -4,8 +4,10 @@ import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.AppointmentResponse;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -16,6 +18,9 @@ public interface AppointmentService {
 
         AppointmentResponse createAppointment(
                         CreateAppointmentRequest request);
+
+        AppointmentResponse createPatientAppointment(
+                CreatePatientAppointmentRequest request);
 
         AppointmentResponse cancelAppointment(
                         Long appointmentId,

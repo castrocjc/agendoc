@@ -24,7 +24,7 @@ Historial del Documento
 | v1.4     | 2026-07-31 | Actualización Codebase Guide completa HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
 | v1.5     | 2026-08-01 | Actualización Codebase Guide completa TS-02, autenticación JWT End-to-End, protección de APIs y cierre técnico de la autenticación. |
 | v1.6     | 2026-08-02 | Actualización Codebase Guide completa TS-03, implementación del contexto del usuario autenticado mediante SecurityContext y resolución del usuario autenticado en el Backend. |
-| v1.7 | 2026-08-03 | Sincronización completa de la documentación posterior al cierre de TS-03. Se actualizó el estado del proyecto para iniciar TS-04 y se alinearon referencias internas del Codebase Guide. |
+| v1.7     | 2026-08-03 | Sincronización completa de la documentación posterior al cierre de TS-03. Se actualizó el estado del proyecto para iniciar TS-04 y se alinearon referencias internas del Codebase Guide. |
 
 ---
 
@@ -129,9 +129,44 @@ El Codebase Guide se rige por los siguientes principios:
 | Sprint 3            | Completado                  |
 
 Sprint 4: 🚧 En ejecución
-Incremento activo:
-TS-04 — Implementar autorización por dominio
-Historia funcional objetivo: HU-09 — Reservar cita como paciente
+
+Incremento técnico actual
+
+TS-05 — Endurecer seguridad y manejo de accesos no autorizados
+
+Historia funcional objetivo
+
+HU-09 — Reservar cita como paciente
+
+---
+
+## Estado del MVP
+
+Objetivo
+
+Esta sección proporciona una vista ejecutiva del avance del producto, permitiendo conocer rápidamente el estado de los principales incrementos funcionales y técnicos del MVP.
+
+Avance del MVP
+
+Área                   | Estado           |
+|----------------------|------------------|
+| Foundation           | ✅ Completada    |
+| Sprint 1             | ✅ Completado    |
+| Sprint 2             | ✅ Completado    |
+| Sprint 3             | ✅ Completado    |
+| Sprint 4             | 🚧 En ejecución  |
+| TS-01                | ✅ Completada    |
+| TS-02                | ✅ Completada    |
+| TS-03                | ✅ Completada    |
+| TS-04                | ✅ Completada    |
+| TS-05                | ⏳ Pendiente     |
+| Portal del Paciente  | 🚧 En desarrollo |
+| Mobile               | ⏳ Pendiente     |
+| Sprint 5             | ⏳ Pendiente     |
+
+Próximo objetivo
+
+Continuar el Sprint 4 con la implementación de TS-05 — Endurecer seguridad y manejo de accesos no autorizados, como habilitador técnico previo al desarrollo de HU-09 — Reservar cita como paciente.
 
 ---
 
@@ -139,8 +174,8 @@ Historia funcional objetivo: HU-09 — Reservar cita como paciente
 
 | Documento                    | Versión | Estado         |
 |------------------------------|---------|----------------|
-| AgenDoc Project Blueprint    | v1.9    | Aprobado       |
-| AgenDoc Development Playbook | v1.4    | Aprobado       |
+| AgenDoc Project Blueprint    | v1.11   | Aprobado       |
+| AgenDoc Development Playbook | v1.5    | Aprobado       |
 | UI Design Guide              | v1.1    | Aprobado       |
 | AgenDoc Codebase Guide       | v1.7    | Vigente        |
 
@@ -225,25 +260,15 @@ Total implementado:
 
 ## Próximo Incremento
 
-Historia objetivo
+Sprint 4: 🚧 En ejecución
 
-TS-04 — Implementar autorización por dominio.
+Incremento técnico actual
 
-Historia funcional objetivo:
-HU-09 — Reservar cita como paciente.
+TS-05 — Endurecer seguridad y manejo de accesos no autorizados
 
-Estado actual
+Historia funcional objetivo
 
-- Sprint 3 completado funcionalmente.
-- HU-13, HU-14 y HU-15 completadas.
-- Backend compilando correctamente.
-- Frontend compilando correctamente.
-- Pruebas automatizadas exitosas.
-- Validación funcional de extremo a extremo completada.
-
-Objetivo
-
-Iniciar el Sprint 4 con el flujo de autogestión del paciente, conforme al Product Backlog vigente.
+HU-09 — Reservar cita como paciente
 
 ---
 
@@ -339,10 +364,10 @@ La incorporación de nuevas tecnologías durante el desarrollo deberá justifica
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 4
 
 Sesión:
-Cierre del Sprint 1
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -435,7 +460,11 @@ Se evitará incorporar estructuras paralelas o duplicadas que dificulten la nave
 
 **Última actualización**
 
-Sprint 1 — Cierre del Sprint 1
+Sprint:
+Sprint 4
+
+Sesión:
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -585,10 +614,10 @@ La evolución de la arquitectura deberá mantenerse alineada con las decisiones 
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Cierre funcional de HU-15
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -1399,10 +1428,10 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Implementación completa de HU-15 — Registrar resultado de asistencia
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -1869,10 +1898,10 @@ La estructura de branding deberá mantenerse alineada con el UI Design Guide.
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Implementación completa de HU-15
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -1928,10 +1957,10 @@ Esta estrategia busca mantener consistencia funcional entre ambas plataformas y 
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 4
 
 Sesión:
-Cierre del Sprint 1
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2047,10 +2076,10 @@ La migración V11 incorporó a `appointments` los campos de trazabilidad para co
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Implementación completa de HU-15
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2146,10 +2175,10 @@ Las próximas APIs serán incorporadas conforme avance el backlog oficial del pr
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Implementación completa de HU-15
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2221,10 +2250,10 @@ Todo nuevo componente reutilizable deberá:
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 4
 
 Sesión:
-Cierre del Sprint 1
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2322,10 +2351,10 @@ Historias pendientes:
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Implementación completa de HU-15
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2374,10 +2403,10 @@ Su propósito es fortalecer la arquitectura, la seguridad, la mantenibilidad y l
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 4
 
 Sesión:
-Cierre del Sprint 1
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2463,10 +2492,10 @@ La estrategia de ramas y versionado se encuentra documentada en el AgenDoc Devel
 **Última actualización**
 
 Sprint:
-Sprint 1
+Sprint 4
 
 Sesión:
-Cierre del Sprint 1
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2575,10 +2604,10 @@ El proyecto mantiene un estado técnico estable y cuenta con HU-08, HU-10, HU-12
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 4
 
 Sesión:
-Implementación completa de HU-12 — Consultar agenda del consultorio
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -2984,10 +3013,10 @@ Los nuevos flujos serán incorporados conforme avance el desarrollo del producto
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Implementación completa de HU-15
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -3107,10 +3136,10 @@ Al cierre del Sprint 1 la arquitectura mantiene un bajo nivel de acoplamiento en
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 4
 
 Sesión:
-Implementación completa de HU-10 — Crear cita desde recepción
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -3128,12 +3157,14 @@ Esta información deberá actualizarse al cierre de cada Sprint.
 
 ## 18.2 Estado Actual
 
-Sprint 4
+Sprint 4: 🚧 En ejecución
 
-Incremento completado:
-TS-04 — Implementar autorización por dominio
+Incremento técnico actual
 
-Siguiente historia funcional:
+TS-05 — Endurecer seguridad y manejo de accesos no autorizados
+
+Historia funcional objetivo
+
 HU-09 — Reservar cita como paciente
 
 ---
@@ -3185,10 +3216,11 @@ Para iniciar el Sprint 4 deberán mantenerse las siguientes condiciones:
 ## 18.6 Objetivo del Incremento
 
 Sprint 4: 🚧 En ejecución
-Incremento completado:
-TS-04 — Implementar autorización por dominio
 
-Siguiente historia funcional:
+Incremento técnico actual:
+TS-05 — Endurecer seguridad y manejo de accesos no autorizados
+
+Historia funcional objetivo:
 HU-09 — Reservar cita como paciente
 
 ---
@@ -3202,10 +3234,10 @@ El proyecto cuenta con Sprint 3 funcionalmente completado y está preparado para
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Cierre de HU-15
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -3253,10 +3285,10 @@ El historial refleja la evolución funcional y técnica del proyecto desde la Fo
 **Última actualización**
 
 Sprint:
-Sprint 3
+Sprint 4
 
 Sesión:
-Cierre funcional del Sprint 3
+Sincronización documental posterior al cierre de TS-04
 
 ---
 
@@ -3361,10 +3393,10 @@ Su contenido describe exclusivamente la implementación existente y no sustituye
 **Última actualización**
 
 Sprint:
-Sprint 2
+Sprint 4
 
 Sesión:
-Cierre de HU-10 — Crear cita desde recepción
+Sincronización documental posterior al cierre de TS-04
 
 ---
 

@@ -6,19 +6,20 @@ import com.agendoc.common.exception.ConflictException;
 import com.agendoc.common.exception.ResourceNotFoundException;
 import com.agendoc.modules.agenda.entity.AgendaBlockEntity;
 import com.agendoc.modules.agenda.repository.AgendaBlockRepository;
-import com.agendoc.modules.appointment.dto.AppointmentResponse;
-import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
+import com.agendoc.modules.appointment.dto.AppointmentResponse;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
-import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
 import com.agendoc.modules.appointment.entity.AppointmentStatusCode;
 import com.agendoc.modules.appointment.entity.AppointmentStatusEntity;
 import com.agendoc.modules.appointment.entity.AppointmentRescheduleHistoryEntity;
 import com.agendoc.modules.appointment.repository.AppointmentRepository;
-import com.agendoc.modules.appointment.repository.AppointmentStatusRepository;
 import com.agendoc.modules.appointment.repository.AppointmentRescheduleHistoryRepository;
+import com.agendoc.modules.appointment.repository.AppointmentStatusRepository;
 import com.agendoc.modules.appointment.authorization.AppointmentAuthorizationPolicy;
 import com.agendoc.security.authorization.AuthenticatedUserAuthorization;
 import com.agendoc.security.authorization.SecurityRoleCode;
@@ -26,10 +27,11 @@ import com.agendoc.security.context.AuthenticatedUserContext;
 import com.agendoc.modules.clinic.entity.ClinicEntity;
 import com.agendoc.modules.clinic.repository.ClinicRepository;
 import com.agendoc.modules.doctor.entity.DoctorEntity;
+import com.agendoc.modules.doctor.entity.MedicalSpecialtyEntity;
 import com.agendoc.modules.doctor.repository.DoctorRepository;
 import com.agendoc.modules.patient.entity.PatientEntity;
 import com.agendoc.modules.patient.repository.PatientRepository;
-import com.agendoc.modules.doctor.entity.MedicalSpecialtyEntity;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -117,15 +119,68 @@ public class AppointmentServiceImpl implements AppointmentService {
                                 clinic
                         );
 
+                return createAppointmentInternal(
+                        clinic,
+                        patient,
+                        request.doctorId(),
+                        request.agendaBlockId(),
+                        request.reason(),
+                        request.notes()
+                );
+        }
+
+        @Override
+        @Transactional
+        public AppointmentResponse createPatientAppointment(
+                CreatePatientAppointmentRequest request) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.PATIENT
+                        );
+
+                ClinicEntity clinic =
+                        findActiveClinic(context.clinicId());
+
+                if (context.patientId() == null) {
+                        throw new ResourceNotFoundException(
+                                PATIENT_NOT_AVAILABLE
+                        );
+                }
+
+                PatientEntity patient =
+                        findActivePatient(
+                                context.patientId(),
+                                clinic
+                        );
+
+                return createAppointmentInternal(
+                        clinic,
+                        patient,
+                        request.doctorId(),
+                        request.agendaBlockId(),
+                        request.reason(),
+                        request.notes()
+                );
+        }
+
+        private AppointmentResponse createAppointmentInternal(
+                ClinicEntity clinic,
+                PatientEntity patient,
+                Long doctorId,
+                Long agendaBlockId,
+                String reason,
+                String notes) {
+
                 DoctorEntity doctor =
                         findActiveDoctor(
-                                request.doctorId(),
+                                doctorId,
                                 clinic
                         );
 
                 AgendaBlockEntity agendaBlock =
                         findAndLockActiveAgendaBlock(
-                                request.agendaBlockId()
+                                agendaBlockId
                         );
 
                 validateAgendaBlock(
@@ -144,12 +199,13 @@ public class AppointmentServiceImpl implements AppointmentService {
 
                 AppointmentEntity appointment =
                         createEntity(
-                                request,
                                 clinic,
                                 patient,
                                 doctor,
                                 agendaBlock,
-                                initialStatus
+                                initialStatus,
+                                reason,
+                                notes
                         );
 
                 agendaBlock.setAvailable(false);
@@ -808,13 +864,16 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         private AppointmentEntity createEntity(
-                        CreateAppointmentRequest request,
-                        ClinicEntity clinic,
-                        PatientEntity patient,
-                        DoctorEntity doctor,
-                        AgendaBlockEntity agendaBlock,
-                        AppointmentStatusEntity status) {
-                AppointmentEntity appointment = new AppointmentEntity();
+                ClinicEntity clinic,
+                PatientEntity patient,
+                DoctorEntity doctor,
+                AgendaBlockEntity agendaBlock,
+                AppointmentStatusEntity status,
+                String reason,
+                String notes) {
+
+                AppointmentEntity appointment =
+                        new AppointmentEntity();
 
                 appointment.setClinic(clinic);
                 appointment.setPatient(patient);
@@ -822,9 +881,11 @@ public class AppointmentServiceImpl implements AppointmentService {
                 appointment.setAgendaBlock(agendaBlock);
                 appointment.setStatus(status);
                 appointment.setReason(
-                                normalizeOptional(request.reason()));
+                        normalizeOptional(reason)
+                );
                 appointment.setNotes(
-                                normalizeOptional(request.notes()));
+                        normalizeOptional(notes)
+                );
 
                 return appointment;
         }

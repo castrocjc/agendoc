@@ -16,6 +16,7 @@ import com.agendoc.modules.agenda.entity.MedicalAgendaEntity;
 import com.agendoc.modules.agenda.repository.AgendaBlockRepository;
 import com.agendoc.modules.appointment.dto.AppointmentResponse;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
+import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
@@ -34,10 +35,10 @@ import com.agendoc.security.context.AuthenticatedUserContext;
 import com.agendoc.modules.clinic.entity.ClinicEntity;
 import com.agendoc.modules.clinic.repository.ClinicRepository;
 import com.agendoc.modules.doctor.entity.DoctorEntity;
+import com.agendoc.modules.doctor.entity.MedicalSpecialtyEntity;
 import com.agendoc.modules.doctor.repository.DoctorRepository;
 import com.agendoc.modules.patient.entity.PatientEntity;
 import com.agendoc.modules.patient.repository.PatientRepository;
-import com.agendoc.modules.doctor.entity.MedicalSpecialtyEntity;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -354,6 +355,276 @@ class AppointmentServiceImplTest {
                                                 any());
 
                 assertThat(agendaBlock.getAvailable()).isTrue();
+        }
+
+        @Test
+        void shouldCreatePatientAppointmentUsingAuthenticatedPatient() {
+
+                CreatePatientAppointmentRequest request =
+                        new CreatePatientAppointmentRequest(
+                                2L,
+                                12L,
+                                "  Consulta médica general  ",
+                                "  Primera cita reservada por el paciente  "
+                        );
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+                AgendaBlockEntity agendaBlock =
+                        createAgendaBlock(clinic, doctor);
+                AppointmentStatusEntity appointmentStatus =
+                        createAppointmentStatus();
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(patientContext);
+
+                when(clinicRepository.findByIdAndRecordStatus(
+                        patientContext.clinicId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(clinic));
+
+                when(patientRepository.findByIdAndRecordStatus(
+                        patientContext.patientId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(patient));
+
+                when(doctorRepository.findByIdAndClinicIdAndRecordStatus(
+                        2L,
+                        patientContext.clinicId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(doctor));
+
+                when(agendaBlockRepository
+                        .findByIdAndRecordStatusForUpdate(
+                                12L,
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(Optional.of(agendaBlock));
+
+                when(appointmentRepository
+                        .existsPatientScheduleConflict(
+                                patient.getId(),
+                                agendaBlock.getAppointmentDate(),
+                                agendaBlock.getStartTime(),
+                                agendaBlock.getEndTime(),
+                                List.of(
+                                        AppointmentStatusCode.PROGRAMADA.name(),
+                                        AppointmentStatusCode.CONFIRMADA.name()
+                                ),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(false);
+
+                when(appointmentStatusRepository
+                        .findByCodeAndRecordStatus(
+                                AppointmentStatusCode.PROGRAMADA.name(),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(Optional.of(appointmentStatus));
+
+                when(appointmentRepository.save(
+                        any(AppointmentEntity.class)
+                )).thenAnswer(invocation -> {
+
+                        AppointmentEntity appointment =
+                                invocation.getArgument(0);
+
+                        appointment.setId(20L);
+
+                        return appointment;
+                });
+
+                AppointmentResponse response =
+                        appointmentService.createPatientAppointment(request);
+
+                assertThat(response.id()).isEqualTo(20L);
+                assertThat(response.clinicId())
+                        .isEqualTo(patientContext.clinicId());
+                assertThat(response.patientId())
+                        .isEqualTo(patientContext.patientId());
+                assertThat(response.doctorId()).isEqualTo(2L);
+                assertThat(response.agendaBlockId()).isEqualTo(12L);
+                assertThat(response.statusCode()).isEqualTo("PROGRAMADA");
+
+                assertThat(response.reason())
+                        .isEqualTo("Consulta médica general");
+
+                assertThat(response.notes())
+                        .isEqualTo(
+                                "Primera cita reservada por el paciente"
+                        );
+
+                assertThat(agendaBlock.getAvailable()).isFalse();
+
+                ArgumentCaptor<AppointmentEntity> appointmentCaptor =
+                        ArgumentCaptor.forClass(
+                                AppointmentEntity.class
+                        );
+
+                verify(appointmentRepository)
+                        .save(appointmentCaptor.capture());
+
+                AppointmentEntity savedAppointment =
+                        appointmentCaptor.getValue();
+
+                assertThat(savedAppointment.getClinic())
+                        .isSameAs(clinic);
+                assertThat(savedAppointment.getPatient())
+                        .isSameAs(patient);
+                assertThat(savedAppointment.getDoctor())
+                        .isSameAs(doctor);
+                assertThat(savedAppointment.getAgendaBlock())
+                        .isSameAs(agendaBlock);
+                assertThat(savedAppointment.getStatus())
+                        .isSameAs(appointmentStatus);
+
+                verify(authenticatedUserAuthorization)
+                        .requireRole(SecurityRoleCode.PATIENT);
+
+                verify(patientRepository)
+                        .findByIdAndRecordStatus(
+                                patientContext.patientId(),
+                                RecordStatus.ACTIVE
+                        );
+        }
+
+        @Test
+        void shouldRejectPatientAppointmentWhenContextHasNoPatientProfile() {
+
+                AuthenticatedUserContext patientWithoutProfile =
+                        new AuthenticatedUserContext(
+                                200L,
+                                "patient.user",
+                                1L,
+                                SecurityRoleCode.PATIENT.name(),
+                                null,
+                                null
+                        );
+
+                CreatePatientAppointmentRequest request =
+                        new CreatePatientAppointmentRequest(
+                                2L,
+                                12L,
+                                "Consulta médica general",
+                                null
+                        );
+
+                ClinicEntity clinic = createClinic();
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(patientWithoutProfile);
+
+                when(clinicRepository.findByIdAndRecordStatus(
+                        patientWithoutProfile.clinicId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(clinic));
+
+                assertThatThrownBy(
+                        () -> appointmentService
+                                .createPatientAppointment(request)
+                )
+                        .isInstanceOf(ResourceNotFoundException.class)
+                        .hasMessage(
+                                "El paciente seleccionado no está disponible."
+                        );
+
+                verify(patientRepository, never())
+                        .findByIdAndRecordStatus(any(), any());
+
+                verify(doctorRepository, never())
+                        .findByIdAndClinicIdAndRecordStatus(
+                                any(),
+                                any(),
+                                any()
+                        );
+
+                verify(agendaBlockRepository, never())
+                        .findByIdAndRecordStatusForUpdate(
+                                any(),
+                                any()
+                        );
+
+                verify(appointmentRepository, never())
+                        .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRejectPatientAppointmentWhenAuthenticatedPatientHasScheduleConflict() {
+
+                CreatePatientAppointmentRequest request =
+                        new CreatePatientAppointmentRequest(
+                                2L,
+                                12L,
+                                "Consulta médica general",
+                                null
+                        );
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+                AgendaBlockEntity agendaBlock =
+                        createAgendaBlock(clinic, doctor);
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(patientContext);
+
+                when(clinicRepository.findByIdAndRecordStatus(
+                        patientContext.clinicId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(clinic));
+
+                when(patientRepository.findByIdAndRecordStatus(
+                        patientContext.patientId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(patient));
+
+                when(doctorRepository.findByIdAndClinicIdAndRecordStatus(
+                        2L,
+                        patientContext.clinicId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(Optional.of(doctor));
+
+                when(agendaBlockRepository
+                        .findByIdAndRecordStatusForUpdate(
+                                12L,
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(Optional.of(agendaBlock));
+
+                when(appointmentRepository
+                        .existsPatientScheduleConflict(
+                                patient.getId(),
+                                agendaBlock.getAppointmentDate(),
+                                agendaBlock.getStartTime(),
+                                agendaBlock.getEndTime(),
+                                List.of(
+                                        AppointmentStatusCode.PROGRAMADA.name(),
+                                        AppointmentStatusCode.CONFIRMADA.name()
+                                ),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(true);
+
+                assertThatThrownBy(
+                        () -> appointmentService
+                                .createPatientAppointment(request)
+                )
+                        .isInstanceOf(ConflictException.class)
+                        .hasMessage(
+                                "El paciente ya tiene una cita programada en el horario seleccionado."
+                        );
+
+                assertThat(agendaBlock.getAvailable()).isTrue();
+
+                verify(appointmentStatusRepository, never())
+                        .findByCodeAndRecordStatus(any(), any());
+
+                verify(appointmentRepository, never())
+                        .save(any(AppointmentEntity.class));
         }
 
         @Test

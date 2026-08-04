@@ -139,17 +139,112 @@ La aplicación web y la aplicación móvil compartirán las mismas reglas de neg
 
 ---
 
-### 9. Seguridad desde el inicio
+### 9. El paciente inicia la relación con el consultorio desde Internet
+
+El primer contacto entre un paciente y el consultorio deberá realizarse desde un portal público del consultorio.
+
+AgenDoc permitirá que cualquier persona conozca el consultorio, sus médicos, especialidades y servicios antes de convertirse en paciente.
+
+El proceso de incorporación de un nuevo paciente priorizará la reserva de la primera cita.
+
+El nuevo interesado podrá explorar el Portal Público, seleccionar la especialidad, el médico, la fecha y el horario disponibles antes de proporcionar sus datos personales.
+
+Únicamente al confirmar la reserva se solicitará la información mínima necesaria para crear su cuenta.
+
+Una vez confirmada la reserva, AgenDoc creará automáticamente:
+
+- la cuenta de usuario;
+- el registro de paciente;
+- la asociación entre ambos;
+- la primera cita médica en estado Programada.
+
+Posteriormente el paciente podrá iniciar sesión y completar el resto de su información desde su perfil.
+
+---
+
+### 10. Seguridad desde el inicio
 
 La autenticación, autorización y protección de los datos médicos se considerarán requisitos fundamentales desde las primeras iteraciones del proyecto.
 
 ---
 
-### 10. Evolución incremental
+### 11. Evolución incremental
 
 AgenDoc crecerá mediante incrementos pequeños y funcionales.
 
 Cada Sprint deberá entregar valor real y mantener el producto potencialmente desplegable.
+
+---
+
+## Portal Público del Consultorio
+
+El Portal Público constituye el punto de entrada principal para nuevos pacientes.
+
+Cada consultorio dispondrá de una presencia pública propia desde la cual podrá:
+
+presentar su identidad;
+mostrar sus especialidades;
+publicar sus médicos;
+ofrecer información general;
+permitir el registro de nuevos pacientes;
+permitir la solicitud de citas médicas.
+
+Cada consultorio dispondrá de un Portal Público administrado por AgenDoc. El Portal Público constituye la experiencia pública del consultorio y forma parte integral de la plataforma, manteniendo una identidad propia para cada consultorio.
+
+---
+
+## Modelo de incorporación de pacientes
+
+AgenDoc distingue dos tipos de pacientes.
+
+### Paciente existente
+
+Corresponde a una persona previamente registrada por el consultorio.
+
+Puede:
+
+iniciar sesión;
+gestionar sus citas;
+consultar su información;
+utilizar todas las funcionalidades habilitadas para pacientes.
+
+### Nuevo interesado
+
+Corresponde a una persona que aún no pertenece al consultorio.
+
+Podrá:
+
+acceder al Portal Público;
+consultar información del consultorio;
+solicitar una primera cita;
+registrarse proporcionando únicamente la información mínima requerida.
+
+Una vez completado el registro, AgenDoc creará automáticamente:
+
+la cuenta de usuario;
+el registro de paciente;
+la asociación entre ambos.
+
+Posteriormente el paciente podrá completar el resto de su información desde su perfil.
+
+---
+
+## Evolución del modelo de consultorio
+
+El MVP se desarrollará inicialmente para un único consultorio.
+
+Cada consultorio dispondrá de:
+
+una identidad propia;
+un Portal Público;
+médicos;
+pacientes;
+agendas;
+citas médicas.
+
+La arquitectura permanecerá preparada para evolucionar hacia un modelo multiconsultorio, donde cada consultorio conservará su identidad, configuración y Portal Público independientes.
+
+Esta evolución no requerirá rediseñar el dominio funcional del producto.
 
 ---
 
@@ -167,13 +262,14 @@ El MVP se centrará en la gestión de citas médicas.
 
 ### Paciente
 
-- Registro
-- Inicio de sesión
+- Registrarse desde el Portal Público
+- Iniciar sesión
+- Completar su perfil
 - Consultar médicos
 - Consultar disponibilidad
 - Reservar cita
-- Visualizar citas
-- Cancelar cita
+- Visualizar sus citas
+- Cancelar sus citas
 
 ---
 
@@ -260,6 +356,7 @@ Responsabilidades:
 
 Relaciones:
 
+- Tiene un Portal Público.
 - Tiene médicos.
 - Tiene recepcionistas.
 - Tiene pacientes.
@@ -2056,11 +2153,9 @@ Cada rol visualizará únicamente las funcionalidades que le corresponden.
 
 La navegación deberá minimizar la cantidad de pasos necesarios para completar las tareas más frecuentes.
 
-### Navegación del Paciente
+### Navegación pública
 
-Flujo principal:
-
-Inicio
+Landing
 
 ↓
 
@@ -2076,7 +2171,25 @@ Disponibilidad
 
 ↓
 
-Reservar cita
+Confirmar primera cita
+
+↓
+
+Registro simplificado
+
+↓
+
+Reserva confirmada
+
+↓
+
+Inicio de sesión
+
+### Navegación del Paciente autenticado
+
+Flujo principal:
+
+Inicio
 
 ↓
 
@@ -2084,7 +2197,15 @@ Mis citas
 
 ↓
 
+Reservar cita
+
+↓
+
 Perfil
+
+↓
+
+Cerrar sesión
 
 Las funcionalidades principales del paciente serán:
 
@@ -2194,6 +2315,18 @@ La versión Mobile utilizará Bottom Navigation y navegación jerárquica cuando
 ---
 
 ## 6.7 Catálogo Oficial de Pantallas del MVP
+
+### Portal Público
+
+| Pantalla                 | Objetivo                                    | Función principal                           |
+|--------------------------|---------------------------------------------|---------------------------------------------|
+| Landing del consultorio  | Presentar el consultorio                    | Información general                         |
+| Especialidades           | Mostrar especialidades disponibles          | Explorar la oferta médica                   |
+| Médicos                  | Mostrar médicos del consultorio             | Consultar perfiles médicos                  |
+| Solicitar primera cita   | Iniciar el proceso de reserva               | Selección de médico y horario               |
+| Registro                 | Crear una cuenta de nuevo paciente          | Registro simplificado                       |
+
+---
 
 ### Pantallas comunes
 
@@ -2467,27 +2600,28 @@ El backlog no incluye tareas de implementación detalladas, diseño de APIs, dis
 
 ## 7.4 Features
 
-| ID    | Épica | Feature                               | Descripción                                                   | Dependencias    | Prioridad   |
-|-------|-------|---------------------------------------|---------------------------------------------------------------|-----------------|-------------|
-| FE-01 | EP-01 | Inicio de sesión                      | Autenticación de usuarios por credenciales                    | Usuarios, roles | Must Have   |
-| FE-02 | EP-01 | Navegación por rol                    | Mostrar opciones según Paciente, Recepcionista o Médico       | FE-01           | Must Have   |
-| FE-03 | EP-02 | Configuración inicial del consultorio | Disponer de los datos mínimos del consultorio base            | Ninguna         | Must Have   |
-| FE-04 | EP-02 | Gestión inicial de médicos            | Registrar médicos asociados al consultorio                    | FE-03           | Must Have   |
-| FE-05 | EP-02 | Gestión inicial de recepcionistas     | Registrar recepcionistas del consultorio                      | FE-03           | Should Have |
-| FE-06 | EP-03 | Registro de pacientes                 | Crear pacientes desde recepción o autogestión                 | FE-01, FE-03    | Must Have   |
-| FE-07 | EP-03 | Búsqueda de pacientes                 | Buscar pacientes por datos básicos                            | FE-06           | Must Have   |
-| FE-08 | EP-04 | Configuración de agenda médica        | Crear agenda y bloques de disponibilidad                      | FE-04           | Must Have   |
-| FE-09 | EP-04 | Consulta de disponibilidad            | Visualizar horarios disponibles por médico                    | FE-08           | Must Have   |
-| FE-10 | EP-05 | Reserva de cita por paciente          | Permitir que el paciente reserve una cita                     | FE-06, FE-09    | Must Have   |
-| FE-11 | EP-05 | Creación de cita por recepcionista    | Permitir que recepción cree citas para pacientes              | FE-06, FE-09    | Must Have   |
-| FE-12 | EP-05 | Consulta de citas                     | Visualizar citas según rol                                    | FE-10, FE-11    | Must Have   |
-| FE-13 | EP-05 | Cancelación de cita                   | Cancelar citas bajo reglas del dominio                        | FE-12           | Must Have   |
-| FE-14 | EP-05 | Reprogramación de cita                | Cambiar fecha y hora de una cita válida                       | FE-09, FE-12    | Should Have |
-| FE-15 | EP-05 | Registro de asistencia                | Confirmar la llegada o registrar la inasistencia del paciente | FE-12           | Should Have |
-| FE-16 | EP-06 | Agenda del médico                     | Mostrar citas asignadas al médico                             | FE-12           | Must Have   |
-| FE-17 | EP-06 | Registro de observación básica        | Registrar una nota simple de atención                         | FE-16           | Must Have   |
-| FE-18 | EP-06 | Marcar cita como atendida             | Cerrar la atención médica                                     | FE-17           | Must Have   |
-| FE-19 | EP-06 | Historial básico                      | Consultar observaciones anteriores del paciente               | FE-17           | Should Have |
+| ID    | Épica | Feature                               | Descripción                                                             | Dependencias        | Prioridad   |
+|-------|-------|---------------------------------------|-------------------------------------------------------------------------|---------------------|-------------|
+| FE-01 | EP-01 | Inicio de sesión                      | Autenticación de usuarios por credenciales                              | Usuarios, roles     | Must Have   |
+| FE-02 | EP-01 | Navegación por rol                    | Mostrar opciones según Paciente, Recepcionista o Médico                 | FE-01               | Must Have   |
+| FE-03 | EP-02 | Configuración inicial del consultorio | Disponer de los datos mínimos del consultorio base                      | Ninguna             | Must Have   |
+| FE-04 | EP-02 | Gestión inicial de médicos            | Registrar médicos asociados al consultorio                              | FE-03               | Must Have   |
+| FE-05 | EP-02 | Gestión inicial de recepcionistas     | Registrar recepcionistas del consultorio                                | FE-03               | Should Have |
+| FE-06 | EP-03 | Registro público de pacientes         | Permitir que nuevos interesados creen su cuenta desde el Portal Público | FE-01, FE-03        | Must Have   |
+| FE-07 | EP-03 | Registro interno de pacientes         | Permitir que la recepcionista registre pacientes                        | FE-01, FE-03        | Must Have   |
+| FE-08 | EP-03 | Búsqueda de pacientes                 | Buscar pacientes por datos básicos                                      | FE-07               | Must Have   |
+| FE-09 | EP-04 | Configuración de agenda médica        | Crear agenda y bloques de disponibilidad                                | FE-04               | Must Have   |
+| FE-10 | EP-04 | Consulta de disponibilidad            | Visualizar horarios disponibles por médico                              | FE-08               | Must Have   |
+| FE-11 | EP-05 | Reserva de cita por paciente          | Permitir que el paciente reserve una cita                               | FE-01, FE-06, FE-09 | Must Have   |
+| FE-12 | EP-05 | Creación de cita por recepcionista    | Permitir que recepción cree citas para pacientes                        | FE-06, FE-09        | Must Have   |
+| FE-13 | EP-05 | Consulta de citas                     | Visualizar citas según rol                                              | FE-10, FE-11        | Must Have   |
+| FE-14 | EP-05 | Cancelación de cita                   | Cancelar citas bajo reglas del dominio                                  | FE-12               | Must Have   |
+| FE-15 | EP-05 | Reprogramación de cita                | Cambiar fecha y hora de una cita válida                                 | FE-09, FE-12        | Should Have |
+| FE-16 | EP-05 | Registro de asistencia                | Confirmar la llegada o registrar la inasistencia del paciente           | FE-12               | Should Have |
+| FE-17 | EP-06 | Agenda del médico                     | Mostrar citas asignadas al médico                                       | FE-12               | Must Have   |
+| FE-18 | EP-06 | Registro de observación básica        | Registrar una nota simple de atención                                   | FE-16               | Must Have   |
+| FE-19 | EP-06 | Marcar cita como atendida             | Cerrar la atención médica                                               | FE-17               | Must Have   |
+| FE-20 | EP-06 | Historial básico                      | Consultar observaciones anteriores del paciente                         | FE-17               | Should Have |
 
 ---
 
@@ -2522,6 +2656,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: Usuarios, roles, consultorio  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Funciona en Web y Mobile.
@@ -2551,6 +2686,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-01  
 Estimación: 2 Story Points  
+
 Definition of Done:
 
 - Funciona en Web y Mobile.
@@ -2620,6 +2756,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-03  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Médico asociado a consultorio.
@@ -2650,6 +2787,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-01, HU-03  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Paciente asociado a consultorio.
@@ -2678,6 +2816,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-05  
 Estimación: 3 Story Points  
+
 Definition of Done:
 
 - Permite búsqueda básica.
@@ -2708,6 +2847,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-04  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Bloques asociados a médico y consultorio.
@@ -2749,6 +2889,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-07  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Muestra disponibilidad real.
@@ -2786,6 +2927,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-01, HU-08  
 Estimación: 8 Story Points  
+
 Definition of Done:
 
 - Cita asociada a paciente, médico, consultorio y bloque.
@@ -2819,6 +2961,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-06, HU-08  
 Estimación: 8 Story Points  
+
 Definition of Done:
 
 - Cita creada desde recepción.
@@ -2847,6 +2990,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-09  
 Estimación: 3 Story Points  
+
 Definition of Done:
 
 - Solo muestra citas del paciente autenticado.
@@ -2875,6 +3019,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-10  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Vista por consultorio.
@@ -2915,6 +3060,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-11, HU-12  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Aplica las transiciones permitidas del estado.
@@ -2945,6 +3091,7 @@ Criterios de aceptación:
 Prioridad: Should Have  
 Dependencias: HU-08, HU-12  
 Estimación: 8 Story Points  
+
 Definition of Done:
 
 - Valida disponibilidad.
@@ -3019,6 +3166,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-10  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Solo muestra citas del médico autenticado.
@@ -3055,6 +3203,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-15, HU-16
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Solo médico puede registrar observación.
@@ -3089,6 +3238,7 @@ Criterios de aceptación:
 Prioridad: Must Have  
 Dependencias: HU-17  
 Estimación: 3 Story Points  
+
 Definition of Done:
 
 - Solo médico puede ejecutar la acción.
@@ -3121,6 +3271,7 @@ Criterios de aceptación:
 Prioridad: Should Have  
 Dependencias: HU-17  
 Estimación: 5 Story Points  
+
 Definition of Done:
 
 - Solo muestra observaciones básicas.
@@ -3128,6 +3279,40 @@ Definition of Done:
 - Respeta seguridad por médico y consultorio.
 - Usa estado vacío cuando corresponde.
 - Solo muestra observaciones de citas Atendidas.
+
+---
+
+#### HU-20 — Registro público de paciente
+
+Como nuevo interesado
+
+Quiero confirmar la reserva de mi primera cita desde el Portal Público proporcionando únicamente la información mínima requerida
+
+Para convertirme automáticamente en paciente del consultorio y acceder posteriormente a la plataforma.
+
+Criterios de aceptación:
+
+- Given que aún no pertenezco al consultorio
+  When completo el formulario de registro con la información mínima requerida
+  Then el sistema crea automáticamente mi cuenta de usuario y mi registro de paciente.
+- Given que el correo electrónico o documento ya existen
+  When intento registrarme
+  Then el sistema informa el conflicto y no crea un nuevo registro.
+- Given que el registro fue exitoso
+  When finaliza el proceso
+  Then puedo iniciar sesión y completar mi perfil posteriormente.
+
+Prioridad: Must Have
+Dependencias: HU-03
+Estimación: 5 Story Points
+
+Definition of Done:
+
+- Registro simplificado.
+- Creación automática de Usuario.
+- Creación automática de Paciente.
+- Asociación entre ambos.
+- Compatible con Web y Mobile.
 
 ---
 
@@ -3379,6 +3564,7 @@ Sprint 5.
 | HU-16    | El médico debe consultar sus citas.                  |
 | HU-17    | La observación básica está incluida en el MVP.       |
 | HU-18    | Permite cerrar el ciclo de atención.                 |
+| HU-20    | Registro público de paciente.                        |
 
 ### Should Have
 
@@ -3432,26 +3618,27 @@ Secuencia lógica de implementación:
 
 Dependencias principales:
 
-| Historia | Depende de                         |
-|----------|------------------------------------|
-| HU-01    | Usuarios, roles, consultorio       |
-| HU-03    | Ninguna                            |
-| HU-04    | HU-03                              |
-| HU-05    | HU-01, HU-03                       |
-| HU-06    | HU-05                              |
-| HU-07    | HU-04                              |
-| HU-08    | HU-07                              |
-| HU-09    | HU-01, HU-08, TS-02, TS-03, TS-04  |
-| HU-10    | HU-06, HU-08, TS-02, TS-03         |
-| HU-11    | HU-09, TS-04                       |
-| HU-12    | HU-10, TS-03                       |
-| HU-13    | HU-11, HU-12, TS-04                |
-| HU-14    | HU-08, HU-12                       |
-| HU-15    | HU-12                              |
-| HU-16    | HU-10, TS-04                       |
-| HU-17    | HU-15, HU-16                       |
-| HU-18    | HU-17                              |
-| HU-19    | HU-17                              |
+| Historia | Depende de                                |
+|----------|-------------------------------------------|
+| HU-01    | Usuarios, roles, consultorio              |
+| HU-03    | Ninguna                                   |
+| HU-04    | HU-03                                     |
+| HU-05    | HU-01, HU-03                              |
+| HU-06    | HU-05                                     |
+| HU-07    | HU-04                                     |
+| HU-08    | HU-07                                     |
+| HU-09    | HU-01, HU-08, TS-02, TS-03, TS-04, HU-20  |
+| HU-10    | HU-06, HU-08, TS-02, TS-03                |
+| HU-11    | HU-09, TS-04                              |
+| HU-12    | HU-10, TS-03                              |
+| HU-13    | HU-11, HU-12, TS-04                       |
+| HU-14    | HU-08, HU-12                              |
+| HU-15    | HU-12                                     |
+| HU-16    | HU-10, TS-04                              |
+| HU-17    | HU-15, HU-16                              |
+| HU-18    | HU-17                                     |
+| HU-19    | HU-17                                     |
+| HU-20    | HU-03                                     |
 
 ---
 
@@ -3536,7 +3723,7 @@ La siguiente matriz resume la relación entre la visión del producto y los elem
 |-----------------------------|--------|----------------------|-------------------------|
 | Gestión segura del acceso   | EP-01  | FE-01, FE-02         | HU-01, HU-02            |
 | Operación del consultorio   | EP-02  | FE-03, FE-04, FE-05  | HU-03, HU-04            |
-| Administración de pacientes | EP-03  | FE-06, FE-07         | HU-05, HU-06            |
+| Administración de pacientes | EP-03  | FE-06, FE-07         | HU-05, HU-06, HU-20     |
 | Gestión de disponibilidad   | EP-04  | FE-08, FE-09         | HU-07, HU-08            |
 | Gestión de citas médicas    | EP-05  | FE-10 a FE-15        | HU-09 a HU-15           |
 | Atención médica básica      | EP-06  | FE-16 a FE-19        | HU-16 a HU-19           |
@@ -3833,6 +4020,27 @@ La disponibilidad será calculada únicamente para citas activas (Programada y C
 
 ---
 
+## ADR-017 — El Portal Público constituye el punto de entrada oficial del paciente
+
+### Decisión
+
+El proceso de incorporación de nuevos pacientes comenzará desde un Portal Público propio de cada consultorio.
+
+El Portal permitirá presentar el consultorio, consultar especialidades, médicos y registrar nuevos pacientes mediante un proceso simplificado.
+
+### Justificación
+
+Mejora la captación digital de pacientes.
+Elimina la dependencia del registro presencial.
+Alinea AgenDoc con plataformas modernas de reserva médica.
+Prepara la evolución futura hacia un modelo SaaS multiconsultorio.
+
+### Estado
+
+✅ Aprobado.
+
+---
+
 # 9. Roadmap
 
 ## Sprint 0 — Descubrimiento y Diseño del Producto
@@ -4058,11 +4266,11 @@ Resultado funcional
 
 ---
 
-## Sprint 4 — Autogestión del paciente
+## Sprint 4 — Experiencia digital del paciente
 
 ### Sprint Goal
 
-Permitir que el paciente consulte disponibilidad, reserve citas y utilice las capacidades de consulta y cancelación previamente implementadas.
+Permitir que un nuevo interesado descubra el consultorio desde el Portal Público, se registre como paciente, reserve su primera cita y posteriormente gestione sus propias citas mediante la plataforma.
 
 ### Product Backlog Items previstos
 
@@ -4072,6 +4280,7 @@ Sprint 4
 - TS-02 — Completar autenticación JWT End-to-End
 - TS-03 — Implementar contexto del usuario autenticado
 - TS-04 — Implementar autorización por dominio
+- HU-20 - Registro público del paciente
 - HU-09 — Reservar cita como paciente
 - HU-11 — Consultar mis citas como paciente
 
