@@ -1,14 +1,30 @@
-import { Navigate } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+} from "react";
 import type { ReactNode } from "react";
+import { Navigate } from "react-router-dom";
 
-import { isAuthenticated } from "../services/sessionService";
+import {
+  isAuthenticated,
+  subscribeToSessionCleared,
+} from "../services/sessionService";
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
-  if (!isAuthenticated()) {
+  const [authenticated, setAuthenticated] =
+    useState(isAuthenticated);
+
+  useEffect(() => {
+    return subscribeToSessionCleared(() => {
+      setAuthenticated(false);
+    });
+  }, []);
+
+  if (!authenticated) {
     return <Navigate to="/login" replace />;
   }
 

@@ -67,7 +67,8 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     @Override
     public boolean isTokenValid(String token) {
         try {
-            parseClaims(token);
+            Claims claims = parseClaims(token);
+            Long.valueOf(claims.getSubject());
             return true;
         } catch (JwtException | IllegalArgumentException exception) {
             return false;

@@ -1,4 +1,7 @@
-import { getAccessToken } from "../../features/auth/services/sessionService";
+import {
+  clearSession,
+  getAccessToken,
+} from "../../features/auth/services/sessionService";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8081";
@@ -91,6 +94,10 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     const errorResponse = await readErrorResponse(response);
+
+    if (response.status === 401) {
+      clearSession();
+    }
 
     throw new ApiClientError(
       errorResponse?.message ??

@@ -7,10 +7,10 @@
 | Proyecto             | AgenDoc                                           |
 | Tipo                 | Plataforma Web + Mobile                           |
 | Metodología          | Scrum                                             |
-| Blueprint Version    | v1.11                                             |
+| Blueprint Version    | v1.12                                             |
 | Sprint Actual        | Sprint 4                                          |
 | Estado               | Sprint 4 en ejecución                             |
-| Última actualización | Sprint 4 — Cierre de TS-04                        |
+| Última actualización | Sprint 4 — Cierre de TS-05                        |
 
 ---
 
@@ -3534,11 +3534,24 @@ Dependencias
 
 Estado
 
-Pendiente.
+Completada.
 
 Sprint previsto
 
 Sprint 5.
+
+Sprint ejecutado
+
+Sprint 4.
+
+Resultado
+
+- Se uniformó el manejo de respuestas 401 (Unauthorized) y 403 (Forbidden).
+- Se centralizó el manejo de errores de autenticación y autorización mediante componentes especializados de Spring Security.
+- Se validó la correcta protección de los endpoints públicos y privados.
+- Se eliminaron configuraciones temporales de seguridad utilizadas durante el desarrollo.
+- Se verificó que las respuestas de error no expongan información sensible del sistema.
+- La plataforma quedó preparada para continuar con las Historias de Usuario del paciente sobre una base de seguridad consistente.
 
 ---
 
@@ -3618,27 +3631,27 @@ Secuencia lógica de implementación:
 
 Dependencias principales:
 
-| Historia | Depende de                                |
-|----------|-------------------------------------------|
-| HU-01    | Usuarios, roles, consultorio              |
-| HU-03    | Ninguna                                   |
-| HU-04    | HU-03                                     |
-| HU-05    | HU-01, HU-03                              |
-| HU-06    | HU-05                                     |
-| HU-07    | HU-04                                     |
-| HU-08    | HU-07                                     |
-| HU-09    | HU-01, HU-08, TS-02, TS-03, TS-04, HU-20  |
-| HU-10    | HU-06, HU-08, TS-02, TS-03                |
-| HU-11    | HU-09, TS-04                              |
-| HU-12    | HU-10, TS-03                              |
-| HU-13    | HU-11, HU-12, TS-04                       |
-| HU-14    | HU-08, HU-12                              |
-| HU-15    | HU-12                                     |
-| HU-16    | HU-10, TS-04                              |
-| HU-17    | HU-15, HU-16                              |
-| HU-18    | HU-17                                     |
-| HU-19    | HU-17                                     |
-| HU-20    | HU-03                                     |
+| Historia | Depende de                                      |
+|----------|-------------------------------------------------|
+| HU-01    | Usuarios, roles, consultorio                    |
+| HU-03    | Ninguna                                         |
+| HU-04    | HU-03                                           |
+| HU-05    | HU-01, HU-03                                    |
+| HU-06    | HU-05                                           |
+| HU-07    | HU-04                                           |
+| HU-08    | HU-07                                           |
+| HU-09    | HU-01, HU-08, TS-02, TS-03, TS-04, TS-05, HU-20 |
+| HU-10    | HU-06, HU-08, TS-02, TS-03                      |
+| HU-11    | HU-09, TS-04, TS-05                             |
+| HU-12    | HU-10, TS-03                                    |
+| HU-13    | HU-11, HU-12, TS-04, TS-05                      |
+| HU-14    | HU-08, HU-12                                    |
+| HU-15    | HU-12                                           |
+| HU-16    | HU-10, TS-04, TS-05                             |
+| HU-17    | HU-15, HU-16                                    |
+| HU-18    | HU-17                                           |
+| HU-19    | HU-17                                           |
+| HU-20    | HU-03                                           |
 
 ---
 
@@ -4302,6 +4315,7 @@ Avance
 - ✅ TS-02 — Completar autenticación JWT End-to-End
 - ✅ TS-03 — Implementar contexto del usuario autenticado
 - ✅ TS-04 — Implementar autorización por dominio
+- ✅ TS-05 — Endurecer seguridad y manejo de accesos no autorizados
 - ⏳ HU-09 — Reservar cita como paciente
 - ⏳ HU-11 — Consultar mis citas como paciente
 
@@ -4694,3 +4708,26 @@ Decisiones tomadas
 
 ---
 
+Sprint 4
+
+Sesión 5 — Cierre de TS-05
+
+Estado
+
+✅ Completada
+
+Technical Stories completadas
+
+- TS-05 — Endurecer seguridad y manejo de accesos no autorizados.
+
+Decisiones tomadas
+
+- Se uniformó el comportamiento de las respuestas 401 (Unauthorized) y 403 (Forbidden).
+- Se centralizó el manejo de errores de autenticación y autorización mediante componentes especializados de Spring Security.
+- Se revisó la protección de los endpoints públicos y privados del Backend.
+- Se eliminaron configuraciones temporales de seguridad utilizadas durante el desarrollo.
+- Se verificó que las respuestas de error no expongan información sensible.
+- La implementación fue validada mediante pruebas funcionales utilizando usuarios con distintos roles y escenarios de acceso autorizado y no autorizado.
+- La plataforma quedó preparada para continuar con el desarrollo de las Historias de Usuario HU-09 y HU-11.
+
+---

@@ -1,8 +1,10 @@
 package com.agendoc.security.config;
 
 import java.util.List;
+import com.agendoc.security.handler.RestAccessDeniedHandler;
+import com.agendoc.security.handler.RestAuthenticationEntryPoint;
 import com.agendoc.security.jwt.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,14 +27,20 @@ public class SecurityConfiguration {
         private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
         private final List<String> allowedOrigins;
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+        private final RestAccessDeniedHandler restAccessDeniedHandler;
 
         public SecurityConfiguration(
                 @Value("${agendoc.cors.allowed-origins}")
                 List<String> allowedOrigins,
-                JwtAuthenticationFilter jwtAuthenticationFilter) {
-
+                JwtAuthenticationFilter jwtAuthenticationFilter,
+                RestAuthenticationEntryPoint restAuthenticationEntryPoint,
+                RestAccessDeniedHandler restAccessDeniedHandler
+        ) {
         this.allowedOrigins = List.copyOf(allowedOrigins);
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+        this.restAccessDeniedHandler = restAccessDeniedHandler;
         }
 
         @Bean
@@ -46,10 +54,10 @@ public class SecurityConfiguration {
                                                 SessionCreationPolicy.STATELESS))
                                 .exceptionHandling(exception -> exception
                                         .authenticationEntryPoint(
-                                                (request, response, authenticationException) ->
-                                                        response.sendError(
-                                                                HttpServletResponse.SC_UNAUTHORIZED
-                                                        )
+                                                restAuthenticationEntryPoint
+                                        )
+                                        .accessDeniedHandler(
+                                                restAccessDeniedHandler
                                         )
                                 )
                                 .authorizeHttpRequests(authorize -> {

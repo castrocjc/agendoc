@@ -9,110 +9,173 @@ import com.agendoc.modules.auth.dto.AuthenticatedUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Date;
+
 class JwtTokenServiceImplTest {
 
-    private static final String ISSUER = "agendoc-test";
-    private static final String SECRET =
-            "agendoc-test-secret-key-with-at-least-32-characters";
-    private static final long EXPIRATION_SECONDS = 3600L;
+        private static final String ISSUER = "agendoc-test";
+        private static final String SECRET = "agendoc-test-secret-key-with-at-least-32-characters";
+        private static final long EXPIRATION_SECONDS = 3600L;
 
-    private JwtTokenService jwtTokenService;
+        private JwtTokenService jwtTokenService;
 
-    @BeforeEach
-    void setUp() {
-        JwtProperties jwtProperties = new JwtProperties(
-                ISSUER,
-                SECRET,
-                EXPIRATION_SECONDS
-        );
+        @BeforeEach
+        void setUp() {
+                JwtProperties jwtProperties = new JwtProperties(
+                                ISSUER,
+                                SECRET,
+                                EXPIRATION_SECONDS);
 
-        jwtTokenService = new JwtTokenServiceImpl(jwtProperties);
-    }
+                jwtTokenService = new JwtTokenServiceImpl(jwtProperties);
+        }
 
-    @Test
-    void shouldGenerateValidToken() {
-        AuthenticatedUser authenticatedUser = createAuthenticatedUser();
+        @Test
+        void shouldRejectEmptyToken() {
+                assertFalse(jwtTokenService.isTokenValid(""));
+        }
 
-        String token = jwtTokenService.generateToken(authenticatedUser);
+        @Test
+        void shouldRejectNullToken() {
+                assertFalse(jwtTokenService.isTokenValid(null));
+        }
 
-        assertNotNull(token);
-        assertFalse(token.isBlank());
-        assertTrue(jwtTokenService.isTokenValid(token));
-    }
+        @Test
+        void shouldRejectExpiredToken() {
+                Instant issuedAt = Instant.now().minusSeconds(120);
 
-    @Test
-    void shouldExtractUserIdFromValidToken() {
-        AuthenticatedUser authenticatedUser = createAuthenticatedUser();
+                Instant expiresAt = Instant.now().minusSeconds(60);
 
-        String token = jwtTokenService.generateToken(authenticatedUser);
+                String token = Jwts.builder()
+                                .issuer(ISSUER)
+                                .subject("1")
+                                .issuedAt(Date.from(issuedAt))
+                                .expiration(Date.from(expiresAt))
+                                .signWith(
+                                                Keys.hmacShaKeyFor(
+                                                                SECRET.getBytes(
+                                                                                StandardCharsets.UTF_8)))
+                                .compact();
 
-        Long userId = jwtTokenService.extractUserId(token);
+                assertFalse(jwtTokenService.isTokenValid(token));
+        }
 
-        assertEquals(authenticatedUser.id(), userId);
-    }
+        @Test
+        void shouldRejectTokenWithNonNumericSubject() {
+                Instant issuedAt = Instant.now();
+                Instant expiresAt = issuedAt.plusSeconds(
+                                EXPIRATION_SECONDS);
 
-    @Test
-    void shouldExposeConfiguredExpirationSeconds() {
-        long expirationSeconds =
-                jwtTokenService.getExpirationSeconds();
+                String token = Jwts.builder()
+                                .issuer(ISSUER)
+                                .subject("invalid-user-id")
+                                .issuedAt(Date.from(issuedAt))
+                                .expiration(Date.from(expiresAt))
+                                .signWith(
+                                                Keys.hmacShaKeyFor(
+                                                                SECRET.getBytes(
+                                                                                StandardCharsets.UTF_8)))
+                                .compact();
 
-        assertEquals(EXPIRATION_SECONDS, expirationSeconds);
-    }
+                assertFalse(jwtTokenService.isTokenValid(token));
+        }
 
-    @Test
-    void shouldRejectTokenSignedWithDifferentSecret() {
-        AuthenticatedUser authenticatedUser = createAuthenticatedUser();
+        @Test
+        void shouldRejectTokenWithoutSubject() {
+                Instant issuedAt = Instant.now();
+                Instant expiresAt = issuedAt.plusSeconds(
+                                EXPIRATION_SECONDS);
 
-        String token = jwtTokenService.generateToken(authenticatedUser);
+                String token = Jwts.builder()
+                                .issuer(ISSUER)
+                                .issuedAt(Date.from(issuedAt))
+                                .expiration(Date.from(expiresAt))
+                                .signWith(
+                                                Keys.hmacShaKeyFor(
+                                                                SECRET.getBytes(
+                                                                                StandardCharsets.UTF_8)))
+                                .compact();
 
-        JwtProperties differentProperties = new JwtProperties(
-                ISSUER,
-                "different-test-secret-key-with-at-least-32-characters",
-                EXPIRATION_SECONDS
-        );
+                assertFalse(jwtTokenService.isTokenValid(token));
+        }
 
-        JwtTokenService differentTokenService =
-                new JwtTokenServiceImpl(differentProperties);
+        @Test
+        void shouldGenerateValidToken() {
+                AuthenticatedUser authenticatedUser = createAuthenticatedUser();
 
-        assertFalse(differentTokenService.isTokenValid(token));
-    }
+                String token = jwtTokenService.generateToken(authenticatedUser);
 
-    @Test
-    void shouldRejectMalformedToken() {
-        assertFalse(
-                jwtTokenService.isTokenValid(
-                        "this-is-not-a-valid-jwt"
-                )
-        );
-    }
+                assertNotNull(token);
+                assertFalse(token.isBlank());
+                assertTrue(jwtTokenService.isTokenValid(token));
+        }
 
-    @Test
-    void shouldRejectTokenWithDifferentIssuer() {
-        AuthenticatedUser authenticatedUser = createAuthenticatedUser();
+        @Test
+        void shouldExtractUserIdFromValidToken() {
+                AuthenticatedUser authenticatedUser = createAuthenticatedUser();
 
-        JwtProperties differentIssuerProperties =
-                new JwtProperties(
-                        "another-issuer",
-                        SECRET,
-                        EXPIRATION_SECONDS
-                );
+                String token = jwtTokenService.generateToken(authenticatedUser);
 
-        JwtTokenService differentIssuerService =
-                new JwtTokenServiceImpl(differentIssuerProperties);
+                Long userId = jwtTokenService.extractUserId(token);
 
-        String token =
-                differentIssuerService.generateToken(authenticatedUser);
+                assertEquals(authenticatedUser.id(), userId);
+        }
 
-        assertFalse(jwtTokenService.isTokenValid(token));
-    }
+        @Test
+        void shouldExposeConfiguredExpirationSeconds() {
+                long expirationSeconds = jwtTokenService.getExpirationSeconds();
 
-    private AuthenticatedUser createAuthenticatedUser() {
-        return new AuthenticatedUser(
-                1L,
-                "receptionist",
-                "receptionist@agendoc.com",
-                "RECEPTIONIST",
-                1L
-        );
-    }
+                assertEquals(EXPIRATION_SECONDS, expirationSeconds);
+        }
+
+        @Test
+        void shouldRejectTokenSignedWithDifferentSecret() {
+                AuthenticatedUser authenticatedUser = createAuthenticatedUser();
+
+                String token = jwtTokenService.generateToken(authenticatedUser);
+
+                JwtProperties differentProperties = new JwtProperties(
+                                ISSUER,
+                                "different-test-secret-key-with-at-least-32-characters",
+                                EXPIRATION_SECONDS);
+
+                JwtTokenService differentTokenService = new JwtTokenServiceImpl(differentProperties);
+
+                assertFalse(differentTokenService.isTokenValid(token));
+        }
+
+        @Test
+        void shouldRejectMalformedToken() {
+                assertFalse(
+                                jwtTokenService.isTokenValid(
+                                                "this-is-not-a-valid-jwt"));
+        }
+
+        @Test
+        void shouldRejectTokenWithDifferentIssuer() {
+                AuthenticatedUser authenticatedUser = createAuthenticatedUser();
+
+                JwtProperties differentIssuerProperties = new JwtProperties(
+                                "another-issuer",
+                                SECRET,
+                                EXPIRATION_SECONDS);
+
+                JwtTokenService differentIssuerService = new JwtTokenServiceImpl(differentIssuerProperties);
+
+                String token = differentIssuerService.generateToken(authenticatedUser);
+
+                assertFalse(jwtTokenService.isTokenValid(token));
+        }
+
+        private AuthenticatedUser createAuthenticatedUser() {
+                return new AuthenticatedUser(
+                                1L,
+                                "receptionist",
+                                "receptionist@agendoc.com",
+                                "RECEPTIONIST",
+                                1L);
+        }
 }

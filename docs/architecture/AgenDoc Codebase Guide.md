@@ -7,7 +7,7 @@
 |-----------|---------------------------------------------|
 | Proyecto  | AgenDoc                                     |
 | Documento | Codebase Guide                              |
-| Versión   | v1.7                                        |
+| Versión   | v1.8                                        |
 | Estado    | Vigente                                     |
 | Ubicación | docs/architecture/AgenDoc Codebase Guide.md |
 
@@ -18,13 +18,14 @@ Historial del Documento
 | Versión  | Fecha      | Descripción                          |
 |----------|------------|--------------------------------------|
 | v1.0     | 2026-07-14 | Creación inicial del Codebase Guide. |
-| v1.1     | 2026-07-29 | Actualización Codebase Guide completa HU-10, creación de citas médicas desde recepción. |
-| v1.2     | 2026-07-30 | Actualización Codebase Guide completa HU-12, consulta de la agenda del consultorio. |
-| v1.3     | 2026-07-30 | Actualización Codebase Guide completa HU-13 (Cancelar cita) y HU-14 (Reprogramar cita). |
-| v1.4     | 2026-07-31 | Actualización Codebase Guide completa HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
-| v1.5     | 2026-08-01 | Actualización Codebase Guide completa TS-02, autenticación JWT End-to-End, protección de APIs y cierre técnico de la autenticación. |
-| v1.6     | 2026-08-02 | Actualización Codebase Guide completa TS-03, implementación del contexto del usuario autenticado mediante SecurityContext y resolución del usuario autenticado en el Backend. |
-| v1.7     | 2026-08-03 | Sincronización completa de la documentación posterior al cierre de TS-03. Se actualizó el estado del proyecto para iniciar TS-04 y se alinearon referencias internas del Codebase Guide. |
+| v1.1     | 2026-07-29 | Codebase Guide HU-10, creación de citas médicas desde recepción. |
+| v1.2     | 2026-07-30 | Codebase Guide HU-12, consulta de la agenda del consultorio. |
+| v1.3     | 2026-07-30 | Codebase Guide HU-13 (Cancelar cita) y HU-14 (Reprogramar cita). |
+| v1.4     | 2026-07-31 | Codebase Guide HU-15, confirmación de llegada y registro de inasistencia del paciente, y cierre funcional del Sprint 3. |
+| v1.5     | 2026-08-01 | Codebase Guide TS-02, autenticación JWT End-to-End, protección de APIs y cierre técnico de la autenticación. |
+| v1.6     | 2026-08-02 | Codebase Guide TS-03, contexto del usuario autenticado con SecurityContext y resolución del usuario autenticado en el Backend. |
+| v1.7     | 2026-08-03 | Sincronización de documentación posterior a TS-03. Se actualizó el estado del proyecto para iniciar TS-04 y se alinearon referencias internas Guide. |
+| v1.8     | 2026-08-04 | Codebase Guide TS-04, implementación de autorización por dominio basada en rol, consultorio y propiedad del recurso. Para iniciar TS-05. |
 
 ---
 
@@ -136,7 +137,7 @@ TS-05 — Endurecer seguridad y manejo de accesos no autorizados
 
 Historia funcional objetivo
 
-HU-09 — Reservar cita como paciente
+HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
 
 ---
 
@@ -166,7 +167,7 @@ Avance del MVP
 
 Próximo objetivo
 
-Continuar el Sprint 4 con la implementación de TS-05 — Endurecer seguridad y manejo de accesos no autorizados, como habilitador técnico previo al desarrollo de HU-09 — Reservar cita como paciente.
+Continuar el Sprint 4 con la implementación de TS-05 — Endurecer seguridad y manejo de accesos no autorizados como último habilitador técnico antes de iniciar HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público.
 
 ---
 
@@ -268,7 +269,7 @@ TS-05 — Endurecer seguridad y manejo de accesos no autorizados
 
 Historia funcional objetivo
 
-HU-09 — Reservar cita como paciente
+HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
 
 ---
 
@@ -367,7 +368,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -464,7 +465,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -586,6 +587,8 @@ La siguiente etapa de evolución corresponde a:
 
 - TS-05: Endurecer seguridad y manejo de accesos no autorizados.
 
+La infraestructura de autorización implementada durante TS-04 constituye la base para el Portal Público y para los futuros flujos de autogestión del paciente, permitiendo que las reglas de acceso permanezcan centralizadas y reutilizables conforme evolucione el producto.
+
 ---
 
 ## Principios de Implementación
@@ -617,7 +620,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -795,6 +798,8 @@ authorization
 - Validar uno entre varios roles autorizados.
 - Centralizar los códigos de rol reconocidos por la seguridad.
 - Generar errores uniformes cuando el usuario no tiene autorización.
+
+La infraestructura de autorización es utilizada por los servicios de Agenda, Doctor, Patient y Appointment para validar el acceso al consultorio autenticado y la propiedad de los recursos sin depender de parámetros enviados por el cliente.
 
 context
 
@@ -1397,31 +1402,32 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 
 ## 6.9 Estado General del Backend
 
-| Elemento                               | Estado       |
-|----------------------------------------|--------------|
-| Aplicación Spring Boot                 | Operativa    |
-| Compilación Maven                      | Exitosa      |
-| PostgreSQL                             | Integrado    |
-| Flyway                                 | Operativo    |
-| Manejo global de excepciones           | Implementado |
-| Autenticación inicial                  | Implementada |
-| JWT End-to-End                         | Implementado |
-| Contexto autenticado                   | Implementado |
-| Registro de médicos                    | Implementado |
-| Registro y búsqueda de pacientes       | Implementado |
-| Creación de bloques de agenda          | Implementada |
-| Consulta de disponibilidad médica      | Implementada |
-| Gestión de citas                       | Implementada |
-| Consulta de agenda del consultorio     | Implementada |
-| Cancelación de citas                   | Implementada |
-| Reprogramación de citas                | Implementada |
-| Confirmación de llegada                | Implementada |
-| Registro de inasistencia               | Implementado |
-| Pruebas automatizadas                  | Exitosas     |
-| Autorización declarativa por rol       | Implementada |
-| Autorización por consultorio           | Implementada |
-| Autorización por propiedad de cita     | Implementada |
-| Infraestructura reutilizable de acceso | Implementada |
+| Elemento                                 | Estado       |
+|------------------------------------------|--------------|
+| Aplicación Spring Boot                   | Operativa    |
+| Compilación Maven                        | Exitosa      |
+| PostgreSQL                               | Integrado    |
+| Flyway                                   | Operativo    |
+| Manejo global de excepciones             | Implementado |
+| Autenticación inicial                    | Implementada |
+| JWT End-to-End                           | Implementado |
+| Contexto autenticado                     | Implementado |
+| Registro de médicos                      | Implementado |
+| Registro y búsqueda de pacientes         | Implementado |
+| Creación de bloques de agenda            | Implementada |
+| Consulta de disponibilidad médica        | Implementada |
+| Gestión de citas                         | Implementada |
+| Consulta de agenda del consultorio       | Implementada |
+| Cancelación de citas                     | Implementada |
+| Reprogramación de citas                  | Implementada |
+| Confirmación de llegada                  | Implementada |
+| Registro de inasistencia                 | Implementado |
+| Pruebas automatizadas                    | Exitosas     |
+| Autorización declarativa por rol         | Implementada |
+| Autorización por consultorio             | Implementada |
+| Autorización por propiedad de cita       | Implementada |
+| Infraestructura reutilizable de acceso   | Implementada |
+| Plataforma preparada para Portal Público | Implementada |
 
 ---
 
@@ -1431,7 +1437,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -1901,7 +1907,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -1960,7 +1966,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -2079,7 +2085,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -2178,7 +2184,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -2253,7 +2259,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -2354,7 +2360,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -2406,7 +2412,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -2495,7 +2501,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -2607,7 +2613,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -3016,7 +3022,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -3139,7 +3145,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -3165,21 +3171,21 @@ TS-05 — Endurecer seguridad y manejo de accesos no autorizados
 
 Historia funcional objetivo
 
-HU-09 — Reservar cita como paciente
+HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
 
 ---
 
 ## 18.3 Historias de Usuario
 
-| Historia | Estado |
-|----------|--------|
-| HU-08 — Consultar disponibilidad médica  | Completada |
-| HU-10 — Crear cita desde recepción       | Completada |
-| HU-12 — Consultar agenda del consultorio | Completada |
-| HU-13 — Cancelar cita desde recepción        | Completada |
-| HU-14 — Reprogramar cita desde recepción     | Completada |
-| HU-15 — Registrar resultado de asistencia    | Completada |
-| HU-09 — Reservar cita como paciente           | Siguiente historia |
+| Historia                                     | Estado             |
+|----------------------------------------------|--------------------|
+| HU-08 — Consultar disponibilidad médica      | Completada         |
+| HU-10 — Crear cita desde recepción           | Completada         |
+| HU-12 — Consultar agenda del consultorio     | Completada         |
+| HU-13 — Cancelar cita desde recepción        | Completada         |
+| HU-14 — Reprogramar cita desde recepción     | Completada         |
+| HU-15 — Registrar resultado de asistencia    | Completada         |
+| HU-09 — Reservar cita como paciente          | Siguiente historia |
 
 ---
 
@@ -3220,14 +3226,15 @@ Sprint 4: 🚧 En ejecución
 Incremento técnico actual:
 TS-05 — Endurecer seguridad y manejo de accesos no autorizados
 
-Historia funcional objetivo:
-HU-09 — Reservar cita como paciente
+Historia funcional objetivo
+
+HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
 
 ---
 
 ## 18.7 Estado General
 
-El proyecto cuenta con Sprint 3 funcionalmente completado y está preparado para iniciar el Sprint 4 con el flujo de autogestión del paciente.
+El proyecto cuenta con Sprint 3 funcionalmente completado y con la infraestructura de autenticación y autorización consolidada. Sprint 4 se encuentra preparado para iniciar el Portal Público mediante HU-20.
 
 ---
 
@@ -3237,7 +3244,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -3288,7 +3295,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 
@@ -3396,7 +3403,7 @@ Sprint:
 Sprint 4
 
 Sesión:
-Sincronización documental posterior al cierre de TS-04
+Actualización documental posterior al cierre de TS-04 e inicio de TS-05
 
 ---
 

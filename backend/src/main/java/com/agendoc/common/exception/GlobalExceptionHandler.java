@@ -163,6 +163,27 @@ public class GlobalExceptionHandler {
                         .body(error);
         }
 
+        @ExceptionHandler(
+                org.springframework.security.authorization.AuthorizationDeniedException.class
+        )
+        public ResponseEntity<ApiError> handleMethodAuthorizationDenied(
+                org.springframework.security.authorization.AuthorizationDeniedException exception,
+                HttpServletRequest request
+        ) {
+
+                ApiError error = new ApiError(
+                        Instant.now(),
+                        HttpStatus.FORBIDDEN.value(),
+                        HttpStatus.FORBIDDEN.getReasonPhrase(),
+                        "No tienes autorización para realizar esta operación.",
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
+                        .body(error);
+        }
+
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ApiError> handleUnexpectedException(
                         Exception exception,

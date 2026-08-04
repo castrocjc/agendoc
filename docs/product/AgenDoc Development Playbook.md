@@ -1071,22 +1071,22 @@ Sprint 4 — Portal Público y Captación Digital
 
 Objetivo:
 
-Iniciar la implementación del Portal Público de AgenDoc como punto de entrada para nuevos pacientes.
+Continuar la implementación del Portal Público de AgenDoc, permitiendo que nuevos pacientes descubran consultorios, consulten disponibilidad y reserven su primera cita completamente en línea.
 
-La estrategia del producto evoluciona desde un sistema utilizado únicamente por pacientes registrados hacia una plataforma de captación digital donde cualquier persona podrá descubrir un consultorio, consultar disponibilidad y reservar una cita.
-
-La creación de la cuenta del paciente se realizará automáticamente como parte del proceso de reserva.
+La estrategia del producto consolida una experiencia pública que convive con la plataforma autenticada, reutilizando la infraestructura de seguridad ya implementada.
 
 Historias completadas:
 
 - TS-03 — Implementar contexto del usuario autenticado.
 - TS-04 — Implementar autorización por dominio.
+- TS-05 — Implementar acceso público y coexistencia de rutas públicas y autenticadas.
 
 Resultado:
 
 - Infraestructura de autenticación consolidada.
 - Autorización por dominio implementada.
-- Plataforma preparada para incorporar flujos públicos y autenticados.
+- Separación entre rutas públicas y autenticadas implementada.
+- Plataforma preparada para desarrollar funcionalidades del Portal Público.
 
 Próximo incremento:
 
@@ -1097,12 +1097,12 @@ Antes de iniciar:
 - Validar sincronización de develop.
 - Validar compilación Backend y Frontend.
 - Confirmar pruebas automatizadas exitosas.
-- Confirmar funcionamiento de autenticación y autorización.
-- Iniciar HU-20.
+- Confirmar funcionamiento de autenticación, autorización y acceso público.
+- Iniciar la implementación funcional de HU-20.
 
 Estado:
 
-Sprint preparado para iniciar HU-20.
+Sprint preparado para iniciar el desarrollo funcional de HU-20.
 
 ---
 
