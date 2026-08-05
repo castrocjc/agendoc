@@ -6,7 +6,7 @@
 |-----------|--------------------------------------|
 | Proyecto  | AgenDoc                              |
 | Documento | UI Design Guide                      |
-| Versión   | v1.1                                 |
+| Versión   | v1.2                                 |
 | Estado    | Aprobado                             |
 | Ubicación | docs/ux/UI Design Guide.md           |
 
@@ -16,6 +16,7 @@ Historial del Documento
 |----------|------------|------------------------------------------------|
 | v1.0 | 2026-07-14 | Creación inicial del UI Design Guide. |
 | v1.1 | 2026-07-31 | Incorporación de lineamientos para estados operativos de citas médicas y consistencia visual del Sprint 3. |
+| v1.2 | 2026-08-04 | Sincronización con Blueprint v1.13. Incorporación de la Recepción Digital, identidad por consultorio y principios SaaS multi-consultorio. |
 
 ---
 
@@ -202,6 +203,44 @@ frontend/
 El SVG maestro será la única fuente autorizada para generar futuras variantes.
 
 ---
+
+
+# 5.2 Recepción Digital del Consultorio
+
+La primera experiencia del paciente no corresponde a una landing de AgenDoc sino a la Recepción Digital de un Consultorio.
+
+Principios:
+
+- La identidad principal visible es la del Consultorio.
+- AgenDoc actúa como plataforma subyacente.
+- La Recepción Digital orienta al paciente, no vende el producto.
+- El branding, colores e información pública pertenecen al Consultorio.
+- La navegación pública siempre ocurre dentro del contexto de un `clinicSlug`.
+
+## Flujo visual inicial
+
+1. Recepción Digital.
+2. Especialidades.
+3. Médicos.
+4. Disponibilidad.
+5. Resumen de reserva.
+6. Registro ultrarrápido.
+7. Confirmación de la cita.
+8. Completar perfil (posteriormente).
+
+## Registro ultrarrápido
+
+El primer registro solicitará únicamente:
+
+- Nombre(s)
+- Apellido(s)
+- Correo electrónico
+- Celular
+- Contraseña
+- Confirmar contraseña
+
+La información administrativa restante se completará posteriormente mediante un perfil progresivo.
+
 
 # 6. Paleta de Colores
 

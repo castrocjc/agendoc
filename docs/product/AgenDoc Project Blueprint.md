@@ -2,15 +2,15 @@
 
 > Documento vivo del proyecto. Toda decisión funcional o técnica aprobada deberá quedar registrada en este documento antes de considerarse oficial.
 
-| Campo                | Valor                                             |
-|----------------------|---------------------------------------------------|
-| Proyecto             | AgenDoc                                           |
-| Tipo                 | Plataforma Web + Mobile                           |
-| Metodología          | Scrum                                             |
-| Blueprint Version    | v1.12                                             |
-| Sprint Actual        | Sprint 4                                          |
-| Estado               | Sprint 4 en ejecución                             |
-| Última actualización | Sprint 4 — Cierre de TS-05                        |
+| Campo                | Valor                                        |
+|----------------------|----------------------------------------------|
+| Proyecto             | AgenDoc                                      |
+| Tipo                 | Plataforma SaaS Web + Mobile                 |
+| Metodología          | Scrum                                        |
+| Blueprint Version    | v1.13                                        |
+| Sprint Actual        | Sprint 4                                     |
+| Estado               | Sprint 4 en ejecución                        |
+| Última actualización | Sprint 4 — Consolidación de la Recepción Digital |
 
 ---
 
@@ -63,17 +63,156 @@ Estos identificadores deberán mantenerse consistentes en toda la documentación
 
 Las Technical Stories representan trabajo técnico habilitador necesario para soportar la seguridad, configuración, mantenibilidad, arquitectura o evolución del producto. No sustituyen Historias de Usuario ni representan funcionalidad directa para el usuario final.
 
+## Definición de Consultorio
+
+En AgenDoc, el término **Consultorio** representa la organización prestadora de servicios de salud que utiliza la plataforma.
+
+Este concepto puede corresponder a:
+
+* un médico independiente;
+* un consultorio médico;
+* una clínica ambulatoria;
+* un centro médico;
+* un centro odontológico;
+* un centro psicológico;
+* un centro de fisioterapia;
+* otro establecimiento equivalente de atención ambulatoria.
+
+Dentro del modelo funcional y técnico, esta organización se representa mediante la entidad `Clinic`.
+
+El término Consultorio se mantendrá como denominación oficial del dominio durante el MVP, sin limitar la evolución comercial de AgenDoc hacia distintos tipos de organizaciones de salud.
+
+## Definición de Recepción Digital
+
+La **Recepción Digital del Consultorio** es la experiencia pública mediante la cual una persona puede ingresar virtualmente a un consultorio, conocer su identidad, consultar sus especialidades y médicos, revisar horarios disponibles, reservar una primera cita e iniciar sesión.
+
+La Recepción Digital:
+
+* pertenece visual y funcionalmente al consultorio;
+* utiliza la infraestructura tecnológica de AgenDoc;
+* mantiene el contexto del consultorio durante toda la navegación;
+* constituye el principal punto de entrada para nuevos pacientes;
+* prioriza la orientación y atención del paciente sobre el contenido comercial.
+
+El término técnico `Portal Público` podrá utilizarse en arquitectura y código. En la experiencia de producto se utilizará preferentemente el concepto **Recepción Digital del Consultorio**.
+
+## Convención de uso: Recepción Digital y Portal Público
+
+La denominación oficial de producto será **Recepción Digital del Consultorio**.
+
+Este término se utilizará en Product Vision, experiencia de usuario, Product Backlog, Roadmap, mensajes al paciente y descripción funcional de las pantallas.
+
+El término **Portal Público** podrá mantenerse como denominación técnica cuando sea necesario describir módulos de código, paquetes, APIs, rutas públicas, configuración de seguridad o infraestructura.
+
+Ambos términos hacen referencia a la misma capacidad. La documentación funcional priorizará **Recepción Digital del Consultorio** para mantener una visión centrada en la experiencia del paciente.
+
 ---
 
 # 1. Product Vision
 
 ## Visión
 
-AgenDoc es una plataforma Web y Mobile para la gestión de consultorios médicos, diseñada para facilitar la administración de citas, pacientes y agendas médicas.
+AgenDoc es una plataforma SaaS Web y Mobile para la gestión de consultorios y organizaciones de atención ambulatoria.
 
-El producto nace con una arquitectura escalable que permitirá operar desde un médico independiente hasta consultorios con múltiples médicos.
+La plataforma permite administrar médicos, pacientes, agendas y citas médicas mediante una arquitectura centralizada, segura y preparada para crecer de forma incremental.
 
-El objetivo es construir un producto simple, sólido y preparado para evolucionar de manera incremental.
+AgenDoc se desarrolla inicialmente para validar el MVP con un consultorio base. Sin embargo, su diseño funcional y arquitectónico reconoce desde el inicio que cada consultorio constituye un contexto organizacional independiente.
+
+Cada consultorio dispondrá de:
+
+* una identidad pública propia;
+* una Recepción Digital;
+* médicos y especialidades;
+* pacientes;
+* agendas médicas;
+* citas;
+* usuarios asociados a su operación.
+
+AgenDoc proporciona la infraestructura tecnológica, las reglas de negocio, la seguridad y la gestión de citas.
+
+El paciente interactúa principalmente con la identidad del consultorio al que desea acudir.
+
+---
+
+## Propuesta de valor
+
+AgenDoc permite que un consultorio transforme su atención y gestión de citas en una experiencia digital sencilla, organizada y confiable.
+
+Para el consultorio, AgenDoc proporciona:
+
+* administración de médicos;
+* gestión de pacientes;
+* configuración de agendas;
+* control de disponibilidad;
+* creación y seguimiento de citas;
+* seguridad y separación de acceso;
+* una Recepción Digital propia.
+
+Para el paciente, AgenDoc proporciona:
+
+* acceso digital al consultorio;
+* consulta de especialidades;
+* consulta de especialistas;
+* consulta de horarios disponibles;
+* reserva de una primera cita;
+* registro simplificado;
+* acceso posterior a sus citas y perfil.
+
+---
+
+## Modelo SaaS de AgenDoc
+
+AgenDoc se concibe como una plataforma SaaS multi-consultorio.
+
+Cada consultorio representa un tenant funcional independiente dentro de la plataforma.
+
+Esto significa que cada consultorio mantiene su propio contexto de:
+
+* identidad;
+* usuarios;
+* médicos;
+* pacientes;
+* agendas;
+* citas;
+* contenido público.
+
+El paciente, médico o recepcionista siempre interactúa dentro del contexto de un consultorio determinado.
+
+Durante el MVP se operará inicialmente con un consultorio base, pero las decisiones de producto, dominio y arquitectura deberán evitar dependencias que obliguen a rediseñar el sistema al incorporar nuevos consultorios.
+
+La evolución hacia múltiples consultorios no deberá modificar la responsabilidad central de las entidades del dominio ni la experiencia principal del paciente.
+
+---
+
+## Separación entre AgenDoc y el consultorio
+
+AgenDoc es la plataforma tecnológica.
+
+El consultorio es la organización visible para el paciente.
+
+En la experiencia pública, la identidad principal corresponderá al consultorio.
+
+Por ejemplo, una persona podría ingresar a la Recepción Digital de:
+
+```text
+Centro Médico Santa Isabel
+```
+
+y visualizar:
+
+* nombre del consultorio;
+* logo;
+* especialidades;
+* médicos;
+* dirección;
+* teléfono;
+* WhatsApp;
+* horarios;
+* acciones para reservar o iniciar sesión.
+
+La persona no deberá percibir que está navegando en una página genérica de AgenDoc.
+
+La marca AgenDoc podrá aparecer de forma secundaria y discreta como proveedor de la infraestructura tecnológica, sin competir con la identidad del consultorio.
 
 ---
 
@@ -83,168 +222,444 @@ Los siguientes principios guiarán todas las decisiones funcionales, técnicas y
 
 ### 1. Simplicidad primero
 
-Cada funcionalidad debe ser intuitiva y fácil de utilizar. Si una característica requiere una explicación extensa para el usuario, probablemente deba simplificarse.
+Cada funcionalidad debe ser intuitiva y fácil de utilizar.
+
+Si una característica requiere una explicación extensa para el usuario, deberá evaluarse una alternativa más simple.
+
+Las tareas frecuentes deberán poder completarse con la menor cantidad razonable de pasos.
 
 ---
 
-### 2. Construir solo lo necesario
+### 2. Construir únicamente lo necesario
 
 El MVP debe resolver el problema principal del consultorio sin incorporar funcionalidades que no aporten valor inmediato.
 
-Toda nueva funcionalidad deberá justificar claramente el beneficio que aporta al usuario.
+Toda nueva funcionalidad deberá justificar claramente su beneficio para el paciente o para la operación del consultorio.
 
 ---
 
 ### 3. Escalabilidad desde el diseño
 
-Aunque el MVP será pequeño, todas las decisiones de arquitectura y modelo de datos deberán permitir el crecimiento futuro del producto sin rediseños importantes.
+Aunque el MVP comenzará con un consultorio base, las decisiones de dominio y arquitectura deberán permitir incorporar nuevos consultorios sin rediseñar el producto.
+
+La escalabilidad no deberá generar sobrearquitectura ni complejidad innecesaria durante el MVP.
 
 ---
 
 ### 4. El Consultorio es el centro del dominio
 
-Todas las funcionalidades deberán diseñarse considerando que pertenecen a un consultorio.
+Todas las funcionalidades de AgenDoc se ejecutan dentro del contexto de un consultorio.
 
-El consultorio será la unidad organizacional principal del sistema.
+El consultorio es la unidad organizacional principal del sistema y agrupa:
+
+* usuarios;
+* médicos;
+* pacientes;
+* agendas;
+* citas;
+* identidad pública.
+
+El paciente no deberá seleccionar manualmente un identificador interno de consultorio cuando el contexto pueda resolverse desde la navegación pública o la sesión autenticada.
 
 ---
 
 ### 5. La cita médica es el núcleo del negocio
 
-El principal objetivo de AgenDoc es gestionar eficientemente las citas médicas.
+El objetivo funcional principal de AgenDoc es gestionar eficientemente el ciclo de vida de las citas médicas.
 
-Las nuevas funcionalidades deberán fortalecer este proceso o integrarse naturalmente con él.
+Las nuevas funcionalidades deberán fortalecer este proceso o integrarse de forma natural con él.
 
 ---
 
 ### 6. Una única fuente de verdad
 
-Cada dato tendrá un único propietario dentro del dominio.
+Las reglas de negocio pertenecen al Backend.
 
-Se evitará duplicar información o generar inconsistencias entre módulos.
+Cada dato tendrá un propietario definido dentro del dominio.
 
----
-
-### 7. Consistencia en la experiencia de usuario
-
-Las pantallas deberán mantener una estructura, navegación y comportamiento uniforme.
-
-El usuario no debe aprender nuevamente cómo utilizar cada módulo.
+El Frontend no deberá reconstruir reglas críticas ni proporcionar identificadores internos cuando estos puedan derivarse del contexto del usuario o del consultorio.
 
 ---
 
-### 8. Mobile y Web como un solo producto
+### 7. Identidad propia para cada consultorio
 
-La aplicación web y la aplicación móvil compartirán las mismas reglas de negocio y ofrecerán una experiencia coherente, adaptada a las capacidades de cada plataforma.
+Cada consultorio contará con una presencia pública propia dentro de AgenDoc.
 
----
+La experiencia pública utilizará:
 
-### 9. El paciente inicia la relación con el consultorio desde Internet
+* nombre del consultorio;
+* identidad visual;
+* información de contacto;
+* especialidades;
+* médicos;
+* disponibilidad.
 
-El primer contacto entre un paciente y el consultorio deberá realizarse desde un portal público del consultorio.
-
-AgenDoc permitirá que cualquier persona conozca el consultorio, sus médicos, especialidades y servicios antes de convertirse en paciente.
-
-El proceso de incorporación de un nuevo paciente priorizará la reserva de la primera cita.
-
-El nuevo interesado podrá explorar el Portal Público, seleccionar la especialidad, el médico, la fecha y el horario disponibles antes de proporcionar sus datos personales.
-
-Únicamente al confirmar la reserva se solicitará la información mínima necesaria para crear su cuenta.
-
-Una vez confirmada la reserva, AgenDoc creará automáticamente:
-
-- la cuenta de usuario;
-- el registro de paciente;
-- la asociación entre ambos;
-- la primera cita médica en estado Programada.
-
-Posteriormente el paciente podrá iniciar sesión y completar el resto de su información desde su perfil.
+AgenDoc mantendrá la estructura, seguridad, navegación y consistencia del producto, mientras que el consultorio proporcionará su identidad y contenido público.
 
 ---
 
-### 10. Seguridad desde el inicio
+### 8. La Recepción Digital es el principal punto de entrada
 
-La autenticación, autorización y protección de los datos médicos se considerarán requisitos fundamentales desde las primeras iteraciones del proyecto.
+La experiencia pública no será una landing genérica de AgenDoc.
+
+Será la Recepción Digital del consultorio.
+
+Su finalidad será orientar al paciente desde el primer momento y facilitar acciones concretas:
+
+* reservar una cita;
+* conocer especialistas;
+* consultar horarios;
+* iniciar sesión;
+* contactar al consultorio;
+* consultar su ubicación.
+
+La Recepción Digital priorizará la utilidad y la atención sobre el contenido promocional.
 
 ---
 
-### 11. Evolución incremental
+### 9. El paciente inicia su relación desde Internet
 
-AgenDoc crecerá mediante incrementos pequeños y funcionales.
+El primer contacto entre un nuevo paciente y el consultorio podrá realizarse completamente desde la Recepción Digital.
 
-Cada Sprint deberá entregar valor real y mantener el producto potencialmente desplegable.
+El interesado podrá:
+
+1. ingresar al contexto público del consultorio;
+2. consultar sus especialidades;
+3. conocer a sus médicos;
+4. seleccionar una fecha;
+5. seleccionar un horario disponible;
+6. proporcionar información mínima;
+7. confirmar su primera cita.
+
+La persona podrá explorar la disponibilidad antes de proporcionar sus datos personales.
 
 ---
 
-## Portal Público del Consultorio
+### 10. Registro ultrarrápido
 
-El Portal Público constituye el punto de entrada principal para nuevos pacientes.
+El registro inicial deberá solicitar únicamente la información necesaria para crear la cuenta, identificar al paciente y confirmar la primera cita.
 
-Cada consultorio dispondrá de una presencia pública propia desde la cual podrá:
+Durante el MVP, el registro inicial solicitará:
 
-presentar su identidad;
-mostrar sus especialidades;
-publicar sus médicos;
-ofrecer información general;
-permitir el registro de nuevos pacientes;
-permitir la solicitud de citas médicas.
+* nombre o nombres;
+* apellido o apellidos;
+* correo electrónico;
+* celular;
+* contraseña;
+* confirmación de contraseña.
 
-Cada consultorio dispondrá de un Portal Público administrado por AgenDoc. El Portal Público constituye la experiencia pública del consultorio y forma parte integral de la plataforma, manteniendo una identidad propia para cada consultorio.
+No se solicitarán durante esta etapa:
+
+* tipo de documento;
+* número de documento;
+* fecha de nacimiento;
+* dirección;
+* información adicional del perfil.
+
+Estos datos podrán completarse posteriormente.
+
+---
+
+### 11. Perfil progresivo del paciente
+
+El proceso de incorporación del paciente se dividirá en dos momentos.
+
+#### Primera etapa: reserva
+
+El paciente proporciona información mínima y confirma su primera cita.
+
+Como resultado, AgenDoc crea automáticamente:
+
+* la cuenta de usuario;
+* el registro de paciente;
+* la asociación entre ambos;
+* la asociación con el consultorio;
+* la primera cita en estado Programada.
+
+#### Segunda etapa: completar perfil
+
+Después de reservar, el sistema invitará al paciente a completar:
+
+* tipo de documento;
+* número de documento;
+* fecha de nacimiento;
+* dirección;
+* información adicional.
+
+La falta de estos datos no impedirá la creación de la primera cita.
+
+Después de confirmar la reserva, el sistema podrá mostrar el siguiente mensaje:
+
+> Tu cita ya está confirmada. Antes del día de tu consulta, por favor completa tu perfil para agilizar tu atención.
+
+El paciente podrá completar el perfil inmediatamente o hacerlo posteriormente desde su cuenta.
+
+---
+
+### 12. Correo electrónico como identificador visible
+
+El paciente utilizará su correo electrónico para iniciar sesión.
+
+La interfaz no solicitará ni mostrará un nombre de usuario independiente.
+
+Cuando la implementación mantenga internamente un campo `username`, este será gestionado automáticamente por AgenDoc y permanecerá oculto para el paciente.
+
+El correo deberá normalizarse antes de utilizarse como identificador de acceso.
+
+Como mínimo se aplicará:
+
+* eliminación de espacios iniciales y finales;
+* conversión a minúsculas.
+
+La autenticación deberá validar el correo dentro del contexto del consultorio correspondiente.
+
+---
+
+### 13. Contexto implícito del consultorio
+
+El paciente siempre navegará dentro del contexto de un consultorio.
+
+La Recepción Digital resolverá ese contexto mediante un identificador público, como un `slug`.
+
+Ejemplos:
+
+```text
+santa-isabel
+clinica-roma
+odontokids
+dermacenter
+```
+
+La experiencia pública podrá representarse inicialmente mediante rutas como:
+
+```text
+agendoc.com/santa-isabel
+agendoc.com/clinica-roma
+```
+
+En una evolución futura podrá soportar subdominios o dominios personalizados:
+
+```text
+santa-isabel.agendoc.com
+```
+
+El identificador interno del consultorio no deberá ser seleccionado ni conocido por el paciente.
+
+---
+
+### 14. Seguridad desde el inicio
+
+La autenticación, autorización y protección de datos se considerarán requisitos fundamentales.
+
+El Backend deberá:
+
+* resolver el consultorio desde un contexto confiable;
+* impedir acceso entre consultorios;
+* validar pertenencia de médicos, agendas y citas;
+* proteger información personal;
+* evitar exposición de identificadores internos innecesarios;
+* mantener reglas uniformes para accesos públicos y autenticados.
+
+---
+
+### 15. Consistencia Web y Mobile
+
+La aplicación Web y Mobile compartirán las mismas reglas de negocio y contratos del Backend.
+
+Las diferencias entre plataformas corresponderán únicamente a presentación, navegación y capacidades propias del dispositivo.
+
+---
+
+### 16. Evolución incremental
+
+AgenDoc crecerá mediante incrementos funcionales pequeños.
+
+Cada Sprint deberá entregar valor real, mantener el producto potencialmente desplegable y evitar ampliar el alcance sin una decisión aprobada.
+
+---
+
+## Recepción Digital del Consultorio
+
+La Recepción Digital constituye la presencia pública de cada consultorio dentro de AgenDoc.
+
+Representa una extensión digital de la recepción física y permite que una persona se oriente, conozca la oferta médica e inicie su relación con el consultorio.
+
+La Recepción Digital podrá mostrar:
+
+* identidad del consultorio;
+* mensaje de bienvenida;
+* especialidades;
+* médicos;
+* horarios disponibles;
+* dirección;
+* mapa;
+* teléfono;
+* WhatsApp;
+* correo de contacto;
+* acceso para reservar;
+* acceso para iniciar sesión.
+
+Su estructura deberá priorizar acciones prácticas.
+
+Ejemplo conceptual:
+
+```text
+Centro Médico Santa Isabel
+
+Bienvenido.
+¿Cómo podemos ayudarte hoy?
+
+Reservar una cita
+Conocer nuestros especialistas
+Consultar horarios
+Iniciar sesión
+
+Dirección
+Mapa
+Teléfono
+WhatsApp
+```
+
+La Recepción Digital no será un constructor genérico de páginas durante el MVP.
+
+AgenDoc proporcionará una plantilla consistente, accesible y responsive. Cada consultorio aportará su identidad y contenido público dentro de los campos habilitados por la plataforma.
+
+---
+
+## Identidad pública del consultorio
+
+Cada consultorio contará con un identificador público único denominado `slug`.
+
+El `slug` permitirá resolver el consultorio desde una URL pública sin exponer su identificador interno.
+
+Ejemplo:
+
+```text
+slug: santa-isabel
+```
+
+URL pública:
+
+```text
+agendoc.com/santa-isabel
+```
+
+Flujo conceptual:
+
+```text
+Solicitud pública
+        │
+        ▼
+Resolver slug
+        │
+        ▼
+Identificar consultorio
+        │
+        ├── cargar identidad
+        ├── cargar especialidades
+        ├── cargar médicos
+        ├── cargar información de contacto
+        └── cargar disponibilidad
+```
+
+El `clinicId` permanecerá como identificador interno.
+
+No deberá ser proporcionado libremente por el paciente ni utilizarse como elemento visible de navegación.
 
 ---
 
 ## Modelo de incorporación de pacientes
 
-AgenDoc distingue dos tipos de pacientes.
+AgenDoc distingue dos situaciones principales.
 
 ### Paciente existente
 
-Corresponde a una persona previamente registrada por el consultorio.
+Es una persona que ya cuenta con un registro asociado al consultorio.
 
 Puede:
 
-iniciar sesión;
-gestionar sus citas;
-consultar su información;
-utilizar todas las funcionalidades habilitadas para pacientes.
+* iniciar sesión;
+* consultar sus citas;
+* reservar nuevas citas;
+* cancelar citas permitidas;
+* completar o actualizar su perfil;
+* utilizar las funcionalidades habilitadas para pacientes.
 
 ### Nuevo interesado
 
-Corresponde a una persona que aún no pertenece al consultorio.
+Es una persona que todavía no pertenece al consultorio.
 
-Podrá:
+Puede:
 
-acceder al Portal Público;
-consultar información del consultorio;
-solicitar una primera cita;
-registrarse proporcionando únicamente la información mínima requerida.
+* acceder a la Recepción Digital;
+* conocer el consultorio;
+* consultar especialidades;
+* consultar médicos;
+* revisar disponibilidad;
+* seleccionar una primera cita;
+* registrarse mediante un formulario ultrarrápido.
 
-Una vez completado el registro, AgenDoc creará automáticamente:
+Al confirmar la reserva, AgenDoc deberá crear en una sola operación funcional:
 
-la cuenta de usuario;
-el registro de paciente;
-la asociación entre ambos.
+* Usuario;
+* Paciente;
+* asociación Usuario-Paciente;
+* asociación con el Consultorio;
+* primera Cita Médica en estado Programada.
 
-Posteriormente el paciente podrá completar el resto de su información desde su perfil.
+Si la operación no puede completarse, no deberán quedar usuarios, pacientes, citas o reservas parciales.
+
+---
+
+## Evolución del perfil del paciente
+
+El perfil inicial podrá encontrarse incompleto después del registro ultrarrápido.
+
+Los datos pendientes deberán representarse como información todavía no proporcionada y no mediante valores ficticios.
+
+No deberán utilizarse datos artificiales como:
+
+* documentos genéricos;
+* fechas de nacimiento ficticias;
+* direcciones inexistentes;
+* textos como `PENDIENTE` almacenados como información real.
+
+Los campos no proporcionados deberán admitir ausencia de valor hasta que el paciente complete su perfil.
+
+En futuras iteraciones podrán incorporarse:
+
+* seguro médico;
+* contacto de emergencia;
+* alergias;
+* antecedentes;
+* medicamentos.
+
+Estas capacidades no forman parte del alcance actual de HU-20 y deberán evaluarse separadamente por su sensibilidad y relación con información médica.
 
 ---
 
 ## Evolución del modelo de consultorio
 
-El MVP se desarrollará inicialmente para un único consultorio.
+El MVP operará inicialmente con un consultorio base.
 
-Cada consultorio dispondrá de:
+La arquitectura permanecerá preparada para incorporar múltiples consultorios, cada uno con:
 
-una identidad propia;
-un Portal Público;
-médicos;
-pacientes;
-agendas;
-citas médicas.
+* slug propio;
+* identidad pública;
+* Recepción Digital;
+* médicos;
+* pacientes;
+* usuarios;
+* agendas;
+* citas.
 
-La arquitectura permanecerá preparada para evolucionar hacia un modelo multiconsultorio, donde cada consultorio conservará su identidad, configuración y Portal Público independientes.
+Durante el MVP, cada perfil de paciente pertenecerá a un solo consultorio.
 
-Esta evolución no requerirá rediseñar el dominio funcional del producto.
+La posibilidad de que una misma identidad de paciente participe en varios consultorios no será resuelta durante esta etapa.
+
+Cuando el producto requiera esa capacidad, deberá evaluarse una evolución específica del modelo de identidad y asociación entre pacientes y consultorios.
+
+Esta restricción mantiene el MVP simple y no modifica la separación funcional entre tenants.
 
 ---
 
@@ -262,7 +677,7 @@ El MVP se centrará en la gestión de citas médicas.
 
 ### Paciente
 
-- Registrarse desde el Portal Público
+- Registrarse desde la Recepción Digital
 - Iniciar sesión
 - Completar su perfil
 - Consultar médicos
@@ -297,6 +712,7 @@ El MVP se centrará en la gestión de citas médicas.
 
 ## Incluido
 
+- Recepción Digital del Consultorio
 - Gestión de Consultorios
 - Gestión de Usuarios
 - Gestión de Roles
@@ -342,43 +758,169 @@ El modelo de dominio de AgenDoc se construye siguiendo los siguientes principios
 
 ---
 
+## Principios de contexto del consultorio
+
+Toda interacción con AgenDoc ocurre dentro del contexto de un Consultorio.
+
+El contexto podrá resolverse de dos maneras:
+
+* mediante un identificador público durante la navegación en la Recepción Digital;
+* mediante el usuario autenticado durante la operación interna de la plataforma.
+
+En la experiencia pública, el Consultorio se resolverá utilizando un identificador público único denominado `slug`.
+
+En la experiencia autenticada, el Consultorio se resolverá mediante el usuario y el contexto de seguridad.
+
+El identificador interno del Consultorio no será utilizado como elemento visible de navegación y no deberá ser seleccionado libremente por el paciente.
+
+## Tenant funcional
+
+Cada Consultorio representa un tenant funcional independiente dentro de AgenDoc.
+
+Un tenant agrupa y delimita:
+
+* identidad pública;
+* usuarios;
+* médicos;
+* pacientes;
+* agendas;
+* bloques de agenda;
+* citas;
+* información de contacto.
+
+La separación entre tenants deberá validarse en el Backend.
+
+La navegación pública, la autenticación y las operaciones del dominio deberán preservar permanentemente el contexto del Consultorio correspondiente.
+
+## Identidad pública del Consultorio
+
+Cada Consultorio tendrá una identidad pública propia.
+
+La identidad pública permitirá presentar la Recepción Digital con información perteneciente al Consultorio.
+
+Podrá incluir:
+
+* nombre público;
+* descripción;
+* logotipo;
+* teléfono;
+* WhatsApp;
+* correo de contacto;
+* dirección;
+* ubicación o mapa;
+* horarios generales;
+* estado de habilitación del portal.
+
+La identidad pública no modifica la responsabilidad organizacional de la entidad Consultorio.
+
+Forma parte del mismo agregado y representa su presencia externa dentro de AgenDoc.
+
+---
+
 ## Entidades principales
 
 ### Consultorio
 
-Representa la unidad organizacional principal de AgenDoc.
+Representa la organización prestadora de servicios de salud que utiliza AgenDoc y constituye la unidad organizacional principal del dominio.
+
+Dentro de la arquitectura SaaS, cada Consultorio representa un tenant funcional independiente.
 
 Responsabilidades:
 
-- Agrupar médicos, recepcionistas, pacientes y citas.
-- Definir el contexto donde ocurre la atención médica.
-- Ser el centro operativo del producto.
+* Agrupar usuarios, médicos, recepcionistas, pacientes, agendas y citas.
+* Definir el contexto donde ocurre la atención médica.
+* Mantener su identidad pública.
+* Proporcionar el contexto de navegación de la Recepción Digital.
+* Determinar el contexto de registro de nuevos pacientes.
+* Determinar el contexto de autenticación de sus usuarios.
+* Delimitar la información pública y privada de su operación.
+* Mantener un identificador público único.
+* Actuar como agregado organizacional principal de AgenDoc.
 
 Relaciones:
 
-- Tiene un Portal Público.
-- Tiene médicos.
-- Tiene recepcionistas.
-- Tiene pacientes.
-- Tiene agendas médicas.
-- Tiene citas médicas.
+* Tiene una Recepción Digital.
+* Tiene una identidad pública.
+* Tiene un identificador público único.
+* Tiene usuarios.
+* Tiene médicos.
+* Tiene recepcionistas.
+* Tiene pacientes.
+* Tiene agendas médicas.
+* Tiene bloques de agenda.
+* Tiene citas médicas.
+
+Reglas:
+
+* Todo Consultorio deberá tener un identificador interno.
+* Todo Consultorio deberá tener un `slug` público único.
+* El `slug` deberá permitir resolver el Consultorio sin exponer su identificador interno.
+* La Recepción Digital solo estará disponible cuando el Consultorio se encuentre activo y tenga habilitado su acceso público.
+* Todos los recursos del dominio deberán operar dentro del contexto de un Consultorio.
+* El identificador interno del Consultorio no será utilizado como elemento visible de navegación.
+
+### Identidad Pública del Consultorio
+
+Representa la información que el Consultorio autoriza mostrar en su Recepción Digital.
+
+No constituye un agregado independiente durante el MVP.
+
+Forma parte de la configuración y responsabilidad del Consultorio.
+
+Información pública inicial:
+
+* nombre público;
+* descripción pública;
+* logotipo;
+* teléfono;
+* WhatsApp;
+* correo de contacto;
+* dirección;
+* ubicación o mapa;
+* estado de habilitación de la Recepción Digital.
+
+Reglas:
+
+* Solo podrá mostrarse información expresamente definida como pública.
+* La ausencia de un dato opcional no deberá impedir el funcionamiento de la Recepción Digital.
+* La identidad pública no deberá exponer datos internos, auditoría o información sensible.
+* Durante el MVP no existirá un constructor visual de páginas.
+* AgenDoc proporcionará una plantilla visual consistente y el Consultorio proporcionará contenido estructurado.
 
 ---
 
 ### Usuario
 
-Representa una persona que accede al sistema.
+Representa la cuenta utilizada para acceder a AgenDoc.
 
 Responsabilidades:
 
-- Autenticarse.
-- Tener un rol dentro del sistema.
-- Acceder únicamente a funcionalidades permitidas.
+* Autenticarse.
+* Mantener un rol.
+* Operar dentro del contexto de un Consultorio.
+* Acceder únicamente a funcionalidades autorizadas.
+* Asociarse con un perfil de negocio cuando corresponda.
 
 Relaciones:
 
-- Tiene un rol.
-- Puede asociarse a uno de los roles de negocio definidos para el sistema.
+* Pertenece a un Consultorio.
+* Tiene un Rol.
+* Puede asociarse a un Paciente.
+* Puede asociarse a un Médico.
+* Puede asociarse a una Recepcionista.
+
+Reglas:
+
+* Todo Usuario deberá pertenecer a un Consultorio.
+* Todo Usuario deberá tener un Rol.
+* El correo electrónico será el identificador visible de acceso para el paciente.
+* La interfaz no solicitará un nombre de usuario independiente al paciente.
+* El correo deberá normalizarse antes de almacenarse o compararse.
+* El campo técnico `username`, cuando exista, será generado automáticamente.
+* El `username` técnico no será visible ni editable por el paciente.
+* La autenticación deberá considerar simultáneamente el Consultorio y el correo normalizado.
+* La contraseña deberá almacenarse exclusivamente mediante un hash seguro.
+* Nunca deberán exponerse contraseñas, hashes o credenciales en respuestas de la API.
 
 ---
 
@@ -401,21 +943,79 @@ Roles del MVP:
 
 ### Paciente
 
-Representa a la persona que recibe atención médica.
+Representa a la persona que recibe atención médica dentro de un Consultorio.
 
 Responsabilidades:
 
-- Consultar disponibilidad.
-- Reservar citas.
-- Visualizar sus citas.
-- Cancelar citas.
-- Mantener datos básicos de identificación y contacto.
+* Reservar citas.
+* Consultar sus citas.
+* Cancelar citas permitidas.
+* Mantener información básica de identificación y contacto.
+* Completar progresivamente su perfil.
+* Acceder posteriormente a la plataforma mediante una cuenta de Usuario.
 
 Relaciones:
 
-- Pertenece al contexto de un consultorio.
-- Tiene citas médicas.
-- Puede ser registrado por sí mismo o por una recepcionista.
+* Pertenece a un Consultorio.
+* Puede tener un Usuario asociado.
+* Tiene citas médicas.
+* Puede ser registrado por sí mismo desde la Recepción Digital.
+* Puede ser registrado por una Recepcionista.
+
+Reglas:
+
+* Todo Paciente deberá pertenecer a un Consultorio.
+* Un Paciente creado desde la Recepción Digital deberá asociarse a un Usuario.
+* El registro inicial solo requerirá nombres, apellidos, correo y celular.
+* Los datos administrativos complementarios podrán permanecer pendientes.
+* Los datos pendientes no deberán completarse utilizando valores ficticios.
+* Durante el MVP, un perfil de Paciente pertenecerá a un único Consultorio.
+* El correo deberá mantenerse alineado con el correo utilizado en la cuenta de acceso.
+* Cuando el Paciente complete su documento, deberá validarse su unicidad dentro del Consultorio.
+
+## Incorporación progresiva del Paciente
+
+La incorporación de un nuevo Paciente desde la Recepción Digital se realizará de forma progresiva.
+
+El objetivo inicial no será completar todo el perfil administrativo, sino permitir que la persona reserve su primera cita con la menor fricción posible.
+
+El proceso se dividirá en dos etapas.
+
+### Etapa 1 — Registro ultrarrápido y primera reserva
+
+El nuevo interesado proporcionará únicamente:
+
+* nombre o nombres;
+* apellido o apellidos;
+* correo electrónico;
+* celular;
+* contraseña;
+* confirmación de contraseña.
+
+Estos datos permitirán:
+
+* crear la cuenta de Usuario;
+* crear el registro de Paciente;
+* asociar Usuario y Paciente;
+* asociar ambos al Consultorio;
+* crear la primera Cita Médica;
+* permitir el inicio de sesión posterior.
+
+La información administrativa adicional no será obligatoria para completar la primera reserva.
+
+### Etapa 2 — Completar perfil
+
+Después de reservar, el Paciente podrá completar:
+
+* tipo de documento;
+* número de documento;
+* fecha de nacimiento;
+* dirección;
+* información adicional.
+
+La falta de estos datos no invalidará al Paciente ni impedirá la creación de su primera Cita.
+
+El perfil progresivo deberá evitar almacenar valores ficticios para representar información pendiente.
 
 ---
 
@@ -586,10 +1186,12 @@ Una cita ubicada en un estado final no podrá cambiar posteriormente de estado d
 
 ---
 
-## Modelo conceptual inicial
+## Modelo conceptual del dominio
 
 ```text
 Consultorio
+├── Identidad Pública
+├── Recepción Digital
 ├── Usuario
 │   └── Rol
 ├── Paciente
@@ -602,6 +1204,8 @@ Consultorio
     ├── Estado de Cita
     └── Observación Médica Básica
 ```
+
+La Identidad Pública y la Recepción Digital forman parte del contexto del Consultorio y no representan agregados independientes durante el MVP.
 
 ---
 
@@ -617,6 +1221,16 @@ Consultorio
 - Un Usuario tiene un Rol.
 - Un Usuario puede asociarse a uno de los roles de negocio del sistema.
 - Una Observación Médica Básica pertenece a una Cita Médica.
+- Un Consultorio tiene un identificador público único.
+- Un Consultorio tiene una Recepción Digital.
+- Un Consultorio mantiene una identidad pública.
+- Un Usuario pertenece a un Consultorio.
+- Un Usuario puede asociarse a un único perfil de negocio durante el MVP.
+- Un Paciente registrado desde la Recepción Digital debe asociarse a un Usuario.
+- El Usuario y el Paciente asociados deben pertenecer al mismo Consultorio.
+- La primera Cita debe pertenecer al mismo Consultorio que el Usuario, Paciente, Médico, Agenda y Bloque seleccionados.
+- El contexto público del Consultorio se resuelve mediante `slug`.
+- El contexto autenticado del Consultorio se resuelve mediante SecurityContext.
 
 ---
 
@@ -631,11 +1245,43 @@ Consultorio
 - Toda cita médica debe asociarse a un bloque de agenda válido.
 - Los usuarios únicamente podrán ejecutar acciones permitidas por su rol y consultorio.
 
+### Contexto público del Consultorio
+
+* Toda Recepción Digital deberá corresponder a un Consultorio activo.
+* El Consultorio público deberá resolverse mediante un identificador público único.
+* Un Consultorio con su Recepción Digital deshabilitada no deberá exponer información pública.
+* El identificador interno del Consultorio no deberá ser solicitado al paciente.
+* El paciente no podrá cambiar el contexto del Consultorio durante el proceso de primera reserva.
+* Toda especialidad, médico, agenda, bloque y cita utilizados en el flujo público deberán pertenecer al Consultorio resuelto.
+* El Backend deberá impedir combinaciones de recursos pertenecientes a consultorios diferentes.
+* La ausencia o invalidez del identificador público deberá producir una respuesta de recurso no encontrado.
+* El cambio manual de identificadores en una solicitud pública no deberá permitir acceso a información de otro Consultorio.
+
+### Registro público
+
+* El registro público siempre se realizará dentro del contexto de un Consultorio.
+* El nuevo Usuario y el nuevo Paciente deberán asociarse al Consultorio resuelto por el identificador público.
+* El Consultorio no deberá recibirse como identificador interno proporcionado libremente por el Frontend.
+* La cuenta de acceso deberá crearse con rol Paciente.
+* El correo electrónico será el identificador visible de acceso.
+* La normalización del correo deberá ejecutarse en el Backend.
+* El nombre de usuario técnico, cuando exista, deberá generarse automáticamente.
+* Usuario, Paciente y primera Cita deberán crearse dentro de una única transacción.
+* Si cualquier parte de la operación falla, no deberán persistirse registros parciales.
+
+### Aislamiento entre consultorios
+
+* Un usuario autenticado solo podrá operar dentro del Consultorio asociado a su cuenta.
+* Un paciente no podrá consultar ni gestionar información de otro Consultorio.
+* Un médico no podrá consultar agendas o citas de otro Consultorio.
+* Una recepcionista no podrá operar sobre pacientes, médicos, agendas o citas de otro Consultorio.
+* El Backend deberá validar el Consultorio incluso cuando el identificador del recurso sea válido.
+
 ### Disponibilidad médica
 
 - La disponibilidad médica es información derivada de los bloques de agenda y de las citas activas.
 - No se persistirá una entidad independiente denominada Disponibilidad.
-- Solo podrán mostrarse bloques activos, disponibles y pertenecientes al consultorio del usuario autenticado.
+- Solo podrán mostrarse bloques activos y disponibles que pertenezcan al Consultorio resuelto desde el contexto público o autenticado, según corresponda.
 - No deberán mostrarse horarios anteriores a la hora actual cuando se consulte la fecha del día.
 - Los horarios disponibles deberán mostrarse ordenados cronológicamente.
 - Un bloque de agenda podrá asociarse como máximo a una cita activa.
@@ -647,7 +1293,7 @@ Consultorio
 - Toda cita deberá crearse inicialmente en estado Programada.
 - Una cita solo podrá crearse sobre un bloque de agenda disponible.
 - La creación de una cita deberá impedir dobles reservas, incluso ante solicitudes concurrentes.
-- La cita creada por el paciente utilizará al paciente autenticado.
+- La cita creada por un Paciente autenticado utilizará al Paciente del SecurityContext. La primera reserva pública utilizará al Paciente creado dentro de la misma transacción.
 - La cita creada por recepción utilizará al paciente seleccionado y al consultorio de la recepcionista autenticada.
 - El consultorio no deberá confiar en identificadores enviados libremente por el Frontend cuando pueda obtenerlos del contexto autenticado.
 
@@ -689,38 +1335,158 @@ Consultorio
 - Una cita deberá tener una observación médica básica antes de marcarse como Atendida.
 - El historial básico mostrará únicamente observaciones correspondientes a citas Atendidas.
 
+### Registro ultrarrápido
+
+* El registro ultrarrápido solo estará disponible dentro de una Recepción Digital válida.
+* El Consultorio deberá resolverse mediante el `clinicSlug`.
+* El paciente no deberá seleccionar un Consultorio.
+* El registro inicial solicitará únicamente nombres, apellidos, correo electrónico, celular y contraseña.
+* La confirmación de contraseña será una validación de entrada y no deberá persistirse.
+* El correo electrónico deberá normalizarse antes de validarse y almacenarse.
+* El celular deberá normalizarse según las reglas definidas por el producto.
+* La contraseña deberá cumplir los criterios mínimos de seguridad.
+* La contraseña deberá almacenarse exclusivamente mediante hash seguro.
+* El Usuario deberá crearse con rol Paciente.
+* El `username` técnico deberá generarse automáticamente.
+* El `username` no deberá mostrarse ni solicitarse al paciente.
+* El Paciente deberá asociarse al Usuario creado.
+* Usuario y Paciente deberán pertenecer al mismo Consultorio.
+* Los datos no proporcionados durante el registro deberán permanecer sin valor.
+* No deberán utilizarse datos ficticios o genéricos para completar campos pendientes.
+
+### Correo electrónico y duplicidad
+
+* El correo electrónico será el identificador visible de acceso.
+* El correo deberá compararse después de normalizarse.
+* Durante el MVP, la duplicidad deberá evaluarse dentro del contexto del Consultorio.
+* Un mismo correo no podrá registrar dos Usuarios Paciente dentro del mismo Consultorio.
+* Si el correo ya pertenece a un Paciente del Consultorio, el sistema no deberá crear un nuevo Usuario ni un nuevo Paciente.
+* El sistema deberá informar que ya existe una cuenta asociada y orientar al usuario a iniciar sesión.
+* El mensaje no deberá exponer información adicional de la cuenta existente.
+
+### Documento de identidad
+
+* El tipo y número de documento no serán obligatorios durante la primera reserva.
+* La validación de duplicidad documental se realizará cuando el paciente complete su perfil.
+* Cuando se proporcione un documento, su unicidad deberá validarse dentro del Consultorio.
+* No deberán generarse documentos temporales ni valores artificiales durante el registro inicial.
+
+## Primera reserva pública
+
+La primera reserva pública representa una única operación funcional mediante la cual un nuevo interesado se convierte en Paciente y obtiene su primera Cita Médica.
+
+La operación deberá incluir:
+
+1. Resolver el Consultorio mediante el `clinicSlug`.
+2. Validar que la Recepción Digital esté activa.
+3. Validar que el Médico pertenezca al Consultorio.
+4. Validar que el Bloque de Agenda pertenezca al Médico y al Consultorio.
+5. Validar que el Bloque permanezca disponible.
+6. Validar que el Bloque no corresponda a una fecha u hora pasada.
+7. Normalizar el correo electrónico.
+8. Validar que no exista una cuenta duplicada dentro del Consultorio.
+9. Crear el Usuario con rol Paciente.
+10. Crear el Paciente.
+11. Asociar Usuario, Paciente y Consultorio.
+12. Crear la Cita Médica en estado Programada.
+13. Asociar la Cita con el Médico y el Bloque seleccionados.
+14. Marcar el Bloque como no disponible.
+15. Confirmar la transacción.
+
+Toda la operación deberá ejecutarse dentro de una única transacción.
+
+Si alguno de los pasos falla, no deberán quedar persistidos:
+
+* Usuarios parciales;
+* Pacientes parciales;
+* Citas parciales;
+* asociaciones incompletas;
+* Bloques ocupados incorrectamente.
+
 ---
 
 ## Agregados del dominio
 
 ### Consultorio
 
-Es el agregado organizacional principal del dominio.
+Es el agregado organizacional principal.
 
-Agrupa toda la operación del negocio.
+Agrupa y delimita:
+
+* identidad pública;
+* Recepción Digital;
+* usuarios;
+* médicos;
+* recepcionistas;
+* pacientes;
+* agendas;
+* citas.
+
+El Consultorio constituye el tenant funcional dentro de AgenDoc.
 
 ### Cita Médica
 
 Es el agregado transaccional principal.
 
-Centraliza la interacción entre paciente, médico, agenda y observaciones.
+Centraliza la interacción entre:
+
+* Consultorio;
+* Paciente;
+* Médico;
+* Agenda;
+* Bloque;
+* Estado;
+* Observación médica.
+
+### Primera reserva pública
+
+La primera reserva pública no constituye un agregado independiente.
+
+Representa una operación transaccional que coordina:
+
+* Consultorio;
+* Usuario;
+* Paciente;
+* Médico;
+* Bloque de Agenda;
+* Cita Médica.
+
+Su consistencia deberá protegerse mediante una única transacción.
 
 ---
 
 ## Invariantes del dominio
 
-- Toda cita pertenece a un consultorio.
-- Toda cita tiene un médico asignado.
-- Toda cita tiene un paciente asignado.
-- No pueden existir dos citas activas para un mismo médico en el mismo horario.
-- Una observación médica siempre pertenece a una cita.
-- Los usuarios únicamente pueden ejecutar acciones permitidas por su rol.
+* Todo Consultorio tiene un identificador interno.
+* Todo Consultorio público tiene un `slug` único.
+* Todo Usuario pertenece a un Consultorio.
+* Todo Usuario tiene un Rol.
+* Todo Médico pertenece a un Consultorio.
+* Todo Paciente pertenece a un Consultorio.
+* Toda Agenda Médica pertenece a un Consultorio y a un Médico.
+* Todo Bloque pertenece a una Agenda Médica.
+* Toda Cita pertenece a un Consultorio.
+* Toda Cita tiene un Médico.
+* Toda Cita tiene un Paciente.
+* La Cita, el Paciente, el Médico, la Agenda y el Bloque deben pertenecer al mismo Consultorio.
+* El contexto público del Consultorio debe resolverse desde un `slug` válido.
+* El `clinicId` no debe ser seleccionado libremente por el paciente.
+* Un correo normalizado no puede crear más de una cuenta de Paciente dentro del mismo Consultorio.
+* Un Paciente registrado públicamente debe asociarse a un Usuario del mismo Consultorio.
+* Usuario, Paciente y primera Cita deben crearse de manera atómica.
+* No pueden existir dos citas activas sobre el mismo Bloque.
+* No pueden existir dos citas activas para el mismo Médico en el mismo horario.
+* La ausencia de información del perfil progresivo no invalida la primera Cita.
+* Una observación médica siempre pertenece a una Cita.
+* Los usuarios únicamente pueden ejecutar acciones permitidas por su rol y Consultorio.
 
 ---
 
 ## Eventos relevantes del dominio
 
+- UsuarioPacienteRegistrado
 - PacienteRegistrado
+- PrimeraCitaReservada
 - CitaProgramada
 - CitaReprogramada
 - CitaCancelada
@@ -728,6 +1494,46 @@ Centraliza la interacción entre paciente, médico, agenda y observaciones.
 - PacienteNoAsistio
 - ObservacionMedicaRegistrada
 - CitaAtendida
+
+---
+
+## Unidad transaccional de la primera reserva
+
+La primera reserva pública deberá ejecutarse dentro de una única frontera transaccional en el Backend.
+
+La transacción deberá coordinar:
+
+* validación del Consultorio;
+* validación del Médico;
+* bloqueo y validación del Bloque;
+* validación de correo duplicado;
+* creación del Usuario;
+* creación del Paciente;
+* asociación Usuario-Paciente;
+* creación de la Cita;
+* actualización de disponibilidad del Bloque.
+
+El orden exacto de ejecución deberá reducir:
+
+* registros parciales;
+* ocupación incorrecta de horarios;
+* condiciones de carrera;
+* cuentas duplicadas;
+* inconsistencias entre Usuario y Paciente.
+
+El Bloque deberá bloquearse de forma pesimista o mediante un mecanismo equivalente antes de confirmar la reserva.
+
+La implementación deberá considerar que dos personas pueden intentar reservar el mismo horario simultáneamente.
+
+Solo una operación podrá completarse.
+
+La operación rechazada deberá:
+
+* devolver un conflicto funcional;
+* no crear Usuario;
+* no crear Paciente;
+* no crear Cita;
+* no modificar el Bloque.
 
 ---
 
@@ -757,6 +1563,8 @@ El modelo se enfoca en persistir la información necesaria para gestionar consul
 
 ```text
 Consultorio
+├── Identidad Pública
+├── Recepción Digital
 ├── Usuario
 │   └── Rol
 ├── Paciente
@@ -773,49 +1581,108 @@ Consultorio
     └── Observación Médica Básica
 ```
 
+La Identidad Pública y la Recepción Digital pertenecen conceptualmente al Consultorio. Durante el MVP se implementarán mediante atributos del Consultorio y no como entidades persistentes independientes.
+
 ---
 
 ## 4.4 Entidades Persistentes
 
 ### Consultorio
 
-Representa la unidad organizacional principal del sistema.
+Representa la unidad organizacional principal y el tenant funcional del sistema.
 
 Atributos principales:
-- id
-- nombre
-- telefono
-- correo
-- direccion
-- estado_registro
+
+* id
+* slug
+* nombre
+* nombre_publico
+* descripcion_publica
+* telefono
+* whatsapp
+* correo
+* direccion
+* map_url
+* logo_url
+* portal_publico_activo
+* estado_registro
 
 Relaciones:
-- Tiene médicos.
-- Tiene pacientes.
-- Tiene recepcionistas.
-- Tiene usuarios.
-- Tiene agendas médicas.
-- Tiene citas médicas.
+
+* Tiene usuarios.
+* Tiene médicos.
+* Tiene pacientes.
+* Tiene recepcionistas.
+* Tiene agendas médicas.
+* Tiene citas médicas.
+* Mantiene su identidad pública.
+* Tiene una Recepción Digital.
+
+Reglas de datos:
+
+* `id` será la clave interna.
+* `slug` será obligatorio.
+* `slug` será único en la plataforma.
+* `slug` deberá almacenarse normalizado.
+* `slug` utilizará letras minúsculas, números y guiones.
+* `slug` no deberá contener espacios.
+* `nombre` representa la denominación organizacional.
+* `nombre_publico` representa el nombre mostrado en la Recepción Digital.
+* Cuando `nombre_publico` no se haya configurado, podrá utilizarse `nombre`.
+* `portal_publico_activo` controlará la disponibilidad de la Recepción Digital.
+* Los atributos de identidad pública, salvo el nombre, podrán ser opcionales durante el MVP.
+* El `id` no deberá utilizarse como identificador público de navegación.
 
 ### Usuario
 
 Representa la cuenta de acceso al sistema.
 
 Atributos principales:
-- id
-- consultorio_id
-- rol_id
-- username
-- email
-- password_hash
-- activo
-- ultimo_acceso
-- estado_registro
+
+* id
+* consultorio_id
+* rol_id
+* username
+* email
+* password_hash
+* activo
+* ultimo_acceso
+* estado_registro
 
 Relaciones:
-- Pertenece a un consultorio.
-- Tiene un rol.
-- Puede asociarse a un perfil de negocio del sistema.
+
+* Pertenece a un Consultorio.
+* Tiene un Rol.
+* Puede asociarse a un perfil de negocio.
+
+Reglas de datos:
+
+* `consultorio_id` será obligatorio.
+* `rol_id` será obligatorio.
+* `email` será obligatorio.
+* `email` deberá almacenarse normalizado.
+* `username` continuará existiendo como identificador técnico durante el MVP.
+* `username` será generado por el Backend.
+* `username` no será solicitado en la interfaz del paciente.
+* `username` deberá ser único.
+* La unicidad funcional de acceso deberá preservar el contexto del Consultorio.
+* `password_hash` será obligatorio.
+* `password_hash` nunca será devuelto mediante APIs.
+* `activo` determinará si el Usuario puede autenticarse.
+
+Construcción conceptual recomendada para el `username` técnico:
+
+```text
+{clinicSlug}:{emailNormalizado}
+```
+
+Ejemplo:
+
+```text
+santa-isabel:paciente@email.com
+```
+
+Esta convención permite mantener un identificador técnico globalmente único sin exponerlo al usuario.
 
 ### Rol
 
@@ -840,23 +1707,73 @@ Relaciones:
 Representa a la persona que recibe atención médica.
 
 Atributos principales:
-- id
-- consultorio_id
-- usuario_id
-- nombres
-- apellidos
-- tipo_documento
-- numero_documento
-- fecha_nacimiento
-- telefono
-- correo
-- direccion
-- estado_registro
+
+* id
+* consultorio_id
+* usuario_id
+* nombres
+* apellidos
+* tipo_documento
+* numero_documento
+* fecha_nacimiento
+* telefono
+* correo
+* direccion
+* informacion_adicional
+* estado_registro
 
 Relaciones:
-- Pertenece a un consultorio.
-- Puede tener un usuario asociado.
-- Tiene citas médicas.
+
+* Pertenece a un Consultorio.
+* Puede tener un Usuario asociado.
+* Tiene citas médicas.
+
+Campos obligatorios durante el registro inicial:
+
+* consultorio_id;
+* usuario_id;
+* nombres;
+* apellidos;
+* telefono;
+* correo;
+* estado_registro.
+
+Campos opcionales durante el registro inicial:
+
+* tipo_documento;
+* numero_documento;
+* fecha_nacimiento;
+* direccion;
+* informacion_adicional.
+
+Reglas de datos:
+
+* `usuario_id` podrá permanecer nulo para pacientes registrados internamente que todavía no tengan acceso a la plataforma.
+* `usuario_id` será obligatorio para pacientes creados mediante la Recepción Digital.
+* El Usuario y el Paciente asociados deberán pertenecer al mismo Consultorio.
+* `correo` deberá almacenarse normalizado.
+* `tipo_documento` y `numero_documento` deberán proporcionarse conjuntamente cuando el paciente complete su perfil.
+* El documento deberá ser único dentro del Consultorio cuando exista.
+* Los campos pendientes deberán almacenarse como `NULL`.
+* No deberán utilizarse valores ficticios para satisfacer restricciones técnicas.
+* `informacion_adicional` no deberá utilizarse como historia clínica ni como repositorio de información médica estructurada.
+
+
+## Información adicional del perfil
+
+El atributo `informacion_adicional` permitirá almacenar información administrativa breve proporcionada voluntariamente por el Paciente.
+
+Durante el MVP no deberá utilizarse para representar una historia clínica ni almacenar información médica estructurada.
+
+No formarán parte del registro inicial:
+
+* seguro médico;
+* contacto de emergencia;
+* alergias;
+* antecedentes;
+* medicamentos.
+
+Estas capacidades deberán evaluarse en Historias de Usuario posteriores debido a su sensibilidad, reglas de privacidad y posible impacto en el Modelo de Datos.
 
 ### Médico
 
@@ -982,6 +1899,17 @@ Relaciones:
 - Tiene un estado de cita.
 - Puede tener una observación médica básica.
 
+Reglas adicionales para la primera reserva pública:
+
+* `consultorio_id` deberá corresponder al Consultorio resuelto mediante `clinicSlug`.
+* `paciente_id` corresponderá al Paciente creado durante la operación.
+* `medico_id` deberá pertenecer al Consultorio resuelto.
+* `bloque_agenda_id` deberá pertenecer a una Agenda del mismo Consultorio.
+* `estado_cita_id` deberá corresponder al estado Programada.
+* La Cita deberá crearse dentro de la misma transacción que el Usuario y el Paciente.
+* La Cita no deberá persistirse si falla la creación del Usuario o del Paciente.
+* El Bloque no deberá quedar ocupado si la creación de la Cita falla.
+
 ### Estado de Cita
 
 Catálogo de estados de la cita médica.
@@ -1025,26 +1953,28 @@ Relaciones:
 
 ## 4.5 Relaciones y Cardinalidades
 
-| Relación                                | Cardinalidad |
-| --------------------------------------- | ------------ |
-| Consultorio → Usuario                   | 1:N          |
-| Consultorio → Paciente                  | 1:N          |
-| Consultorio → Médico                    | 1:N          |
-| Consultorio → Recepcionista             | 1:N          |
-| Consultorio → Agenda Médica             | 1:N          |
-| Consultorio → Cita Médica               | 1:N          |
-| Usuario → Rol                           | N:1          |
-| Usuario → Paciente                      | 1:0..1       |
-| Usuario → Médico                        | 1:0..1       |
-| Usuario → Recepcionista                 | 1:0..1       |
-| Especialidad Médica → Médico            | 1:N          |
-| Médico → Agenda Médica                  | 1:1          |
-| Agenda Médica → Bloque de Agenda        | 1:N          |
-| Bloque de Agenda → Cita Médica          | 1:0..N       |
-| Paciente → Cita Médica                  | 1:N          |
-| Médico → Cita Médica                    | 1:N          |
-| Estado de Cita → Cita Médica            | 1:N          |
-| Cita Médica → Observación Médica Básica | 1:0..1       |
+| Relación                                | Cardinalidad   |
+| --------------------------------------- | -------------- |
+| Consultorio → Identidad Pública         | 1:1            |
+| Consultorio → Recepción Digital         | 1:1 conceptual |
+| Consultorio → Usuario                   | 1:N            |
+| Consultorio → Paciente                  | 1:N            |
+| Consultorio → Médico                    | 1:N            |
+| Consultorio → Recepcionista             | 1:N            |
+| Consultorio → Agenda Médica             | 1:N            |
+| Consultorio → Cita Médica               | 1:N            |
+| Usuario → Rol                           | N:1            |
+| Usuario → Paciente                      | 1:0..1         |
+| Usuario → Médico                        | 1:0..1         |
+| Usuario → Recepcionista                 | 1:0..1         |
+| Paciente → Cita Médica                  | 1:N            |
+| Médico → Agenda Médica                  | 1:1            |
+| Agenda Médica → Bloque de Agenda        | 1:N            |
+| Bloque de Agenda → Cita Médica          | 1:0..N         |
+| Estado de Cita → Cita Médica            | 1:N            |
+| Cita Médica → Observación Médica Básica | 1:0..1         |
+
+La Recepción Digital y la Identidad Pública permanecen conceptualmente asociadas uno a uno con el Consultorio, pero durante el MVP podrán implementarse mediante atributos de la misma entidad persistente.
 
 ---
 
@@ -1107,6 +2037,80 @@ El catálogo podrá ampliarse sin modificar el modelo de datos.
 - La disponibilidad será derivada de bloques de agenda y citas activas; no será una entidad persistente.
 - Para el control de disponibilidad, una cita activa será aquella que se encuentre en estado Programada o Confirmada.
 
+* Todo Consultorio deberá tener un `slug` único.
+* El `slug` deberá identificar públicamente al Consultorio sin exponer su clave interna.
+* Todo Usuario deberá pertenecer a un Consultorio.
+* El correo electrónico deberá normalizarse antes de validar duplicidad.
+* La unicidad de acceso deberá considerar el contexto del Consultorio.
+* Un nuevo Paciente registrado públicamente deberá pertenecer al mismo Consultorio que su Usuario.
+* Una primera Cita deberá pertenecer al mismo Consultorio que el Usuario, Paciente, Médico, Agenda y Bloque seleccionados.
+* No podrá crearse una primera Cita utilizando recursos de consultorios diferentes.
+* Los campos del perfil progresivo podrán permanecer nulos hasta que el paciente complete su información.
+* No deberán almacenarse valores ficticios para representar datos pendientes.
+* Un Consultorio con el portal público deshabilitado no deberá admitir nuevas reservas públicas.
+
+## Reglas de integridad multi-consultorio
+
+* Todo Consultorio deberá tener un `slug`.
+* El `slug` deberá ser único globalmente.
+* El `slug` deberá almacenarse en minúsculas.
+* Un Usuario deberá pertenecer a un Consultorio.
+* Un Paciente deberá pertenecer a un Consultorio.
+* Un Médico deberá pertenecer a un Consultorio.
+* Una Agenda deberá pertenecer al mismo Consultorio que su Médico.
+* Una Cita deberá pertenecer al mismo Consultorio que su Paciente, Médico y Agenda.
+* Un Usuario y su perfil de negocio deberán pertenecer al mismo Consultorio.
+* Un correo normalizado no podrá repetirse para cuentas de Paciente dentro del mismo Consultorio.
+* Un documento, cuando exista, no podrá repetirse dentro del mismo Consultorio.
+* La ausencia de documento no deberá impedir el registro inicial.
+* Un Consultorio con `portal_publico_activo = false` no deberá aceptar reservas públicas.
+* Un `clinicSlug` válido no autoriza el acceso a datos privados.
+* Todos los recursos utilizados en una operación pública deberán validarse contra el Consultorio resuelto.
+
+## Reglas de integridad de primera reserva
+
+* La primera reserva deberá crear Usuario, Paciente y Cita en una única transacción.
+* La transacción deberá bloquear el Bloque de Agenda antes de confirmar su disponibilidad.
+* El Bloque solo podrá quedar no disponible cuando la Cita haya sido creada exitosamente.
+* Si existe un conflicto de correo, no deberá crearse ningún registro.
+* Si existe un conflicto de disponibilidad, no deberá crearse ningún registro.
+* Si falla la persistencia de la Cita, deberán revertirse Usuario y Paciente.
+* Si falla la persistencia del Usuario o Paciente, el Bloque deberá permanecer disponible.
+
+---
+
+## Duplicidad de cuentas durante el MVP
+
+La duplicidad del correo se evaluará dentro del contexto del Consultorio.
+
+Regla:
+
+```text
+Consultorio + correo normalizado = cuenta única
+```
+
+Esto permite mantener aislamiento funcional entre Consultorios.
+
+Durante el MVP no se implementará una identidad global de persona.
+
+Por tanto, una misma dirección de correo podría representar cuentas independientes en Consultorios distintos, siempre que la estrategia física de autenticación y `username` lo permita.
+
+Dentro de un mismo Consultorio:
+
+* el correo no podrá registrarse dos veces;
+* el sistema no deberá crear un nuevo Paciente;
+* el sistema deberá orientar al usuario a iniciar sesión.
+
+La duplicidad documental se validará cuando el Paciente complete el perfil.
+
+Regla:
+
+```text
+Consultorio + tipo de documento + número de documento = Paciente único
+```
+
+Los valores nulos del documento no deberán impedir múltiples perfiles incompletos, pero una vez proporcionado el documento deberá aplicarse la restricción correspondiente.
+
 ---
 
 ## 4.8 Convenciones del Modelo
@@ -1123,6 +2127,49 @@ El catálogo podrá ampliarse sin modificar el modelo de datos.
 - Las citas médicas deberán poder consultarse eficientemente por consultorio, médico, paciente, fecha y estado.
 - La agenda médica deberá poder consultarse eficientemente por médico, fecha y disponibilidad.
 - Las entidades de referencia deberán administrarse mediante datos maestros y no mediante valores codificados en la aplicación.
+
+## Normalización de identificadores públicos y datos de acceso
+
+### Slug
+
+Antes de persistirse:
+
+* deberá eliminar espacios iniciales y finales;
+* deberá convertirse a minúsculas;
+* deberá reemplazar espacios internos por guiones cuando corresponda;
+* deberá rechazar caracteres no permitidos;
+* deberá validarse su unicidad.
+
+Expresión conceptual:
+
+```text
+^[a-z0-9]+(?:-[a-z0-9]+)*$
+```
+
+### Correo electrónico
+
+Antes de persistirse o compararse:
+
+* deberá eliminar espacios iniciales y finales;
+* deberá convertirse a minúsculas.
+
+No se aplicarán transformaciones específicas de proveedores de correo, como eliminar puntos o etiquetas, durante el MVP.
+
+### Username técnico
+
+Se generará exclusivamente en el Backend.
+
+No deberá aceptarse como valor libre desde el Frontend del paciente.
+
+---
+
+## Estado de implementación del modelo progresivo
+
+El modelo de datos definido para la Recepción Digital representa el objetivo funcional aprobado para HU-20.
+
+Antes de implementar deberá revisarse el esquema físico vigente para determinar las restricciones actuales de nulabilidad, unicidad de correo y documento, asociación entre Usuario y Paciente, estructura del Consultorio y estrategia de generación de `username`.
+
+Los cambios físicos se implementarán mediante nuevas migraciones Flyway. Las migraciones existentes no deberán modificarse.
 
 ---
 
@@ -1203,6 +2250,57 @@ La arquitectura estará compuesta por:
 El Backend API será el responsable de centralizar las reglas de negocio, seguridad, validaciones y persistencia.
 
 Frontend Web y Mobile consumirán la misma API mediante REST sobre HTTPS.
+
+## Contexto público y autenticado
+
+La arquitectura distinguirá dos contextos de acceso.
+
+### Contexto público
+
+Se utiliza durante la navegación de la Recepción Digital.
+
+El Consultorio se resuelve mediante un identificador público.
+
+```text
+URL pública
+    │
+    ▼
+clinicSlug
+    │
+    ▼
+Backend
+    │
+    ▼
+ClinicRepository
+    │
+    ▼
+Consultorio
+```
+
+Una vez resuelto el Consultorio, el Backend limita todas las consultas públicas a dicho contexto.
+
+### Contexto autenticado
+
+Se utiliza después del inicio de sesión.
+
+El Consultorio se resuelve mediante el Usuario autenticado y el SecurityContext.
+
+```text
+JWT
+    │
+    ▼
+SecurityContext
+    │
+    ▼
+Usuario autenticado
+    │
+    ▼
+Consultorio
+```
+
+El contexto público no reemplaza el contexto autenticado.
+
+El `slug` permite identificar el Consultorio antes de la autenticación. Después del login, el Backend utiliza el Consultorio asociado al Usuario como fuente de verdad.
 
 ---
 
@@ -1343,6 +2441,161 @@ Consultas críticas a optimizar:
 - Citas por fecha.
 - Citas por estado.
 - Bloques de agenda por médico, fecha y disponibilidad.
+- Consultorio por slug.
+- Consultorio activo por slug.
+- Usuario por consultorio y correo normalizado.
+- Médico activo por consultorio.
+- Especialidades disponibles por consultorio.
+- Bloques disponibles por consultorio, médico y fecha.
+
+---
+
+## Índices y restricciones conceptuales
+
+La implementación deberá considerar como mínimo los siguientes índices y restricciones.
+
+### Consultorio
+
+* índice único sobre `slug`;
+* índice sobre `portal_publico_activo`;
+* índice combinado sobre `slug`, `estado_registro` y `portal_publico_activo` cuando mejore la consulta pública.
+
+### Usuario
+
+* índice único sobre `username`;
+* índice sobre `consultorio_id`;
+* índice sobre `email`;
+* restricción o índice único funcional sobre `consultorio_id` y correo normalizado, según las capacidades de PostgreSQL y la estrategia de implementación aprobada.
+
+### Paciente
+
+* índice sobre `consultorio_id`;
+* índice sobre `usuario_id`;
+* índice sobre `correo`;
+* índice para búsqueda por nombres y apellidos;
+* restricción de unicidad sobre `consultorio_id`, `tipo_documento` y `numero_documento` cuando el documento exista.
+
+### Médico
+
+* índice sobre `consultorio_id`;
+* índice sobre `especialidad_id`;
+* índice combinado sobre `consultorio_id`, `especialidad_id` y `estado_registro`.
+
+### Agenda y Bloques
+
+* índice sobre `consultorio_id` y `medico_id`;
+* índice sobre fecha y disponibilidad;
+* índice combinado para consultar bloques disponibles por Consultorio, Médico y fecha.
+
+### Citas
+
+* índice sobre `consultorio_id`;
+* índice sobre `paciente_id`;
+* índice sobre `medico_id`;
+* índice sobre `bloque_agenda_id`;
+* índice sobre fecha y estado;
+* restricciones que protejan la asociación de un Bloque con una única Cita activa cuando corresponda.
+
+---
+
+## Evolución conceptual del esquema
+
+La implementación de HU-20 podrá requerir nuevas migraciones Flyway.
+
+Los cambios conceptuales esperados son:
+
+1. Incorporar `slug` al Consultorio.
+2. Incorporar atributos de identidad pública.
+3. Incorporar `portal_publico_activo`.
+4. Permitir valores nulos en campos administrativos del Paciente.
+5. Incorporar `informacion_adicional` cuando se apruebe como parte del perfil.
+6. Ajustar restricciones de unicidad de Usuario y Paciente.
+7. Crear índices para consultas públicas por Consultorio.
+8. Actualizar datos iniciales del Consultorio base.
+
+Las migraciones existentes no deberán modificarse.
+
+Toda evolución deberá incorporarse mediante nuevas migraciones versionadas.
+
+Antes de definir la migración exacta deberá revisarse el esquema físico implementado y las restricciones vigentes.
+
+---
+
+## Configuración inicial del Consultorio base
+
+El Consultorio base utilizado durante el MVP deberá contar con:
+
+* `slug` válido;
+* nombre público;
+* Recepción Digital activa;
+* información de contacto mínima;
+* médicos activos;
+* especialidades asociadas;
+* agendas y bloques disponibles.
+
+Ejemplo conceptual:
+
+```text
+slug: santa-isabel
+nombre_publico: Centro Médico Santa Isabel
+portal_publico_activo: true
+```
+
+Los valores definitivos deberán corresponder a los datos utilizados en el entorno de desarrollo.
+
+No deberán introducirse datos comerciales ficticios en ambientes productivos.
+
+---
+
+## Clasificación inicial de datos
+
+### Datos públicos del Consultorio
+
+* slug;
+* nombre público;
+* descripción pública;
+* logotipo;
+* teléfono público;
+* WhatsApp público;
+* correo público;
+* dirección pública;
+* mapa;
+* especialidades publicadas;
+* médicos publicados;
+* disponibilidad.
+
+### Datos privados del Consultorio
+
+* identificador interno;
+* usuarios;
+* pacientes;
+* citas;
+* auditoría;
+* configuraciones sensibles;
+* credenciales;
+* información administrativa interna.
+
+### Datos públicos del Médico
+
+* nombre;
+* especialidad;
+* información profesional aprobada;
+* disponibilidad.
+
+### Datos privados del Médico
+
+* documento;
+* correo privado;
+* teléfono personal;
+* usuario;
+* auditoría;
+* datos internos no aprobados para publicación.
+
+### Datos privados del Paciente
+
+Toda la información del Paciente será privada.
+
+La Recepción Digital no deberá exponer datos de pacientes existentes.
 
 ---
 
@@ -1374,6 +2627,165 @@ Reglas de autorización iniciales:
 - El médico solo podrá visualizar sus citas asignadas y registrar observaciones básicas.
 - Solo el médico podrá marcar una cita como atendida.
 - Solo el médico podrá registrar observaciones médicas básicas.
+
+## Contraseña durante el registro público
+
+La contraseña será creada durante el registro ultrarrápido.
+
+La interfaz solicitará:
+
+* contraseña;
+* confirmación de contraseña.
+
+La confirmación de contraseña:
+
+* será validada antes de enviar o procesar la solicitud;
+* no formará parte de la entidad Usuario;
+* no deberá persistirse;
+* no deberá registrarse en logs.
+
+El Backend deberá:
+
+* validar que contraseña y confirmación coincidan;
+* aplicar la política mínima de seguridad;
+* generar el hash mediante el componente oficial de contraseñas;
+* descartar el valor original después de procesarlo;
+* evitar incluir la contraseña en respuestas, excepciones o trazas.
+
+La respuesta de la primera reserva no deberá devolver:
+
+* contraseña;
+* confirmación de contraseña;
+* hash;
+* token de autenticación, salvo que una decisión posterior apruebe inicio de sesión automático.
+
+## Inicio de sesión posterior a la primera reserva
+
+Después de completar la primera reserva, el Paciente podrá iniciar sesión utilizando:
+
+* el contexto del Consultorio;
+* su correo electrónico;
+* su contraseña.
+
+Durante el MVP, la creación de la primera reserva no iniciará sesión automáticamente.
+
+El sistema mostrará una confirmación y ofrecerá al Paciente:
+
+* completar su perfil;
+* iniciar sesión;
+* volver a la Recepción Digital.
+
+El inicio de sesión automático podrá evaluarse posteriormente, pero no formará parte de HU-20 mientras no exista una decisión aprobada.
+
+## Autenticación contextualizada por Consultorio
+
+El inicio de sesión deberá ejecutarse dentro del contexto de un Consultorio.
+
+La ruta pública permitirá resolver el Consultorio antes de enviar las credenciales.
+
+Ejemplo:
+
+```text
+/santa-isabel/login
+```
+
+El usuario proporcionará:
+
+* correo electrónico;
+* contraseña.
+
+El Backend deberá:
+
+1. resolver el Consultorio mediante el `slug`;
+2. normalizar el correo;
+3. localizar al Usuario dentro del Consultorio;
+4. validar la contraseña;
+5. generar el JWT;
+6. incluir el contexto interno necesario para las operaciones protegidas.
+
+Después de la autenticación, el Consultorio asociado al Usuario será la fuente de verdad.
+
+El Backend deberá rechazar el inicio de sesión cuando:
+
+* el Consultorio no exista;
+* la cuenta no pertenezca al Consultorio;
+* la cuenta esté inactiva;
+* las credenciales sean inválidas.
+
+La respuesta no deberá revelar cuál de estos elementos produjo el fallo.
+
+El mensaje visible será uniforme y no expondrá información sensible.
+
+## Identificador visible de acceso
+
+El correo electrónico será el único identificador de acceso solicitado al paciente.
+
+AgenDoc podrá mantener internamente un `username` técnico para conservar compatibilidad con la implementación existente.
+
+El `username`:
+
+* será generado automáticamente;
+* no será solicitado al usuario;
+* no será mostrado en la interfaz;
+* podrá incorporar el contexto del Consultorio;
+* no reemplazará al correo como identificador visible.
+
+## Seguridad del contexto público
+
+Las rutas públicas deberán exponer únicamente información necesaria para la Recepción Digital.
+
+No deberán exponer:
+
+* documentos de identidad;
+* datos privados de pacientes;
+* correos privados de médicos;
+* teléfonos personales no publicados;
+* agendas completas;
+* citas;
+* identificadores internos del Consultorio;
+* hashes;
+* tokens;
+* información de auditoría.
+
+Las respuestas públicas deberán utilizar DTOs específicos y no serializar directamente las entidades persistentes.
+
+---
+
+## Convención del username técnico
+
+El `username` técnico será una decisión interna de implementación.
+
+No deberá aparecer en:
+
+* formularios;
+* mensajes;
+* correos;
+* pantallas de perfil;
+* respuestas públicas;
+* documentación para pacientes.
+
+La convención conceptual será:
+
+```text
+{clinicSlug}:{emailNormalizado}
+```
+
+Ejemplo:
+
+```text
+santa-isabel:paciente@email.com
+```
+
+El Backend será responsable de:
+
+* generar el valor;
+* validar su unicidad;
+* impedir que el Frontend lo proporcione;
+* mantenerlo sincronizado con la estrategia de autenticación.
+
+El correo electrónico seguirá siendo la credencial visible.
+
+Una futura modificación del correo deberá considerar el impacto sobre el `username` técnico y la autenticación. La actualización de correo no forma parte de HU-20.
 
 ---
 
@@ -1449,6 +2861,52 @@ La arquitectura permitirá incorporarlas posteriormente mediante nuevos módulos
 
 ---
 
+## Límites arquitectónicos de la Recepción Digital durante el MVP
+
+La implementación de la Recepción Digital deberá mantenerse dentro de los límites aprobados.
+
+### Incluido
+
+* Resolución del Consultorio mediante `slug`.
+* Identidad pública básica.
+* Consulta de especialidades.
+* Consulta de Médicos.
+* Consulta de disponibilidad.
+* Registro ultrarrápido.
+* Creación automática de Usuario.
+* Creación automática de Paciente.
+* Creación de la primera Cita.
+* Confirmación de reserva.
+* Invitación para completar perfil.
+* Login contextualizado.
+* Aislamiento por Consultorio.
+* Diseño responsive.
+* Accesibilidad básica WCAG AA.
+
+### No incluido
+
+* Marketplace de Consultorios.
+* Búsqueda global de Consultorios.
+* Ranking o reseñas.
+* Publicidad.
+* Pagos.
+* Seguros Médicos.
+* Dominios personalizados.
+* Subdominios.
+* Constructor de landing.
+* Personalización total de colores.
+* Editor de contenido.
+* Gestión pública de promociones.
+* Integración con WhatsApp.
+* Notificaciones automáticas.
+* Recuperación completa de contraseña.
+* Inicio de sesión automático después del registro.
+* Una identidad de Paciente compartida entre varios Consultorios.
+* Historia clínica.
+* Información médica avanzada.
+
+---
+
 ## 5.12 Diagrama de Arquitectura de Alto Nivel
 
 ```text
@@ -1477,6 +2935,63 @@ Aplicación Mobile
    │
    └── REST / HTTPS ─────► Backend API
 ```
+
+## Diagrama de contexto público
+
+```text
+Persona
+   │
+   ▼
+Recepción Digital
+/{clinicSlug}
+   │
+   ▼
+Frontend Web
+   │
+   │ REST / HTTPS
+   ▼
+Public Portal API
+   │
+   ▼
+Tenant Resolver
+   │
+   ▼
+Consultorio
+   │
+   ├── Identidad pública
+   ├── Especialidades
+   ├── Médicos
+   ├── Agenda
+   └── Primera reserva
+   │
+   ▼
+PostgreSQL
+```
+
+## Diagrama de contexto autenticado
+
+```text
+Paciente / Médico / Recepcionista
+   │
+   ▼
+/{clinicSlug}/login
+   │
+   ▼
+Authentication API
+   │
+   ▼
+JWT
+   │
+   ▼
+SecurityContext
+   │
+   ▼
+Consultorio del Usuario
+   │
+   ▼
+Servicios protegidos
+```
+
 ---
 
 ## 5.13 Decisiones Arquitectónicas
@@ -1495,6 +3010,36 @@ Aplicación Mobile
 - PostgreSQL se ejecutará localmente durante el MVP.
 - Docker quedará reservado para una futura etapa de integración, pruebas o despliegue.
 
+### Recepción Digital y contexto multi-consultorio
+- AgenDoc se concibe como una plataforma SaaS multi-consultorio.
+- Cada Consultorio representa un tenant funcional.
+- El MVP operará inicialmente con un Consultorio base.
+- Cada Consultorio tendrá un `slug` público único.
+- Durante el MVP se utilizarán rutas basadas en `slug`.
+- El `clinicId` permanecerá como identificador interno.
+- El paciente no seleccionará ni enviará libremente el `clinicId`.
+- El contexto público se resolverá mediante `clinicSlug`.
+- El contexto autenticado se resolverá mediante SecurityContext.
+- El `clinicSlug` no reemplaza la autorización.
+- El Backend validará pertenencia al Consultorio en toda operación.
+- La Recepción Digital utilizará la identidad principal del Consultorio.
+- AgenDoc aparecerá únicamente como proveedor tecnológico secundario cuando corresponda.
+- Las APIs públicas utilizarán DTOs específicos.
+- La información pública y privada estará claramente separada.
+- El registro inicial solicitará únicamente datos mínimos.
+- El perfil del Paciente podrá completarse progresivamente.
+- El correo será el identificador visible de acceso.
+- El `username` técnico será generado por el Backend y permanecerá oculto.
+- La autenticación será contextualizada por Consultorio.
+- Usuario, Paciente y primera Cita se crearán en una única transacción.
+- La Cita inicial se creará en estado Programada.
+- El Bloque se ocupará únicamente cuando la transacción sea exitosa.
+- No se utilizarán valores ficticios para completar el perfil.
+- La evolución hacia subdominios o dominios propios se postergará.
+- La relación de una misma persona con múltiples Consultorios no se resolverá durante el MVP.
+- No se implementará un constructor visual de páginas durante HU-20.
+- No se incorporará información clínica avanzada al registro público.
+
 ---
 
 ## 5.14 Estándares de Desarrollo
@@ -1509,6 +3054,257 @@ Durante el desarrollo del MVP se adoptarán los siguientes estándares:
 - Validaciones de experiencia de usuario en Frontend.
 - Cobertura de pruebas para componentes críticos.
 - Uso de migraciones versionadas para Base de Datos.
+
+---
+
+## 5.15 Arquitectura de la Recepción Digital
+
+La Recepción Digital será implementada como una experiencia pública dentro del Frontend Web.
+
+El Frontend obtendrá el contexto del Consultorio desde la URL y consumirá exclusivamente APIs públicas diseñadas para este propósito.
+
+Flujo general:
+
+```text
+Persona
+   │
+   ▼
+/santa-isabel
+   │
+   ▼
+Frontend Web
+   │
+   ▼
+API pública con clinicSlug
+   │
+   ▼
+Resolución del Consultorio
+   │
+   ├── identidad pública
+   ├── especialidades
+   ├── médicos
+   ├── disponibilidad
+   └── primera reserva
+```
+
+El Frontend no almacenará un `clinicId` como fuente de verdad.
+
+Podrá mantener temporalmente el `slug` obtenido desde la ruta para realizar las solicitudes públicas.
+
+El Backend deberá resolver el identificador interno del Consultorio y validar todas las relaciones del dominio.
+
+### URLs públicas
+
+Durante el MVP se utilizará una estrategia basada en rutas.
+
+Ejemplo:
+
+```text
+/santa-isabel
+/santa-isabel/especialidades
+/santa-isabel/medicos
+/santa-isabel/reservar
+/santa-isabel/login
+```
+
+Esta estrategia reduce la complejidad inicial de infraestructura.
+
+En una evolución futura podrá utilizarse:
+
+```text
+santa-isabel.agendoc.com
+```
+
+o un dominio personalizado.
+
+La evolución de rutas a subdominios no deberá modificar las reglas del dominio ni los contratos centrales del Backend.
+
+### Resolución del tenant
+
+La resolución del tenant seguirá este flujo:
+
+1. Recibir el `clinicSlug`.
+2. Normalizar el valor.
+3. Buscar un Consultorio activo.
+4. Validar que la Recepción Digital esté habilitada.
+5. Resolver el identificador interno.
+6. Ejecutar la operación dentro del contexto resuelto.
+7. Rechazar recursos que no pertenezcan al Consultorio.
+
+El `clinicSlug` es un identificador de navegación.
+
+No constituye autorización suficiente por sí mismo.
+
+Todas las operaciones deberán continuar aplicando validaciones de pertenencia y reglas de negocio.
+
+---
+
+## 5.16 Contratos conceptuales de la Recepción Digital
+
+Las APIs públicas utilizarán versionado y una estructura consistente.
+
+Convención propuesta:
+
+```text
+/api/v1/public/clinics/{clinicSlug}
+```
+
+Operaciones conceptuales:
+
+```http
+GET /api/v1/public/clinics/{clinicSlug}
+```
+
+Responsabilidad:
+
+* obtener identidad pública;
+* obtener información de contacto;
+* validar que la Recepción Digital esté activa.
+
+```http
+GET /api/v1/public/clinics/{clinicSlug}/specialties
+```
+
+Responsabilidad:
+
+* listar especialidades con médicos activos dentro del Consultorio.
+
+```http
+GET /api/v1/public/clinics/{clinicSlug}/doctors
+```
+
+Responsabilidad:
+
+* listar médicos activos del Consultorio;
+* permitir filtro por especialidad cuando corresponda.
+
+```http
+GET /api/v1/public/clinics/{clinicSlug}/doctors/{doctorId}/availability
+```
+
+Responsabilidad:
+
+* consultar bloques activos y disponibles;
+* validar que el Médico pertenezca al Consultorio;
+* excluir horarios pasados.
+
+```http
+POST /api/v1/public/clinics/{clinicSlug}/first-appointments
+```
+
+Responsabilidad:
+
+* registrar al nuevo Usuario;
+* crear el Paciente;
+* asociar ambos con el Consultorio;
+* crear la primera Cita;
+* ocupar el Bloque;
+* ejecutar toda la operación transaccionalmente.
+
+Los contratos definitivos se establecerán durante el diseño técnico de HU-20.
+
+El Blueprint documenta únicamente sus responsabilidades conceptuales.
+
+### Contrato conceptual de primera reserva
+
+Endpoint conceptual:
+
+```http
+POST /api/v1/public/clinics/{clinicSlug}/first-appointments
+```
+
+Información de entrada:
+
+* doctorId;
+* agendaBlockId;
+* nombres;
+* apellidos;
+* email;
+* phone;
+* password;
+* passwordConfirmation;
+* motivo, cuando corresponda.
+
+El contrato no deberá recibir:
+
+* clinicId;
+* patientId;
+* userId;
+* roleId;
+* appointmentStatusId;
+* username técnico.
+
+El Backend resolverá o generará estos valores.
+
+Información de salida:
+
+* identificador público o funcional de la Cita;
+* nombre del Consultorio;
+* nombre del Médico;
+* especialidad;
+* fecha;
+* hora de inicio;
+* hora de fin;
+* estado Programada;
+* indicación de perfil pendiente.
+
+El contrato definitivo se establecerá durante el diseño técnico de HU-20.
+
+---
+
+### Respuestas funcionales de primera reserva
+
+La API deberá diferenciar como mínimo:
+
+### Reserva creada
+
+Código HTTP esperado:
+
+```text
+201 Created
+```
+
+### Datos inválidos
+
+Código HTTP esperado:
+
+```text
+400 Bad Request
+```
+
+### Consultorio, Médico o recurso público inexistente
+
+Código HTTP esperado:
+
+```text
+404 Not Found
+```
+
+### Correo ya registrado
+
+Código HTTP esperado:
+
+```text
+409 Conflict
+```
+
+### Bloque ocupado o modificado durante la reserva
+
+Código HTTP esperado:
+
+```text
+409 Conflict
+```
+
+### Error inesperado
+
+Código HTTP esperado:
+
+```text
+500 Internal Server Error
+```
+
+Las respuestas deberán utilizar la estructura uniforme de errores de AgenDoc y no exponer información sensible.
 
 ---
 
@@ -1609,6 +3405,110 @@ Como mínimo deberá considerar:
 - mensajes comprensibles
 
 ---
+
+## Accesibilidad de la Recepción Digital
+
+La Recepción Digital deberá contemplar:
+
+* jerarquía semántica de encabezados;
+* nombre accesible del Consultorio;
+* texto alternativo para el logotipo;
+* navegación por teclado;
+* foco visible;
+* orden lógico del foco;
+* errores asociados a cada campo;
+* mensajes anunciados mediante tecnologías asistivas;
+* controles táctiles de tamaño adecuado;
+* contraste WCAG AA;
+* fechas y horarios comprensibles;
+* estados no dependientes únicamente del color.
+
+Las Cards interactivas deberán comportarse como controles accesibles y no como contenedores visuales sin semántica.
+
+Después de un error de formulario:
+
+* el foco deberá dirigirse al resumen de errores o al primer campo inválido;
+* el usuario deberá poder identificar qué debe corregir.
+
+Después de una reserva exitosa:
+
+* el foco deberá dirigirse al título de confirmación.
+
+---
+
+### Contexto visible del Consultorio
+
+La persona deberá identificar claramente en todo momento el Consultorio dentro del cual está navegando.
+
+La experiencia pública deberá mostrar de manera consistente:
+
+* nombre del Consultorio;
+* logotipo cuando exista;
+* información de contacto relevante;
+* contexto de la reserva en curso.
+
+El paciente no deberá sentir que fue trasladado a una plataforma genérica o a otro Consultorio durante el proceso.
+
+### Orientación antes que promoción
+
+La Recepción Digital deberá orientar al paciente para completar una acción útil.
+
+Su prioridad será facilitar:
+
+* la reserva de una cita;
+* la consulta de especialistas;
+* la consulta de disponibilidad;
+* el inicio de sesión;
+* el contacto con el Consultorio.
+
+El contenido promocional podrá existir de forma breve, pero no deberá desplazar las acciones principales ni dificultar la navegación.
+
+### Progresividad
+
+La experiencia deberá solicitar información únicamente cuando sea necesaria.
+
+El paciente podrá explorar:
+
+* especialidades;
+* médicos;
+* fechas;
+* horarios;
+
+antes de proporcionar información personal.
+
+El registro aparecerá únicamente después de que el paciente haya seleccionado el horario de su primera cita.
+
+### Persistencia del contexto
+
+La selección realizada por el paciente deberá conservarse durante el flujo.
+
+Al avanzar entre pasos, el sistema deberá mantener:
+
+* Consultorio;
+* especialidad;
+* Médico;
+* fecha;
+* horario seleccionado.
+
+El usuario no deberá repetir selecciones salvo que decida modificarlas.
+
+### Transparencia de la reserva
+
+Antes de confirmar, el paciente deberá visualizar un resumen claro con:
+
+* nombre del Consultorio;
+* especialidad;
+* Médico;
+* fecha;
+* hora;
+* datos básicos ingresados.
+
+La confirmación final deberá distinguir claramente entre:
+
+* selección provisional;
+* envío en proceso;
+* reserva confirmada;
+* error de reserva.
 
 ---
 
@@ -1801,6 +3701,79 @@ Criterios:
 
 ---
 
+## Identidad visual en la Recepción Digital
+
+La identidad visual principal de la Recepción Digital corresponderá al Consultorio.
+
+La interfaz podrá mostrar:
+
+* nombre público;
+* logotipo;
+* descripción breve;
+* información de contacto;
+* ubicación;
+* contenido público aprobado.
+
+AgenDoc conservará el control de:
+
+* estructura de navegación;
+* componentes;
+* accesibilidad;
+* comportamiento responsive;
+* jerarquía visual;
+* estados;
+* consistencia funcional.
+
+Durante el MVP, la identidad del Consultorio no implicará libertad total de personalización.
+
+No se implementará un constructor visual de páginas ni un sistema abierto de temas.
+
+La personalización inicial se limitará a información estructurada y recursos aprobados.
+
+### Jerarquía de marca
+
+La jerarquía visual será:
+
+1. Consultorio.
+2. Acción principal del paciente.
+3. Información médica y operativa.
+4. AgenDoc como proveedor tecnológico secundario.
+
+La marca AgenDoc podrá mostrarse de forma discreta, por ejemplo:
+
+```text
+Tecnología proporcionada por AgenDoc
+```
+
+No deberá competir visualmente con el nombre o logotipo del Consultorio.
+
+### Uso del logotipo
+
+Cuando el Consultorio tenga logotipo:
+
+* deberá mostrarse con proporciones correctas;
+* no deberá deformarse;
+* deberá mantener espacio de seguridad;
+* deberá contar con texto alternativo;
+* no deberá afectar la legibilidad de la navegación.
+
+Cuando no exista logotipo, el nombre público del Consultorio será suficiente para construir la identidad principal.
+
+### Paleta durante el MVP
+
+La Recepción Digital utilizará la paleta oficial de AgenDoc como base.
+
+No se permitirán combinaciones de colores que:
+
+* reduzcan el contraste;
+* afecten la accesibilidad;
+* modifiquen colores de estados;
+* generen inconsistencias entre pantallas.
+
+La personalización avanzada de colores podrá evaluarse en una iteración posterior.
+
+---
+
 ## 6.4 Tokens de Diseño
 
 Con el fin de compartir el mismo Design System entre React Web y React Native, AgenDoc utilizará un conjunto de Design Tokens.
@@ -1858,8 +3831,6 @@ Estos niveles se utilizarán principalmente en:
 - Modales.
 - Menús flotantes.
 - Dropdowns.
-
----
 
 ---
 
@@ -2143,6 +4114,101 @@ Como mínimo el proyecto deberá implementar los siguientes componentes reutiliz
 
 ---
 
+## Componentes requeridos por HU-20
+
+HU-20 deberá reutilizar los componentes base existentes:
+
+* AppButton.
+* AppCard.
+* AppInput.
+* AppSelect cuando corresponda.
+
+Durante la implementación se evaluará incorporar:
+
+* AppAlert.
+* AppLoader o Skeleton.
+* AppEmptyState.
+* AppErrorState.
+* AppAvatar.
+* AppChip o selector de horario.
+
+Un nuevo componente solo deberá crearse cuando:
+
+* exista una necesidad recurrente;
+* reduzca duplicación;
+* mantenga coherencia visual;
+* pueda reutilizarse en posteriores flujos del paciente.
+
+No deberá construirse durante HU-20:
+
+* un editor visual de landing;
+* un sistema completo de temas;
+* un calendario avanzado sin necesidad funcional;
+* un constructor de formularios;
+* un CMS genérico.
+
+---
+
+## Lenguaje y contenido
+
+La Recepción Digital utilizará lenguaje:
+
+* cercano;
+* directo;
+* comprensible;
+* profesional;
+* no técnico.
+
+Se preferirán expresiones como:
+
+* Reservar una cita.
+* Ver especialistas.
+* Consultar horarios.
+* Completar mi perfil.
+* Iniciar sesión.
+
+Se evitarán expresiones como:
+
+* Crear transacción.
+* Registrar entidad.
+* Seleccionar bloque.
+* Autenticarse en el tenant.
+* Error de validación del recurso.
+
+Los términos técnicos permanecerán únicamente en Backend, logs y documentación interna.
+
+La interfaz utilizará el nombre público del Consultorio en mensajes relevantes.
+
+Ejemplo:
+
+> Tu cita en Centro Médico Santa Isabel ya está confirmada.
+
+---
+
+## Privacidad en la experiencia pública
+
+La Recepción Digital deberá solicitar datos personales únicamente después de que el paciente haya seleccionado su Cita.
+
+Los formularios públicos no deberán mostrar información de otros pacientes.
+
+Las respuestas de conflicto no deberán revelar:
+
+* nombre de la cuenta existente;
+* número telefónico;
+* documento;
+* fecha de nacimiento;
+* citas registradas;
+* estado de la cuenta.
+
+La pantalla de confirmación deberá mostrar únicamente la información necesaria para la reserva actual.
+
+Cuando el usuario abandone el flujo antes de confirmar:
+
+* no deberá existir una Cita;
+* no deberá crearse un Usuario;
+* no deberá crearse un Paciente;
+* no deberá considerarse ocupado el horario.
+
 ---
 
 ## 6.6 Arquitectura de Navegación
@@ -2153,37 +4219,96 @@ Cada rol visualizará únicamente las funcionalidades que le corresponden.
 
 La navegación deberá minimizar la cantidad de pasos necesarios para completar las tareas más frecuentes.
 
-### Navegación pública
+### Navegación de la Recepción Digital
 
-Landing
+La navegación pública se ejecutará siempre dentro del contexto de un Consultorio.
 
-↓
+Flujo principal:
 
-Especialidades
-
-↓
-
-Médicos
-
-↓
-
-Disponibilidad
-
-↓
-
-Confirmar primera cita
-
-↓
-
-Registro simplificado
-
-↓
-
+```text
+Recepción Digital
+        ↓
+Explorar especialidades
+        ↓
+Seleccionar especialidad
+        ↓
+Explorar médicos
+        ↓
+Seleccionar Médico
+        ↓
+Seleccionar fecha
+        ↓
+Seleccionar horario
+        ↓
+Revisar resumen
+        ↓
+Registro ultrarrápido
+        ↓
+Confirmar primera reserva
+        ↓
 Reserva confirmada
+        ↓
+Completar perfil o iniciar sesión
+```
 
-↓
+Rutas conceptuales:
 
-Inicio de sesión
+```text
+/{clinicSlug}
+/{clinicSlug}/especialidades
+/{clinicSlug}/medicos
+/{clinicSlug}/reservar
+/{clinicSlug}/registro
+/{clinicSlug}/reserva-confirmada
+/{clinicSlug}/login
+```
+
+Durante el MVP, la navegación podrá implementarse mediante:
+
+* múltiples rutas;
+* una experiencia progresiva dentro de una sola página;
+* una combinación de rutas y pasos.
+
+La decisión de implementación deberá preservar:
+
+* el historial de navegación;
+* la posibilidad de volver al paso anterior;
+* la selección realizada;
+* el contexto del Consultorio;
+* la compatibilidad con dispositivos móviles.
+
+### Navegación directa
+
+La Recepción Digital deberá permitir acceso directo a:
+
+* reservar una cita;
+* conocer especialistas;
+* consultar horarios;
+* iniciar sesión;
+* información de contacto.
+
+La acción principal será:
+
+```text
+Reservar una cita
+```
+
+Las acciones secundarias serán:
+
+* Conocer nuestros especialistas.
+* Consultar horarios.
+* Iniciar sesión.
+
+### Navegación posterior a la reserva
+
+Después de una reserva exitosa, el paciente podrá:
+
+* completar su perfil;
+* iniciar sesión;
+* volver a la Recepción Digital.
+
+El sistema no deberá enviar automáticamente al paciente a una pantalla protegida sin autenticación.
+
 
 ### Navegación del Paciente autenticado
 
@@ -2316,15 +4441,178 @@ La versión Mobile utilizará Bottom Navigation y navegación jerárquica cuando
 
 ## 6.7 Catálogo Oficial de Pantallas del MVP
 
-### Portal Público
+### Recepción Digital del Consultorio
 
-| Pantalla                 | Objetivo                                    | Función principal                           |
-|--------------------------|---------------------------------------------|---------------------------------------------|
-| Landing del consultorio  | Presentar el consultorio                    | Información general                         |
-| Especialidades           | Mostrar especialidades disponibles          | Explorar la oferta médica                   |
-| Médicos                  | Mostrar médicos del consultorio             | Consultar perfiles médicos                  |
-| Solicitar primera cita   | Iniciar el proceso de reserva               | Selección de médico y horario               |
-| Registro                 | Crear una cuenta de nuevo paciente          | Registro simplificado                       |
+| Pantalla                | Objetivo                                        | Función principal                                                      |
+| ----------------------- | ----------------------------------------------- | ---------------------------------------------------------------------- |
+| Recepción Digital       | Presentar el Consultorio y orientar al paciente | Acceso a reserva, especialistas, horarios, contacto e inicio de sesión |
+| Especialidades          | Mostrar la oferta médica disponible             | Seleccionar una especialidad                                           |
+| Médicos                 | Presentar médicos activos del Consultorio       | Seleccionar un Médico                                                  |
+| Disponibilidad          | Mostrar fechas y horarios disponibles           | Seleccionar un Bloque de Agenda                                        |
+| Resumen de reserva      | Revisar la selección antes del registro         | Confirmar Médico, fecha y horario                                      |
+| Registro ultrarrápido   | Crear la cuenta y el perfil inicial             | Capturar datos mínimos                                                 |
+| Confirmación de reserva | Comunicar la creación de la primera Cita        | Mostrar detalle e invitar a completar perfil                           |
+| Completar perfil        | Incorporar información administrativa pendiente | Completar datos del Paciente                                           |
+| Login contextualizado   | Autenticar dentro del Consultorio               | Iniciar sesión con correo y contraseña                                 |
+
+### Pantallas y responsabilidades
+
+#### Recepción Digital
+
+Deberá mostrar:
+
+* identidad del Consultorio;
+* saludo o mensaje de bienvenida;
+* acción principal para reservar;
+* accesos a especialistas y horarios;
+* acceso para iniciar sesión;
+* dirección;
+* teléfono;
+* WhatsApp cuando esté disponible;
+* mapa o enlace de ubicación cuando esté disponible.
+
+La pantalla deberá ser útil incluso cuando parte de la información pública todavía no haya sido configurada.
+
+#### Especialidades
+
+Deberá mostrar únicamente especialidades asociadas a Médicos activos del Consultorio.
+
+Cada especialidad podrá representarse mediante una Card con:
+
+* nombre;
+* descripción breve cuando exista;
+* cantidad o disponibilidad de especialistas, cuando corresponda;
+* acción para ver Médicos.
+
+No deberá mostrar especialidades sin oferta activa si esto produce una experiencia vacía o engañosa.
+
+#### Médicos
+
+Cada Médico podrá mostrarse mediante una Card con:
+
+* nombre completo;
+* especialidad;
+* información profesional básica aprobada;
+* próxima disponibilidad cuando sea posible;
+* acción para consultar horarios.
+
+No deberán mostrarse:
+
+* correo privado;
+* teléfono personal;
+* documento;
+* número de colegiatura cuando no haya sido aprobado para publicación;
+* datos internos de auditoría.
+
+#### Disponibilidad
+
+Deberá permitir:
+
+* seleccionar fecha;
+* consultar horarios disponibles;
+* cambiar de Médico;
+* regresar a especialidades;
+* identificar claramente el horario seleccionado.
+
+Los horarios:
+
+* deberán mostrarse ordenados;
+* no deberán incluir horas pasadas;
+* deberán mostrar únicamente Bloques disponibles;
+* no deberán depender únicamente del color;
+* deberán ser fáciles de seleccionar en dispositivos táctiles.
+
+#### Resumen de reserva
+
+Antes del registro, deberá mostrar:
+
+* Consultorio;
+* Médico;
+* especialidad;
+* fecha;
+* hora de inicio;
+* hora de fin cuando aporte claridad.
+
+Deberá permitir modificar:
+
+* especialidad;
+* Médico;
+* fecha;
+* horario.
+
+El resumen no representa todavía una reserva confirmada.
+
+#### Registro ultrarrápido
+
+Solicitará:
+
+* nombre o nombres;
+* apellido o apellidos;
+* correo electrónico;
+* celular;
+* contraseña;
+* confirmación de contraseña.
+
+No solicitará:
+
+* username;
+* tipo de documento;
+* número de documento;
+* fecha de nacimiento;
+* dirección;
+* información médica.
+
+La pantalla deberá mantener visible un resumen compacto de la Cita seleccionada.
+
+#### Confirmación de reserva
+
+Deberá mostrar:
+
+* confirmación explícita;
+* Consultorio;
+* Médico;
+* especialidad;
+* fecha;
+* hora;
+* estado Programada;
+* orientación para completar el perfil.
+
+Mensaje principal:
+
+> Tu cita ya está confirmada.
+
+Mensaje complementario:
+
+> Antes del día de tu consulta, por favor completa tu perfil para agilizar tu atención.
+
+Acciones:
+
+* Completar mi perfil.
+* Iniciar sesión.
+* Volver al consultorio.
+
+#### Completar perfil
+
+Permitirá ingresar:
+
+* tipo de documento;
+* número de documento;
+* fecha de nacimiento;
+* dirección;
+* información adicional.
+
+El paciente podrá omitir temporalmente este paso después de su primera reserva.
+
+#### Login contextualizado
+
+Mostrará:
+
+* identidad del Consultorio;
+* correo electrónico;
+* contraseña;
+* acción para iniciar sesión.
+
+No mostrará ni solicitará username.
 
 ---
 
@@ -2390,6 +4678,80 @@ El MVP podrá incorporar las siguientes pantallas reutilizables:
 Estas pantallas deberán reutilizar los componentes definidos en el Design System.
 
 ---
+
+## Estructura visual de la Recepción Digital
+
+La pantalla inicial utilizará una estructura simple y orientada a acciones.
+
+### Encabezado
+
+El encabezado podrá incluir:
+
+* logotipo del Consultorio;
+* nombre público;
+* acceso para iniciar sesión;
+* menú compacto en Mobile.
+
+No deberá incluir una navegación extensa durante el MVP.
+
+### Sección principal
+
+La sección principal deberá responder inmediatamente:
+
+* qué Consultorio es;
+* cómo puede ayudar;
+* cuál es la acción principal.
+
+Contenido conceptual:
+
+```text
+Centro Médico Santa Isabel
+
+Bienvenido.
+¿Cómo podemos ayudarte hoy?
+
+[ Reservar una cita ]
+
+[ Conocer nuestros especialistas ]
+[ Consultar horarios ]
+[ Iniciar sesión ]
+```
+
+### Información del Consultorio
+
+Podrá incluir:
+
+* descripción breve;
+* dirección;
+* teléfono;
+* WhatsApp;
+* mapa;
+* horario general.
+
+### Especialidades destacadas
+
+Podrá mostrar una selección de especialidades activas mediante Cards.
+
+La sección deberá incluir acceso para consultar todas las especialidades disponibles.
+
+### Médicos destacados
+
+Podrá mostrar Médicos activos cuando exista información suficiente.
+
+No será obligatorio mostrar todos los Médicos en la pantalla inicial.
+
+### Pie de página
+
+Podrá incluir:
+
+* información de contacto;
+* dirección;
+* acceso al mapa;
+* privacidad;
+* términos;
+* identificación secundaria de AgenDoc.
+
+La estructura deberá adaptarse según la información configurada para el Consultorio.
 
 ---
 
@@ -2508,6 +4870,41 @@ Las reglas de negocio deberán mantenerse idénticas.
 
 ---
 
+## Responsive de la Recepción Digital
+
+### Mobile
+
+* Navegación en una columna.
+* Acción principal visible sin desplazamiento excesivo.
+* Cards apiladas.
+* Horarios mostrados en una cuadrícula táctil.
+* Resumen de reserva compacto.
+* Formulario en una columna.
+* Botón principal de ancho completo cuando corresponda.
+
+### Tablet
+
+* Cards organizadas en dos columnas cuando exista espacio suficiente.
+* Resumen de reserva visible sin desplazar el formulario principal.
+* Navegación simplificada.
+
+### Desktop
+
+* Hero y acciones con mayor espacio visual.
+* Especialidades y Médicos en grids.
+* Formulario y resumen de reserva en dos paneles.
+* Información del Consultorio visible sin saturar la pantalla.
+
+### Wide
+
+* El contenido deberá mantener un ancho máximo.
+* No deberá extenderse indefinidamente.
+* Se priorizará legibilidad sobre ocupación total del espacio.
+
+La secuencia funcional deberá permanecer idéntica en todos los tamaños.
+
+---
+
 ### Consistencia Visual
 
 Todos los módulos deberán reutilizar exclusivamente los componentes definidos en el Design System.
@@ -2539,6 +4936,245 @@ Se adopta la siguiente convención para componentes reutilizables:
 - AppLoader
 - AppEmptyState
 - AppErrorState
+
+---
+
+## Card de especialidad
+
+La Card de especialidad deberá incluir como mínimo:
+
+* nombre;
+* descripción breve opcional;
+* acción para consultar Médicos.
+
+Estados:
+
+* default;
+* hover;
+* focus;
+* selected cuando forme parte del flujo;
+* disabled cuando corresponda.
+
+La Card completa podrá ser interactiva, siempre que:
+
+* mantenga foco visible;
+* pueda activarse mediante teclado;
+* tenga un nombre accesible;
+* no dependa únicamente de un icono.
+
+## Card de Médico
+
+La Card de Médico deberá incluir:
+
+* nombre completo;
+* especialidad;
+* información pública breve;
+* acción para ver disponibilidad.
+
+Podrá incluir:
+
+* iniciales o avatar;
+* próxima fecha disponible;
+* modalidad de atención cuando se incorpore al alcance.
+
+No deberá incluir datos privados ni información que no haya sido aprobada para publicación.
+
+Cuando no exista fotografía, se utilizarán inicialmente las iniciales del Médico.
+
+---
+
+## Selección de fecha
+
+El selector de fecha deberá:
+
+* impedir fechas pasadas;
+* resaltar la fecha seleccionada;
+* permitir cambiar de fecha;
+* mostrar el estado de carga de disponibilidad;
+* funcionar mediante teclado;
+* ser usable en pantallas táctiles.
+
+Durante el MVP podrá utilizarse un control de fecha nativo o un componente simple, siempre que cumpla las necesidades funcionales y de accesibilidad.
+
+No será obligatorio construir un calendario avanzado durante HU-20.
+
+## Selección de horario
+
+Los horarios disponibles se mostrarán mediante botones, Chips seleccionables o controles equivalentes.
+
+Cada opción deberá mostrar:
+
+* hora de inicio;
+* hora de fin cuando sea necesaria;
+* estado de selección.
+
+Reglas visuales:
+
+* el horario seleccionado deberá distinguirse claramente;
+* los horarios no deberán depender únicamente del color;
+* los controles deberán tener tamaño táctil adecuado;
+* la lista deberá reordenarse cronológicamente;
+* un horario que deje de estar disponible deberá retirarse o marcarse claramente antes de una nueva confirmación.
+
+Cuando no exista disponibilidad, deberá mostrarse un estado vacío con acciones para:
+
+* cambiar fecha;
+* seleccionar otro Médico;
+* volver a especialidades.
+
+---
+
+## Formulario de registro ultrarrápido
+
+El formulario utilizará una columna en Mobile.
+
+En Desktop podrá utilizar dos columnas para:
+
+* nombres y apellidos;
+* contraseña y confirmación de contraseña;
+
+siempre que el orden de lectura permanezca claro.
+
+Campos:
+
+* Nombre o nombres.
+* Apellido o apellidos.
+* Correo electrónico.
+* Celular.
+* Contraseña.
+* Confirmar contraseña.
+
+Reglas:
+
+* los labels permanecerán visibles;
+* todos los campos serán obligatorios;
+* el correo utilizará teclado y autocompletado apropiados;
+* el celular utilizará teclado telefónico en Mobile;
+* la contraseña podrá mostrar u ocultar su contenido;
+* la confirmación deberá validarse antes del envío;
+* no deberá existir un campo username;
+* el botón principal permanecerá deshabilitado durante el envío;
+* el usuario deberá recibir retroalimentación clara si ocurre un conflicto.
+
+Texto recomendado antes de confirmar:
+
+> Al reservar, crearemos tu cuenta de paciente en este consultorio.
+
+La aceptación de términos y privacidad deberá incorporarse cuando estén definidos los documentos legales correspondientes.
+
+---
+
+## Resumen persistente de la reserva
+
+Durante los pasos finales, la interfaz deberá mantener visible un resumen de la selección.
+
+Contenido:
+
+* Consultorio;
+* especialidad;
+* Médico;
+* fecha;
+* horario.
+
+En Desktop podrá mostrarse en una Card lateral.
+
+En Mobile podrá mostrarse:
+
+* al inicio del formulario;
+* mediante una Card compacta;
+* mediante una sección expandible.
+
+El resumen deberá permitir editar la selección sin eliminar innecesariamente los datos ya ingresados.
+
+Si el usuario cambia el Médico, la fecha o el horario, el sistema deberá volver a validar la disponibilidad.
+
+---
+
+## Estados visuales de la Recepción Digital
+
+### Consultorio no encontrado
+
+Se mostrará cuando el `clinicSlug` no corresponda a un Consultorio disponible.
+
+El mensaje no deberá exponer información técnica.
+
+Acciones posibles:
+
+* volver al inicio general;
+* verificar el enlace;
+* contactar soporte cuando corresponda.
+
+### Recepción Digital no disponible
+
+Se mostrará cuando el Consultorio exista, pero su portal público esté deshabilitado.
+
+Mensaje sugerido:
+
+> La recepción digital de este consultorio no está disponible temporalmente.
+
+### Cargando información
+
+Se utilizarán Skeletons para:
+
+* identidad del Consultorio;
+* especialidades;
+* Médicos;
+* disponibilidad.
+
+### Estado vacío
+
+Se mostrará cuando:
+
+* no existan especialidades activas;
+* no existan Médicos disponibles;
+* no existan horarios para una fecha.
+
+El estado vacío deberá incluir una acción útil.
+
+### Conflicto de correo
+
+Mensaje sugerido:
+
+> Ya existe una cuenta asociada a este correo en el consultorio.
+
+Acciones:
+
+* Iniciar sesión.
+* Utilizar otro correo.
+
+### Horario ocupado
+
+Mensaje sugerido:
+
+> Este horario acaba de ser reservado. Selecciona otro horario disponible.
+
+La interfaz deberá actualizar la disponibilidad.
+
+### Error inesperado
+
+Mensaje sugerido:
+
+> No pudimos completar la reserva. Tus datos no fueron registrados. Intenta nuevamente.
+
+El mensaje solo podrá asegurar que no hubo registros cuando el Backend confirme el rollback completo.
+
+### Reserva confirmada
+
+La confirmación deberá utilizar una pantalla dedicada.
+
+No deberá depender exclusivamente de un Toast.
+
+---
+
+## Aplicación de HU-20 en Web y Mobile
+
+Las reglas funcionales, contratos de API y criterios de experiencia definidos para HU-20 serán comunes para Web y Mobile.
+
+Durante el Sprint 4, la implementación funcional se realizará inicialmente en el Frontend Web responsive. La implementación nativa en React Native y Expo se realizará cuando el Roadmap active el desarrollo funcional de la aplicación Mobile.
+
+La ausencia temporal de una pantalla nativa Mobile no autoriza reglas diferentes, contratos exclusivos para Web, lógica de negocio en el Frontend ni decisiones que impidan la futura integración Mobile.
+
+La validación responsive deberá cubrir teléfono, tablet y escritorio.
 
 ---
 
@@ -2607,13 +5243,13 @@ El backlog no incluye tareas de implementación detalladas, diseño de APIs, dis
 | FE-03 | EP-02 | Configuración inicial del consultorio | Disponer de los datos mínimos del consultorio base                      | Ninguna             | Must Have   |
 | FE-04 | EP-02 | Gestión inicial de médicos            | Registrar médicos asociados al consultorio                              | FE-03               | Must Have   |
 | FE-05 | EP-02 | Gestión inicial de recepcionistas     | Registrar recepcionistas del consultorio                                | FE-03               | Should Have |
-| FE-06 | EP-03 | Registro público de pacientes         | Permitir que nuevos interesados creen su cuenta desde el Portal Público | FE-01, FE-03        | Must Have   |
+| FE-06 | EP-03 | Incorporación pública de nuevos pacientes | Permitir que un nuevo interesado se registre progresivamente desde la Recepción Digital durante la reserva de su primera cita | FE-03, FE-04, FE-09, FE-10 | Must Have |
 | FE-07 | EP-03 | Registro interno de pacientes         | Permitir que la recepcionista registre pacientes                        | FE-01, FE-03        | Must Have   |
 | FE-08 | EP-03 | Búsqueda de pacientes                 | Buscar pacientes por datos básicos                                      | FE-07               | Must Have   |
 | FE-09 | EP-04 | Configuración de agenda médica        | Crear agenda y bloques de disponibilidad                                | FE-04               | Must Have   |
-| FE-10 | EP-04 | Consulta de disponibilidad            | Visualizar horarios disponibles por médico                              | FE-08               | Must Have   |
-| FE-11 | EP-05 | Reserva de cita por paciente          | Permitir que el paciente reserve una cita                               | FE-01, FE-06, FE-09 | Must Have   |
-| FE-12 | EP-05 | Creación de cita por recepcionista    | Permitir que recepción cree citas para pacientes                        | FE-06, FE-09        | Must Have   |
+| FE-10 | EP-04 | Consulta de disponibilidad            | Visualizar horarios disponibles por médico                              | FE-09               | Must Have   |
+| FE-11 | EP-05 | Reserva digital por paciente          | Permitir la primera reserva pública y las reservas posteriores del paciente autenticado | FE-06, FE-09, FE-10 | Must Have |
+| FE-12 | EP-05 | Creación de cita por recepcionista    | Permitir que recepción cree citas para pacientes                        | FE-07, FE-10        | Must Have   |
 | FE-13 | EP-05 | Consulta de citas                     | Visualizar citas según rol                                              | FE-10, FE-11        | Must Have   |
 | FE-14 | EP-05 | Cancelación de cita                   | Cancelar citas bajo reglas del dominio                                  | FE-12               | Must Have   |
 | FE-15 | EP-05 | Reprogramación de cita                | Cambiar fecha y hora de una cita válida                                 | FE-09, FE-12        | Should Have |
@@ -2826,6 +5462,107 @@ Definition of Done:
 
 ---
 
+#### HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital
+
+Como nuevo interesado
+Quiero ingresar a la Recepción Digital de un consultorio, conocer sus especialistas, seleccionar un horario y registrarme con información mínima
+Para reservar mi primera cita y convertirme automáticamente en paciente del consultorio.
+
+Descripción:
+
+Permite que una persona que todavía no pertenece al Consultorio complete el flujo de incorporación y primera reserva desde la experiencia pública.
+
+El Consultorio se resuelve mediante su identificador público.
+
+La persona podrá explorar especialidades, médicos y disponibilidad antes de proporcionar sus datos personales.
+
+Criterios de aceptación:
+
+* Given una URL con un `clinicSlug` válido
+  When la persona ingresa
+  Then visualiza la identidad pública del Consultorio correspondiente.
+
+* Given un Consultorio activo
+  When consulta la Recepción Digital
+  Then visualiza únicamente sus especialidades, médicos y disponibilidad.
+
+* Given una persona que seleccionó un Médico y un Bloque disponible
+  When avanza al registro
+  Then el sistema solicita únicamente nombres, apellidos, correo, celular, contraseña y confirmación de contraseña.
+
+* Given un registro válido y un Bloque disponible
+  When la persona confirma la reserva
+  Then el sistema crea automáticamente el Usuario, el Paciente y la primera Cita en estado Programada.
+
+* Given una primera reserva exitosa
+  When finaliza la operación
+  Then el Usuario, Paciente, Médico, Bloque y Cita pertenecen al mismo Consultorio.
+
+* Given una reserva exitosa
+  When la Cita se crea
+  Then el Bloque deja de estar disponible.
+
+* Given un correo que ya tiene una cuenta en el Consultorio
+  When se intenta registrar nuevamente
+  Then el sistema informa el conflicto, no crea registros duplicados y ofrece iniciar sesión.
+
+* Given un Bloque reservado por otra persona durante el proceso
+  When se confirma la reserva
+  Then el sistema rechaza la operación y no crea registros parciales.
+
+* Given una operación que falla después de iniciar el registro
+  When la transacción finaliza con error
+  Then no quedan Usuarios, Pacientes, Citas o Bloques inconsistentes.
+
+* Given una reserva exitosa
+  When se muestra la confirmación
+  Then el sistema invita al Paciente a completar su perfil antes de la consulta.
+
+* Given una cuenta creada
+  When el Paciente desea ingresar posteriormente
+  Then puede iniciar sesión con su correo y contraseña dentro del contexto del mismo Consultorio.
+
+Prioridad:
+
+Must Have.
+
+Dependencias:
+
+* HU-03.
+* HU-04.
+* HU-07.
+* HU-08.
+* TS-02.
+* TS-03.
+* TS-04.
+* TS-05.
+
+Estimación:
+
+13 Story Points.
+
+Definition of Done:
+
+* Recepción Digital contextualizada mediante `clinicSlug`.
+* Identidad pública del Consultorio visible.
+* Especialidades y Médicos consultados desde el Backend.
+* Disponibilidad real.
+* Registro ultrarrápido.
+* Correo utilizado como identificador visible.
+* Usuario creado con rol Paciente.
+* Paciente creado y asociado al Usuario.
+* Primera Cita creada en estado Programada.
+* Bloque ocupado de forma segura.
+* Operación transaccional.
+* Conflictos de correo y disponibilidad gestionados.
+* Confirmación visible.
+* Invitación para completar perfil.
+* Flujo responsive.
+* Validaciones de seguridad y aislamiento por Consultorio.
+* Pruebas Backend y Frontend ejecutadas.
+* Flujo validado de extremo a extremo.
+
+---
 ### EP-04 — Agenda médica y disponibilidad
 
 #### HU-07 — Crear bloques de agenda médica
@@ -2904,37 +5641,67 @@ Definition of Done:
 
 ### EP-05 — Gestión de citas médicas
 
-#### HU-09 — Reservar cita como paciente
+#### HU-09 — Reservar una nueva cita como paciente autenticado
 
-Como paciente  
-Quiero reservar una cita con un médico disponible  
-Para asegurar una atención médica en una fecha y hora.
+Como paciente autenticado
+Quiero reservar una nueva cita con un Médico disponible
+Para programar una atención adicional dentro de mi Consultorio.
+
+Descripción:
+
+Permite que un Paciente ya registrado y autenticado reserve citas posteriores sin repetir el proceso de registro público.
 
 Criterios de aceptación:
 
-- Given un paciente autenticado y un bloque disponible  
-  When confirma la reserva  
-  Then se crea una cita en estado Programada asociada al paciente autenticado, médico, consultorio y bloque seleccionados.
+* Given un Paciente autenticado
+  When consulta especialidades y Médicos
+  Then visualiza únicamente información de su Consultorio.
 
-- Given un paciente autenticado  
-  When intenta reservar utilizando datos de otro paciente o consultorio  
+* Given un Paciente autenticado y un Bloque disponible
+  When confirma la reserva
+  Then se crea una Cita en estado Programada asociada al Paciente autenticado.
+
+* Given un Paciente autenticado
+  When intenta reservar utilizando recursos de otro Consultorio
   Then el sistema impide la operación.
 
-- Given un horario no disponible  
-  When intenta reservar  
-  Then el sistema impide la reserva.
+* Given un Bloque ocupado
+  When intenta reservar
+  Then el sistema informa el conflicto y no crea la Cita.
 
-Prioridad: Must Have  
-Dependencias: HU-01, HU-08  
-Estimación: 8 Story Points  
+* Given un Paciente con una Cita activa superpuesta
+  When intenta reservar un horario incompatible
+  Then el sistema impide la operación.
+
+Prioridad:
+
+Must Have.
+
+Dependencias:
+
+* HU-01.
+* HU-08.
+* HU-20.
+* TS-02.
+* TS-03.
+* TS-04.
+* TS-05.
+
+Estimación:
+
+5 Story Points.
 
 Definition of Done:
 
-- Cita asociada a paciente, médico, consultorio y bloque.
-- Estado inicial correcto.
-- Previene doble reserva.
-- Confirmación visible al usuario.
-- Funciona en Web y Mobile.
+* Utiliza al Paciente autenticado.
+* No solicita datos de registro.
+* No recibe `patientId` ni `clinicId` libremente.
+* Crea la Cita en estado Programada.
+* Previene doble reserva.
+* Previene superposición de citas activas.
+* Respeta el Consultorio del SecurityContext.
+* Muestra confirmación visible.
+* Funciona en Web y Mobile.
 
 ---
 
@@ -2988,7 +5755,7 @@ Criterios de aceptación:
   Then visualiza un estado vacío.
 
 Prioridad: Must Have  
-Dependencias: HU-09  
+Dependencias: HU-09, HU-20  
 Estimación: 3 Story Points  
 
 Definition of Done:
@@ -3282,39 +6049,7 @@ Definition of Done:
 
 ---
 
-#### HU-20 — Registro público de paciente
 
-Como nuevo interesado
-
-Quiero confirmar la reserva de mi primera cita desde el Portal Público proporcionando únicamente la información mínima requerida
-
-Para convertirme automáticamente en paciente del consultorio y acceder posteriormente a la plataforma.
-
-Criterios de aceptación:
-
-- Given que aún no pertenezco al consultorio
-  When completo el formulario de registro con la información mínima requerida
-  Then el sistema crea automáticamente mi cuenta de usuario y mi registro de paciente.
-- Given que el correo electrónico o documento ya existen
-  When intento registrarme
-  Then el sistema informa el conflicto y no crea un nuevo registro.
-- Given que el registro fue exitoso
-  When finaliza el proceso
-  Then puedo iniciar sesión y completar mi perfil posteriormente.
-
-Prioridad: Must Have
-Dependencias: HU-03
-Estimación: 5 Story Points
-
-Definition of Done:
-
-- Registro simplificado.
-- Creación automática de Usuario.
-- Creación automática de Paciente.
-- Asociación entre ambos.
-- Compatible con Web y Mobile.
-
----
 
 ## 7.6 Technical Stories
 
@@ -3499,6 +6234,10 @@ Sprint previsto
 
 Sprint 4.
 
+Sprint ejecutado
+
+Sprint 4.
+
 Resultado
 
 - Se implementó autorización por dominio basada en el usuario autenticado.
@@ -3569,7 +6308,7 @@ Resultado
 | HU-06    | Recepción necesita ubicar pacientes para operar.     |
 | HU-07    | Sin bloques de agenda no existe disponibilidad.      |
 | HU-08    | La disponibilidad es requisito para reservar citas.  |
-| HU-09    | Permite el flujo central del paciente.               |
+| HU-09    | Permite que un paciente autenticado reserve nuevas citas sin repetir su incorporación. |
 | HU-10    | Permite el flujo central de recepción.               |
 | HU-11    | El paciente debe visualizar sus citas.               |
 | HU-12    | Recepción debe gestionar la agenda del consultorio.  |
@@ -3577,7 +6316,7 @@ Resultado
 | HU-16    | El médico debe consultar sus citas.                  |
 | HU-17    | La observación básica está incluida en el MVP.       |
 | HU-18    | Permite cerrar el ciclo de atención.                 |
-| HU-20    | Registro público de paciente.                        |
+| HU-20    | Permite captar nuevos pacientes desde la Recepción Digital y completar la primera reserva de extremo a extremo. |
 
 ### Should Have
 
@@ -3612,46 +6351,48 @@ Resultado
 
 ## 7.8 Dependencias funcionales
 
-Secuencia lógica de implementación:
+Secuencia lógica de implementación actualizada:
 
 1. Consultorio base.
 2. Usuarios, roles e inicio de sesión.
 3. Registro de médicos.
-4. Registro y búsqueda de pacientes.
+4. Registro y búsqueda interna de pacientes.
 5. Creación de agenda y bloques.
 6. Consulta de disponibilidad.
-7. Creación de citas.
-8. Consulta de citas por rol.
-9. Cancelación y reprogramación.
-10. Registro de asistencia o inasistencia.
-11. Agenda del médico.
-12. Observación médica básica.
-13. Cita atendida.
-14. Historial básico.
+7. Creación y gestión de citas desde recepción.
+8. Seguridad y autorización por dominio.
+9. Recepción Digital del Consultorio.
+10. Registro ultrarrápido y primera reserva pública.
+11. Reservas posteriores del paciente autenticado.
+12. Consulta de citas por el paciente.
+13. Agenda del médico.
+14. Observación médica básica.
+15. Cita atendida.
+16. Historial básico.
 
 Dependencias principales:
 
-| Historia | Depende de                                      |
-|----------|-------------------------------------------------|
-| HU-01    | Usuarios, roles, consultorio                    |
-| HU-03    | Ninguna                                         |
-| HU-04    | HU-03                                           |
-| HU-05    | HU-01, HU-03                                    |
-| HU-06    | HU-05                                           |
-| HU-07    | HU-04                                           |
-| HU-08    | HU-07                                           |
-| HU-09    | HU-01, HU-08, TS-02, TS-03, TS-04, TS-05, HU-20 |
-| HU-10    | HU-06, HU-08, TS-02, TS-03                      |
-| HU-11    | HU-09, TS-04, TS-05                             |
-| HU-12    | HU-10, TS-03                                    |
-| HU-13    | HU-11, HU-12, TS-04, TS-05                      |
-| HU-14    | HU-08, HU-12                                    |
-| HU-15    | HU-12                                           |
-| HU-16    | HU-10, TS-04, TS-05                             |
-| HU-17    | HU-15, HU-16                                    |
-| HU-18    | HU-17                                           |
-| HU-19    | HU-17                                           |
-| HU-20    | HU-03                                           |
+| Historia | Depende de                                             |
+|----------|--------------------------------------------------------|
+| HU-01    | Usuarios, roles, consultorio                           |
+| HU-03    | Ninguna                                                |
+| HU-04    | HU-03                                                  |
+| HU-05    | HU-01, HU-03                                           |
+| HU-06    | HU-05                                                  |
+| HU-07    | HU-04                                                  |
+| HU-08    | HU-07                                                  |
+| HU-09    | HU-01, HU-08, HU-20, TS-02, TS-03, TS-04, TS-05        |
+| HU-10    | HU-06, HU-08, TS-02, TS-03                             |
+| HU-11    | HU-09, HU-20, TS-04, TS-05                             |
+| HU-12    | HU-10, TS-03                                           |
+| HU-13    | HU-11, HU-12, TS-04, TS-05                             |
+| HU-14    | HU-08, HU-12                                           |
+| HU-15    | HU-12                                                  |
+| HU-16    | HU-10, TS-04, TS-05                                    |
+| HU-17    | HU-15, HU-16                                           |
+| HU-18    | HU-17                                                  |
+| HU-19    | HU-17                                                  |
+| HU-20    | HU-03, HU-04, HU-07, HU-08, TS-02, TS-03, TS-04, TS-05 |
 
 ---
 
@@ -3720,7 +6461,7 @@ Este incremento constituyó el primer Vertical Slice funcional del producto y de
 | Arquitectura del Producto | Respeta Backend como fuente de reglas, Web y Mobile consumiendo la misma API y autorización por rol.                        |
 | UX/UI                     | Considera Design System, navegación por rol, estados vacíos, badges, formularios y accesibilidad.                           |
 
-No se identifican historias duplicadas.
+HU-20 cubre la primera reserva pública de un nuevo interesado. HU-09 cubre las reservas posteriores de un paciente autenticado. No existe duplicidad de responsabilidad entre ambas historias.
 
 El backlog mantiene una secuencia incremental viable.
 
@@ -3736,10 +6477,10 @@ La siguiente matriz resume la relación entre la visión del producto y los elem
 |-----------------------------|--------|----------------------|-------------------------|
 | Gestión segura del acceso   | EP-01  | FE-01, FE-02         | HU-01, HU-02            |
 | Operación del consultorio   | EP-02  | FE-03, FE-04, FE-05  | HU-03, HU-04            |
-| Administración de pacientes | EP-03  | FE-06, FE-07         | HU-05, HU-06, HU-20     |
-| Gestión de disponibilidad   | EP-04  | FE-08, FE-09         | HU-07, HU-08            |
-| Gestión de citas médicas    | EP-05  | FE-10 a FE-15        | HU-09 a HU-15           |
-| Atención médica básica      | EP-06  | FE-16 a FE-19        | HU-16 a HU-19           |
+| Administración de pacientes | EP-03  | FE-06, FE-07, FE-08  | HU-05, HU-06, HU-20     |
+| Gestión de disponibilidad   | EP-04  | FE-09, FE-10         | HU-07, HU-08            |
+| Gestión de citas médicas    | EP-05  | FE-11 a FE-16        | HU-09 a HU-15, HU-20    |
+| Atención médica básica      | EP-06  | FE-17 a FE-20        | HU-16 a HU-19           |
 
 Esta matriz permitirá mantener la trazabilidad entre la estrategia del producto y los incrementos desarrollados durante los Sprints.
 
@@ -4050,7 +6791,401 @@ Prepara la evolución futura hacia un modelo SaaS multiconsultorio.
 
 ### Estado
 
+⚠️ Reemplazado por ADR-018.
+
+---
+
+
+La decisión se conserva por trazabilidad histórica. Su alcance evolucionó y quedó consolidado en ADR-018.
+
+---
+
+## ADR-018 — Recepción Digital multi-consultorio contextualizada mediante slug
+
+
+### Estado
+
 ✅ Aprobado.
+
+### Fecha
+
+2026-08-04.
+
+### Contexto
+
+AgenDoc fue concebido inicialmente para operar el MVP con un consultorio base.
+
+Sin embargo, la visión del producto establece que cada Consultorio deberá contar con una experiencia pública propia desde la cual una persona pueda:
+
+* conocer el Consultorio;
+* consultar especialidades;
+* conocer Médicos;
+* consultar disponibilidad;
+* reservar una primera Cita;
+* registrarse como Paciente;
+* iniciar sesión posteriormente.
+
+El paciente no debe ingresar a una landing genérica de AgenDoc ni seleccionar manualmente el Consultorio al que desea acudir.
+
+La experiencia pública debe sentirse como una extensión digital de la recepción física del Consultorio.
+
+La arquitectura debe soportar inicialmente un Consultorio, pero permanecer preparada para incorporar múltiples Consultorios sin rediseñar el dominio central.
+
+### Problema
+
+La plataforma necesita identificar de forma segura y comprensible el Consultorio al que pertenece una navegación pública.
+
+Utilizar directamente el identificador interno del Consultorio produciría:
+
+* URLs poco legibles;
+* exposición innecesaria de identificadores internos;
+* mayor riesgo de combinación incorrecta de recursos;
+* una experiencia genérica y poco alineada con la identidad del Consultorio;
+* dependencia del Frontend para seleccionar correctamente el contexto organizacional.
+
+También es necesario definir cómo se comportarán:
+
+* el registro de nuevos Pacientes;
+* el login;
+* la identidad pública;
+* la asociación de Usuario y Paciente;
+* la primera reserva;
+* el aislamiento entre Consultorios.
+
+### Decisión
+
+AgenDoc se implementará como una plataforma SaaS multi-consultorio.
+
+Cada Consultorio representará un tenant funcional independiente.
+
+Cada Consultorio tendrá un identificador público único denominado `slug`.
+
+Durante el MVP, el `slug` formará parte de la ruta pública.
+
+Ejemplo:
+
+```text
+agendoc.com/santa-isabel
+```
+
+El Backend resolverá el Consultorio a partir del `slug` y utilizará internamente su identificador persistente.
+
+El paciente no seleccionará ni enviará libremente el `clinicId`.
+
+El `clinicId` permanecerá como identificador interno del dominio y de persistencia.
+
+### Recepción Digital
+
+La experiencia pública de cada Consultorio se denominará **Recepción Digital del Consultorio**.
+
+La Recepción Digital:
+
+* pertenecerá visualmente al Consultorio;
+* utilizará la infraestructura de AgenDoc;
+* mostrará la identidad pública del Consultorio;
+* permitirá consultar especialidades, Médicos y disponibilidad;
+* permitirá reservar la primera Cita;
+* permitirá iniciar sesión dentro del mismo contexto.
+
+AgenDoc podrá mostrarse como proveedor tecnológico secundario, sin competir con la identidad principal del Consultorio.
+
+### Resolución del contexto público
+
+La resolución del Consultorio seguirá este flujo:
+
+```text
+URL pública
+    │
+    ▼
+clinicSlug
+    │
+    ▼
+Resolver Consultorio activo
+    │
+    ▼
+Validar Recepción Digital habilitada
+    │
+    ▼
+Obtener clinicId interno
+    │
+    ▼
+Ejecutar consultas y operaciones dentro del Consultorio
+```
+
+El `slug` permitirá identificar el contexto público, pero no constituirá autorización suficiente.
+
+Toda operación deberá validar que los recursos utilizados pertenezcan al Consultorio resuelto.
+
+### Resolución del contexto autenticado
+
+Después de iniciar sesión, el Consultorio asociado al Usuario y disponible mediante el SecurityContext será la fuente de verdad.
+
+Flujo:
+
+```text
+JWT
+    │
+    ▼
+SecurityContext
+    │
+    ▼
+Usuario autenticado
+    │
+    ▼
+Consultorio asociado
+```
+
+El `slug` podrá mantenerse como parte de la navegación, pero las reglas de autorización no dependerán exclusivamente de él.
+
+### Registro ultrarrápido
+
+El registro inicial del nuevo Paciente solicitará únicamente:
+
+* nombre o nombres;
+* apellido o apellidos;
+* correo electrónico;
+* celular;
+* contraseña;
+* confirmación de contraseña.
+
+No solicitará inicialmente:
+
+* tipo de documento;
+* número de documento;
+* fecha de nacimiento;
+* dirección;
+* información adicional;
+* seguro médico;
+* contacto de emergencia;
+* alergias;
+* antecedentes;
+* medicamentos.
+
+La información pendiente podrá completarse posteriormente desde el perfil.
+
+### Identificador de acceso
+
+El correo electrónico será el identificador visible de acceso para el Paciente.
+
+La interfaz no solicitará un nombre de usuario independiente.
+
+Cuando el modelo mantenga un campo técnico `username`, este será generado automáticamente por el Backend y permanecerá oculto para el usuario.
+
+La construcción técnica podrá incorporar el contexto del Consultorio.
+
+Ejemplo conceptual:
+
+```text
+santa-isabel:paciente@email.com
+```
+
+La autenticación deberá considerar:
+
+* Consultorio;
+* correo normalizado;
+* contraseña.
+
+### Primera reserva
+
+La primera reserva pública se ejecutará como una única operación transaccional.
+
+La operación creará:
+
+* Usuario;
+* Paciente;
+* asociación Usuario-Paciente;
+* asociación con el Consultorio;
+* primera Cita en estado Programada;
+* ocupación del Bloque de Agenda.
+
+Si cualquier paso falla, la operación completa deberá revertirse.
+
+No deberán quedar:
+
+* Usuarios parciales;
+* Pacientes parciales;
+* Citas parciales;
+* asociaciones incompletas;
+* Bloques ocupados incorrectamente.
+
+### Perfil progresivo
+
+Después de reservar, el sistema invitará al Paciente a completar:
+
+* tipo de documento;
+* número de documento;
+* fecha de nacimiento;
+* dirección;
+* información adicional.
+
+La ausencia temporal de estos datos no invalidará al Paciente ni su primera Cita.
+
+Los campos pendientes deberán almacenarse sin valor y no mediante datos ficticios.
+
+### Aislamiento entre Consultorios
+
+Todo recurso del dominio deberá permanecer dentro de un Consultorio.
+
+El Backend deberá validar que:
+
+* Usuario y Paciente pertenezcan al mismo Consultorio;
+* Médico y Agenda pertenezcan al mismo Consultorio;
+* Bloque y Médico pertenezcan al mismo Consultorio;
+* Cita, Paciente, Médico, Agenda y Bloque pertenezcan al mismo Consultorio.
+
+No se permitirá combinar recursos de Consultorios diferentes, aunque sus identificadores sean válidos.
+
+### Alcance del MVP
+
+Durante el MVP:
+
+* se utilizarán rutas basadas en `slug`;
+* no se implementarán subdominios por Consultorio;
+* no se implementarán dominios personalizados;
+* no se implementará un constructor visual de páginas;
+* no se implementará un sistema completo de temas;
+* no se resolverá un mismo Paciente compartido entre varios Consultorios;
+* no se implementará login automático después de la primera reserva;
+* no se incorporará información clínica avanzada al perfil público;
+* no se implementará un modelo global de identidad de pacientes.
+
+### Evolución futura
+
+La arquitectura quedará preparada para evolucionar hacia:
+
+```text
+santa-isabel.agendoc.com
+```
+
+o dominios propios del Consultorio.
+
+También podrá evolucionar hacia un modelo donde una misma persona tenga relación con varios Consultorios.
+
+Estas evoluciones requerirán decisiones adicionales sobre:
+
+* identidad global;
+* asociación Paciente-Consultorio;
+* autenticación;
+* dominios;
+* branding;
+* privacidad;
+* migración de cuentas.
+
+### Consecuencias positivas
+
+* El paciente ingresa directamente al Consultorio.
+* La experiencia pública refuerza la identidad del Consultorio.
+* Se elimina la selección manual del tenant.
+* Las URLs son legibles y fáciles de compartir.
+* El `clinicId` permanece protegido como identificador interno.
+* El Backend controla el contexto organizacional.
+* El registro inicial tiene menos fricción.
+* La primera reserva entrega valor completo.
+* El modelo queda preparado para múltiples Consultorios.
+* La arquitectura autenticada continúa utilizando SecurityContext.
+* La evolución hacia subdominios no requiere rediseñar el dominio principal.
+
+### Consecuencias y restricciones
+
+* El `slug` deberá ser único y estable.
+* Los cambios de `slug` deberán administrarse de forma controlada.
+* Toda API pública deberá recibir o resolver el contexto del Consultorio.
+* Todas las consultas públicas deberán filtrar por Consultorio.
+* El login deberá conocer el contexto del Consultorio.
+* El esquema de Paciente deberá admitir información administrativa pendiente.
+* La creación de Usuario, Paciente y Cita requerirá una transacción coordinada.
+* Las APIs públicas deberán utilizar DTOs específicos.
+* El Frontend deberá preservar el `slug` durante la navegación.
+* Será necesario actualizar migraciones, índices y datos iniciales.
+
+### Alternativas evaluadas
+
+#### Usar `clinicId` en la URL
+
+Rechazada porque:
+
+* expone un identificador interno;
+* produce URLs poco comprensibles;
+* incrementa el riesgo de manipulación;
+* debilita la identidad pública del Consultorio.
+
+#### Mostrar una lista para seleccionar Consultorio
+
+Rechazada porque:
+
+* agrega fricción;
+* rompe la experiencia de Recepción Digital;
+* permite errores de selección;
+* no representa la forma natural en que el paciente llega al Consultorio.
+
+#### Crear una landing genérica de AgenDoc
+
+Rechazada como experiencia principal porque:
+
+* desplaza la identidad del Consultorio;
+* transforma el flujo en una experiencia de marketplace;
+* no representa la visión de recepción digital;
+* obliga a introducir navegación y selección adicionales.
+
+#### Usar subdominios desde el MVP
+
+Postergada porque:
+
+* requiere DNS wildcard;
+* requiere administración adicional de certificados;
+* incrementa la complejidad de despliegue;
+* no aporta valor suficiente para validar el primer incremento.
+
+#### Solicitar el perfil completo antes de reservar
+
+Rechazada porque:
+
+* incrementa el abandono;
+* solicita datos antes de demostrar disponibilidad;
+* no es necesario para crear la primera Cita;
+* contradice el principio de registro progresivo.
+
+#### Solicitar username al Paciente
+
+Rechazada porque:
+
+* agrega un dato artificial;
+* dificulta el registro;
+* el correo ya cumple la función de identificador visible;
+* obliga al usuario a recordar una credencial adicional.
+
+### Resultado
+
+AgenDoc adopta oficialmente un modelo SaaS multi-consultorio basado en una Recepción Digital contextualizada mediante `slug`.
+
+La primera reserva será el flujo principal de incorporación del nuevo Paciente y combinará registro ultrarrápido, creación del perfil inicial y creación transaccional de la primera Cita.
+
+---
+
+## Estabilidad del slug
+
+El `slug` será un identificador público estable.
+
+Durante el MVP:
+
+* deberá definirse al configurar el Consultorio;
+* deberá ser único;
+* deberá almacenarse normalizado;
+* no deberá cambiarse desde una interfaz pública;
+* no deberá generarse automáticamente en cada consulta;
+* no deberá depender del identificador interno.
+
+Un cambio posterior de `slug` podrá afectar:
+
+* enlaces compartidos;
+* marcadores;
+* campañas;
+* rutas del Frontend;
+* referencias externas.
+
+La administración de cambios de `slug`, redirecciones y alias no formará parte del MVP.
+
+Cuando dicha capacidad sea necesaria, deberá diseñarse una estrategia de redirección o conservación de slugs históricos.
 
 ---
 
@@ -4199,16 +7334,17 @@ Product Backlog Items del Sprint
 
 ✅ HU-12 — Consultar agenda del consultorio
 
-### Technical Stories asociadas
+### Technical Stories originalmente asociadas
 
 - TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente.
 - TS-02 — Completar autenticación JWT End-to-End.
 - TS-03 — Implementar contexto del usuario autenticado.
 
+Estas Technical Stories fueron reprogramadas y ejecutadas durante Sprint 4. El cierre funcional de Sprint 2 no dependió de declararlas completadas.
+
 ### Estimación funcional referencial
 
-18 Story Points funcionales
-más las Technical Stories TS-01, TS-02 y TS-03.
+18 Story Points funcionales. Las Technical Stories se gestionaron separadamente y fueron reprogramadas a Sprint 4.
 
 ### Estado
 
@@ -4246,15 +7382,16 @@ Permitir que la recepcionista gestione las principales situaciones operativas de
 - HU-14 — Reprogramar cita.
 - HU-15 — Registrar resultado de asistencia.
 
-### Technical Stories previstas
+### Technical Stories originalmente previstas
 
 - TS-04 — Implementar autorización por dominio.
 - TS-05 — Endurecer seguridad y manejo de accesos no autorizados.
 
+Estas Technical Stories fueron reprogramadas y ejecutadas durante Sprint 4.
+
 ### Estimación funcional referencial
 
-18 Story Points funcionales
-más TS-04 y TS-05.
+18 Story Points funcionales. Las Technical Stories se gestionaron separadamente y fueron reprogramadas a Sprint 4.
 
 Avance
 
@@ -4279,45 +7416,80 @@ Resultado funcional
 
 ---
 
-## Sprint 4 — Experiencia digital del paciente
+## Sprint 4 — Recepción Digital y experiencia del paciente
 
 ### Sprint Goal
 
-Permitir que un nuevo interesado descubra el consultorio desde el Portal Público, se registre como paciente, reserve su primera cita y posteriormente gestione sus propias citas mediante la plataforma.
+Permitir que un nuevo interesado acceda a la Recepción Digital de un Consultorio, conozca su oferta médica, consulte disponibilidad y reserve su primera Cita mediante un registro ultrarrápido.
 
-### Product Backlog Items previstos
+Posteriormente, el Paciente podrá iniciar sesión, reservar nuevas Citas y consultar sus propias Citas.
 
-Sprint 4
+### Product Backlog Items
 
-- TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
-- TS-02 — Completar autenticación JWT End-to-End
-- TS-03 — Implementar contexto del usuario autenticado
-- TS-04 — Implementar autorización por dominio
-- HU-20 - Registro público del paciente
-- HU-09 — Reservar cita como paciente
-- HU-11 — Consultar mis citas como paciente
+#### Habilitadores técnicos
+
+- TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente.
+- TS-02 — Completar autenticación JWT End-to-End.
+- TS-03 — Implementar contexto del usuario autenticado.
+- TS-04 — Implementar autorización por dominio.
+- TS-05 — Endurecer seguridad y manejo de accesos no autorizados.
+
+#### Historias funcionales
+
+- HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital.
+- HU-09 — Reservar una nueva cita como paciente autenticado.
+- HU-11 — Consultar mis citas como paciente.
+
+### Secuencia del Sprint
+
+```text
+TS-01
+   ↓
+TS-02
+   ↓
+TS-03
+   ↓
+TS-04
+   ↓
+TS-05
+   ↓
+HU-20
+   ↓
+HU-09
+   ↓
+HU-11
+```
 
 ### Consideración funcional
 
-La capacidad del paciente para cancelar sus propias citas utilizará la funcionalidad implementada en HU-13, respetando autorización por propietario y estado de la cita.
+La capacidad del Paciente para cancelar sus propias Citas reutilizará HU-13 y las reglas de autorización por propiedad implementadas durante TS-04 y TS-05.
 
 ### Estimación funcional referencial
 
-11 Story Points.
+| Historia | Estimación |
+|----------|-----------:|
+| HU-20    | 13 Story Points |
+| HU-09    | 5 Story Points |
+| HU-11    | 3 Story Points |
+
+Total funcional referencial: **21 Story Points**.
+
+Las Technical Stories se gestionan separadamente como trabajo habilitador.
 
 ### Estado
 
 🚧 En ejecución.
 
-Avance
+### Avance
 
-- ✅ TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente
-- ✅ TS-02 — Completar autenticación JWT End-to-End
-- ✅ TS-03 — Implementar contexto del usuario autenticado
-- ✅ TS-04 — Implementar autorización por dominio
-- ✅ TS-05 — Endurecer seguridad y manejo de accesos no autorizados
-- ⏳ HU-09 — Reservar cita como paciente
-- ⏳ HU-11 — Consultar mis citas como paciente
+- ✅ TS-01 — Configurar entorno de desarrollo multidispositivo y multiambiente.
+- ✅ TS-02 — Completar autenticación JWT End-to-End.
+- ✅ TS-03 — Implementar contexto del usuario autenticado.
+- ✅ TS-04 — Implementar autorización por dominio.
+- ✅ TS-05 — Endurecer seguridad y manejo de accesos no autorizados.
+- 🚧 HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital.
+- ⏳ HU-09 — Reservar una nueva cita como paciente autenticado.
+- ⏳ HU-11 — Consultar mis citas como paciente.
 
 ---
 
@@ -4431,7 +7603,7 @@ Planificado.
 - Se definió JWT como modelo de autenticación.
 - Se definió autorización basada en roles.
 - Se definió una infraestructura inicial con ambientes local, desarrollo y producción.
-- Se definió el uso de Docker y GitHub Actions como base para despliegue y CI/CD.
+- Se consideró Docker como base futura para despliegue y se definió GitHub Actions para CI/CD. Posteriormente se aprobó no utilizar Docker en el desarrollo local del MVP.
 - Se confirmó que integraciones como notificaciones, pagos, historia clínica, facturación y laboratorio quedan fuera del MVP, pero la arquitectura deberá permitir incorporarlas posteriormente.
 
 ---
@@ -4638,6 +7810,52 @@ Decisiones tomadas
 
 Sprint 4
 
+Sesión — Refinamiento de la Recepción Digital y reordenamiento del Sprint 4
+
+Estado
+
+✅ Aprobada
+
+Contexto
+
+Durante el refinamiento de HU-09 se identificó que la reserva de un Paciente autenticado dependía previamente de una experiencia completa de incorporación pública. También se recuperaron decisiones funcionales sobre Recepción Digital propia por Consultorio, registro ultrarrápido, perfil progresivo, correo como identificador de acceso, contexto mediante `slug` y creación transaccional de Usuario, Paciente y primera Cita.
+
+Decisiones tomadas
+
+- AgenDoc se define formalmente como plataforma SaaS multi-consultorio.
+- Cada Consultorio representa un tenant funcional.
+- Se adopta el concepto de Recepción Digital del Consultorio.
+- HU-20 se redefine como el flujo integral de exploración, registro y primera reserva.
+- HU-09 se redefine como la reserva de nuevas Citas por un Paciente ya autenticado.
+- HU-20 pasa a ejecutarse antes de HU-09.
+- El registro inicial solicita únicamente nombres, apellidos, correo, celular y contraseña.
+- El perfil administrativo se completará progresivamente.
+- El correo será el identificador visible de acceso.
+- El `username` permanecerá como detalle técnico oculto.
+- Cada Consultorio tendrá un `slug` público único.
+- Durante el MVP se utilizarán rutas basadas en `slug`.
+- La primera reserva creará Usuario, Paciente y Cita dentro de una única transacción.
+- El `clinicId` no será seleccionado ni enviado libremente por el paciente.
+- Se aprueba ADR-018.
+
+Resultado
+
+El orden funcional del Sprint 4 queda actualizado:
+
+```text
+HU-20
+   ↓
+HU-09
+   ↓
+HU-11
+```
+
+La selección inicial de HU-09 queda reemplazada por este refinamiento aprobado.
+
+---
+
+Sprint 4
+
 Sesión 2 — Cierre de TS-02
 
 Estado
@@ -4728,6 +7946,69 @@ Decisiones tomadas
 - Se eliminaron configuraciones temporales de seguridad utilizadas durante el desarrollo.
 - Se verificó que las respuestas de error no expongan información sensible.
 - La implementación fue validada mediante pruebas funcionales utilizando usuarios con distintos roles y escenarios de acceso autorizado y no autorizado.
-- La plataforma quedó preparada para continuar con el desarrollo de las Historias de Usuario HU-09 y HU-11.
+- La plataforma quedó preparada para iniciar HU-20 y continuar posteriormente con HU-09 y HU-11.
 
 ---
+
+### Sprint 4 — Evolución de la Recepción Digital y arquitectura multi-consultorio
+
+Estado
+
+✅ Aprobada
+
+Fecha
+
+2026-08-04
+
+Decisiones aprobadas:
+
+* AgenDoc se define formalmente como una plataforma SaaS multi-consultorio.
+* Cada Consultorio representa un tenant funcional independiente.
+* Se adopta el concepto de Recepción Digital del Consultorio.
+* La identidad pública principal corresponde al Consultorio.
+* AgenDoc actúa como infraestructura tecnológica secundaria.
+* Cada Consultorio tendrá un `slug` público único.
+* Durante el MVP se utilizarán rutas basadas en `slug`.
+* El `clinicId` permanecerá como identificador interno.
+* El registro inicial del Paciente será ultrarrápido.
+* El perfil se completará progresivamente.
+* El correo será el identificador visible de acceso.
+* El `username` será técnico, automático y oculto.
+* El login se contextualizará por Consultorio.
+* La primera reserva creará Usuario, Paciente y Cita transaccionalmente.
+* HU-20 se redefine como el flujo integral de exploración, registro y primera reserva.
+* HU-09 queda enfocada en reservas posteriores de un Paciente autenticado.
+* Durante el MVP no se implementarán subdominios, dominios personalizados, marketplace, constructor visual ni identidad global de pacientes.
+
+Resultado:
+
+El Blueprint queda preparado para diseñar e implementar HU-20 sobre una arquitectura coherente con la visión SaaS y con la experiencia pública de cada Consultorio.
+
+---
+
+---
+
+## Validación de consistencia v1.13
+
+| Artefacto | Validación |
+|---|---|
+| Product Vision | AgenDoc se define como SaaS multi-consultorio y la Recepción Digital representa el punto de entrada del nuevo Paciente. |
+| MVP Scope | Se mantiene la gestión de Citas como núcleo y no se incorporan pagos, seguros, historia clínica ni funcionalidades avanzadas. |
+| Modelo de Dominio | El Consultorio permanece como agregado organizacional y la Cita como agregado transaccional. |
+| Modelo de Datos | Se incorporan conceptualmente `slug`, identidad pública, perfil progresivo y unicidad contextualizada. |
+| Arquitectura | El contexto público se resuelve mediante `slug` y el autenticado mediante SecurityContext. |
+| Seguridad | El `clinicId` permanece interno y el Backend valida pertenencia al Consultorio. |
+| UX/UI | La identidad principal corresponde al Consultorio y el registro aparece después de seleccionar disponibilidad. |
+| Product Backlog | HU-20 cubre la primera reserva pública y HU-09 las reservas posteriores. |
+| Roadmap | HU-20 se ejecuta antes de HU-09 y HU-11. |
+| ADR | ADR-018 registra la decisión multi-consultorio y sus consecuencias. |
+
+### Resultado
+
+- No existen dos historias responsables de la primera reserva.
+- No existen dos definiciones vigentes de registro público.
+- El registro ultrarrápido y el perfil progresivo mantienen responsabilidades distintas.
+- El modelo público y el modelo autenticado utilizan fuentes de contexto claramente diferenciadas.
+- El alcance se mantiene dentro del MVP.
+- Las evoluciones futuras permanecen explícitamente fuera del Sprint 4.
+

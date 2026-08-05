@@ -7,7 +7,7 @@
 |-----------|---------------------------------------------|
 | Proyecto  | AgenDoc                                     |
 | Documento | Codebase Guide                              |
-| Versión   | v1.8                                        |
+| Versión   | v1.9                                        |
 | Estado    | Vigente                                     |
 | Ubicación | docs/architecture/AgenDoc Codebase Guide.md |
 
@@ -25,7 +25,8 @@ Historial del Documento
 | v1.5     | 2026-08-01 | Codebase Guide TS-02, autenticación JWT End-to-End, protección de APIs y cierre técnico de la autenticación. |
 | v1.6     | 2026-08-02 | Codebase Guide TS-03, contexto del usuario autenticado con SecurityContext y resolución del usuario autenticado en el Backend. |
 | v1.7     | 2026-08-03 | Sincronización de documentación posterior a TS-03. Se actualizó el estado del proyecto para iniciar TS-04 y se alinearon referencias internas Guide. |
-| v1.8     | 2026-08-04 | Codebase Guide TS-04, implementación de autorización por dominio basada en rol, consultorio y propiedad del recurso. Para iniciar TS-05. |
+| v1.8     | 2026-08-04 | Codebase Guide TS-04, implementación de autorización por dominio basada en rol, consultorio y propiedad del recurso. |
+| v1.9     | 2026-08-04 | Sincronización con Blueprint v1.13 y cierre de TS-05. Preparación para HU-20 y Recepción Digital. |
 
 ---
 
@@ -133,11 +134,7 @@ Sprint 4: 🚧 En ejecución
 
 Incremento técnico actual
 
-TS-05 — Endurecer seguridad y manejo de accesos no autorizados
-
-Historia funcional objetivo
-
-HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
+HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital
 
 ---
 
@@ -160,14 +157,14 @@ Avance del MVP
 | TS-02                | ✅ Completada    |
 | TS-03                | ✅ Completada    |
 | TS-04                | ✅ Completada    |
-| TS-05                | ⏳ Pendiente     |
-| Portal del Paciente  | 🚧 En desarrollo |
+| TS-05                | ✅ Completada     |
+| Recepción Digital  | 🚧 En desarrollo |
 | Mobile               | ⏳ Pendiente     |
 | Sprint 5             | ⏳ Pendiente     |
 
 Próximo objetivo
 
-Continuar el Sprint 4 con la implementación de TS-05 — Endurecer seguridad y manejo de accesos no autorizados como último habilitador técnico antes de iniciar HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público.
+Continuar el Sprint 4 con la implementación de TS-05 — Endurecer seguridad y manejo de accesos no autorizados como último habilitador técnico antes de iniciar HU-20 — Explorar consultorios y reservar una primera cita desde el Recepción Digital.
 
 ---
 
@@ -255,7 +252,7 @@ Total implementado:
 | TS-02 | Completar autenticación JWT End-to-End                             | Completada |
 | TS-03 | Implementar contexto del usuario autenticado                       | Completada |
 | TS-04 | Implementar autorización por dominio                               | Completada |
-| TS-05 | Endurecer seguridad y manejo de accesos no autorizados             | Pendiente  |
+| TS-05 | Endurecer seguridad y manejo de accesos no autorizados             | Completada  |
 
 ---
 
@@ -265,11 +262,7 @@ Sprint 4: 🚧 En ejecución
 
 Incremento técnico actual
 
-TS-05 — Endurecer seguridad y manejo de accesos no autorizados
-
-Historia funcional objetivo
-
-HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
+HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital
 
 ---
 
@@ -477,6 +470,11 @@ Esta sección describe cómo se encuentra implementada actualmente la arquitectu
 
 No reemplaza la arquitectura conceptual definida en el AgenDoc Project Blueprint. Su propósito es documentar la materialización de dicha arquitectura dentro del repositorio.
 
+
+## Contexto multi-consultorio implementado
+
+La implementación evoluciona hacia un modelo SaaS multi-consultorio. El contexto del consultorio será resuelto mediante `clinicSlug` en las rutas públicas, mientras que `clinicId` permanecerá como identificador interno del dominio.
+
 ---
 
 ## Visión General
@@ -587,7 +585,7 @@ La siguiente etapa de evolución corresponde a:
 
 - TS-05: Endurecer seguridad y manejo de accesos no autorizados.
 
-La infraestructura de autorización implementada durante TS-04 constituye la base para el Portal Público y para los futuros flujos de autogestión del paciente, permitiendo que las reglas de acceso permanezcan centralizadas y reutilizables conforme evolucione el producto.
+La infraestructura de autorización implementada durante TS-04 constituye la base para el Recepción Digital y para los futuros flujos de autogestión del paciente, permitiendo que las reglas de acceso permanezcan centralizadas y reutilizables conforme evolucione el producto.
 
 ---
 
@@ -1427,7 +1425,7 @@ La cobertura automatizada deberá ampliarse progresivamente en las nuevas Histor
 | Autorización por consultorio             | Implementada |
 | Autorización por propiedad de cita       | Implementada |
 | Infraestructura reutilizable de acceso   | Implementada |
-| Plataforma preparada para Portal Público | Implementada |
+| Plataforma preparada para Recepción Digital | Implementada |
 
 ---
 
@@ -2400,9 +2398,9 @@ Su propósito es fortalecer la arquitectura, la seguridad, la mantenibilidad y l
 
 | Elemento                        | Estado |
 |---------------------------------|--------|
-| Technical Stories implementadas | 4      |
+| Technical Stories implementadas | 5      |
 | Technical Stories en desarrollo | 0      |
-| Technical Stories pendientes    | 1      |
+| Technical Stories pendientes    | 0      |
 
 ---
 
@@ -3167,11 +3165,7 @@ Sprint 4: 🚧 En ejecución
 
 Incremento técnico actual
 
-TS-05 — Endurecer seguridad y manejo de accesos no autorizados
-
-Historia funcional objetivo
-
-HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
+HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital
 
 ---
 
@@ -3224,17 +3218,13 @@ Para iniciar el Sprint 4 deberán mantenerse las siguientes condiciones:
 Sprint 4: 🚧 En ejecución
 
 Incremento técnico actual:
-TS-05 — Endurecer seguridad y manejo de accesos no autorizados
-
-Historia funcional objetivo
-
-HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público
+HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital
 
 ---
 
 ## 18.7 Estado General
 
-El proyecto cuenta con Sprint 3 funcionalmente completado y con la infraestructura de autenticación y autorización consolidada. Sprint 4 se encuentra preparado para iniciar el Portal Público mediante HU-20.
+El proyecto cuenta con Sprint 3 funcionalmente completado y con la infraestructura de autenticación y autorización consolidada. Sprint 4 se encuentra preparado para iniciar el Recepción Digital mediante HU-20.
 
 ---
 

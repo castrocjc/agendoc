@@ -7,7 +7,7 @@
 |-----------|----------------------|
 | Proyecto  | AgenDoc              |
 | Documento | Development Playbook |
-| Versión   | v1.5                 |
+| Versión   | v1.6                 |
 | Estado    | Aprobado             |
 | Vigencia  | Desde Sprint 1       |
 
@@ -92,6 +92,17 @@ Las reglas del negocio pertenecen al Backend.
 ## Consistencia Web y Mobile
 
 Ambos clientes compartirán el mismo comportamiento funcional.
+
+
+## Principios de multi-consultorio
+
+El Playbook adopta las siguientes reglas operativas alineadas con el Blueprint:
+
+- El Blueprint continúa siendo la fuente oficial de decisiones funcionales.
+- Cada Consultorio representa un tenant funcional.
+- La Recepción Digital siempre opera dentro del contexto de un Consultorio.
+- El Backend resuelve el contexto mediante `clinicSlug`; el Frontend nunca envía libremente `clinicId`.
+- El Backend sigue siendo la única fuente de verdad para reglas de negocio, autorización y resolución del contexto.
 
 ---
 
@@ -1067,11 +1078,11 @@ Todos los Sprints futuros deberán seguir este Playbook.
 
 # Sesión actual
 
-Sprint 4 — Portal Público y Captación Digital
+Sprint 4 — Recepción Digital y Experiencia del Paciente
 
 Objetivo:
 
-Continuar la implementación del Portal Público de AgenDoc, permitiendo que nuevos pacientes descubran consultorios, consulten disponibilidad y reserven su primera cita completamente en línea.
+Continuar la implementación del Recepción Digital del Consultorio, permitiendo que nuevos pacientes descubran consultorios, consulten disponibilidad y reserven su primera cita completamente en línea.
 
 La estrategia del producto consolida una experiencia pública que convive con la plataforma autenticada, reutilizando la infraestructura de seguridad ya implementada.
 
@@ -1079,18 +1090,18 @@ Historias completadas:
 
 - TS-03 — Implementar contexto del usuario autenticado.
 - TS-04 — Implementar autorización por dominio.
-- TS-05 — Implementar acceso público y coexistencia de rutas públicas y autenticadas.
+- TS-05 — Endurecer seguridad y manejo de accesos no autorizados.
 
 Resultado:
 
 - Infraestructura de autenticación consolidada.
 - Autorización por dominio implementada.
 - Separación entre rutas públicas y autenticadas implementada.
-- Plataforma preparada para desarrollar funcionalidades del Portal Público.
+- Plataforma preparada para desarrollar funcionalidades del Recepción Digital.
 
 Próximo incremento:
 
-HU-20 — Explorar consultorios y reservar una primera cita desde el Portal Público.
+HU-20 — Explorar consultorios y reservar una primera cita desde el Recepción Digital.
 
 Antes de iniciar:
 
