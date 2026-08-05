@@ -1,5 +1,13 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {
+  useState,
+} from "react";
+import type {
+  ChangeEvent,
+  FormEvent,
+} from "react";
+import {
+  useNavigate,
+} from "react-router-dom";
 import {
   CalendarDays,
   LockKeyhole,
@@ -15,7 +23,10 @@ import {
   AuthenticationError,
   login,
 } from "../services/authService";
-import { saveSession } from "../services/sessionService";
+import {
+  getDefaultRouteForRole,
+  saveSession,
+} from "../services/sessionService";
 
 import "./LoginPage.css";
 
@@ -25,14 +36,15 @@ function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitError, setSubmitError] =
+    useState<string | null>(null);
 
   const isFormValid =
     username.trim().length > 0 &&
     password.trim().length > 0;
 
   async function handleSubmit(
-    event: React.FormEvent<HTMLFormElement>,
+    event: FormEvent<HTMLFormElement>,
   ): Promise<void> {
     event.preventDefault();
 
@@ -50,7 +62,13 @@ function LoginPage() {
       });
 
       saveSession(response);
-      navigate("/dashboard");
+
+      navigate(
+        getDefaultRouteForRole(response.user.role),
+        {
+          replace: true,
+        },
+      );
     } catch (error: unknown) {
       if (error instanceof AuthenticationError) {
         setSubmitError(error.message);
@@ -65,7 +83,7 @@ function LoginPage() {
   }
 
   function handleUsernameChange(
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>,
   ): void {
     setUsername(event.target.value);
 
@@ -75,7 +93,7 @@ function LoginPage() {
   }
 
   function handlePasswordChange(
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: ChangeEvent<HTMLInputElement>,
   ): void {
     setPassword(event.target.value);
 
@@ -104,8 +122,7 @@ function LoginPage() {
             </h1>
 
             <p>
-              La plataforma diseñada para gestionar citas médicas de forma
-              simple, rápida y segura.
+              La plataforma diseñada para gestionar citas médicas de forma simple, rápida y segura.
             </p>
 
             <div className="login-benefits">
@@ -193,7 +210,10 @@ function LoginPage() {
                   role="alert"
                   aria-live="assertive"
                 >
-                  <span className="login-error__icon" aria-hidden="true">
+                  <span
+                    className="login-error__icon"
+                    aria-hidden="true"
+                  >
                     !
                   </span>
 
@@ -213,7 +233,10 @@ function LoginPage() {
 
             <p className="login-footer">
               ¿No tienes una cuenta?{" "}
-              <button type="button" disabled={isSubmitting}>
+              <button
+                type="button"
+                disabled={isSubmitting}
+              >
                 Contacta al administrador
               </button>
             </p>

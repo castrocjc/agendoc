@@ -39,19 +39,19 @@ public class PatientEntity extends BaseEntity {
     @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
-    @Column(name = "document_type", nullable = false, length = 30)
+    @Column(name = "document_type", length = 30)
     private String documentType;
 
-    @Column(name = "document_number", nullable = false, unique = true, length = 50)
+    @Column(name = "document_number", length = 50)
     private String documentNumber;
 
-    @Column(name = "birth_date", nullable = false)
+    @Column(name = "birth_date")
     private LocalDate birthDate;
 
     @Column(name = "phone", nullable = false, length = 30)
     private String phone;
 
-    @Column(name = "email", unique = true, length = 150)
+    @Column(name = "email", length = 150)
     private String email;
 
     @Column(name = "address", length = 250)

@@ -12,31 +12,38 @@ import org.springframework.data.jpa.repository.JpaRepository;
  */
 public interface DoctorRepository extends JpaRepository<DoctorEntity, Long> {
 
-        boolean existsByDocumentNumberIgnoreCase(String documentNumber);
+        boolean existsByDocumentNumberIgnoreCase(
+                        String documentNumber);
 
         boolean existsByMedicalLicenseNumberIgnoreCase(
                         String medicalLicenseNumber);
 
-        boolean existsByEmailIgnoreCase(String email);
+        boolean existsByEmailIgnoreCase(
+                        String email);
 
         Optional<DoctorEntity> findByIdAndRecordStatus(
                         Long id,
                         RecordStatus recordStatus);
 
+        @EntityGraph(attributePaths = { "specialty" })
         Optional<DoctorEntity> findByIdAndClinicIdAndRecordStatus(
-                Long id,
-                Long clinicId,
-                RecordStatus recordStatus
-        );
+                        Long id,
+                        Long clinicId,
+                        RecordStatus recordStatus);
 
         Optional<DoctorEntity> findByUserIdAndClinicIdAndRecordStatus(
-                Long userId,
-                Long clinicId,
-                RecordStatus recordStatus
-        );
+                        Long userId,
+                        Long clinicId,
+                        RecordStatus recordStatus);
 
         @EntityGraph(attributePaths = { "specialty" })
         List<DoctorEntity> findAllByClinicIdAndRecordStatusOrderByLastNameAscFirstNameAsc(
                         Long clinicId,
+                        RecordStatus recordStatus);
+
+        @EntityGraph(attributePaths = { "specialty" })
+        List<DoctorEntity> findAllByClinicIdAndSpecialtyIdAndRecordStatusOrderByLastNameAscFirstNameAsc(
+                        Long clinicId,
+                        Long specialtyId,
                         RecordStatus recordStatus);
 }

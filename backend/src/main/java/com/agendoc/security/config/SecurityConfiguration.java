@@ -25,6 +25,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class SecurityConfiguration {
         private static final String LOGIN_ENDPOINT = "/api/v1/auth/login";
+        private static final String PUBLIC_RECEPTION_ENDPOINTS = "/api/v1/public/**";
         private final List<String> allowedOrigins;
         private final JwtAuthenticationFilter jwtAuthenticationFilter;
         private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
@@ -61,14 +62,22 @@ public class SecurityConfiguration {
                                         )
                                 )
                                 .authorizeHttpRequests(authorize -> {
-                                        authorize
-                                                        .requestMatchers(
-                                                                        HttpMethod.POST,
-                                                                        LOGIN_ENDPOINT)
-                                                        .permitAll();
-                                        authorize
-                                                        .anyRequest()
-                                                        .authenticated();
+                                authorize
+                                        .requestMatchers(
+                                                HttpMethod.POST,
+                                                LOGIN_ENDPOINT
+                                        )
+                                        .permitAll();
+
+                                authorize
+                                        .requestMatchers(
+                                                PUBLIC_RECEPTION_ENDPOINTS
+                                        )
+                                        .permitAll();
+
+                                authorize
+                                        .anyRequest()
+                                        .authenticated();
                                 })
                                 .formLogin(form -> form.disable())
                                 .httpBasic(basic -> basic.disable())

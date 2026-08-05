@@ -125,5 +125,18 @@ public interface AppointmentRepository
                 LocalTime endTime,
                 Collection<String> statusCodes,
                 RecordStatus recordStatus
-        );                        
+        );
+
+        @Query("""
+                SELECT COUNT(appointment) > 0
+                FROM AppointmentEntity appointment
+                WHERE appointment.agendaBlock.id = :agendaBlockId
+                AND appointment.recordStatus = :recordStatus
+                AND appointment.status.code IN :statusCodes
+                """)
+        boolean existsActiveAppointmentByAgendaBlockId(
+                Long agendaBlockId,
+                Collection<String> statusCodes,
+                RecordStatus recordStatus
+        );
 }

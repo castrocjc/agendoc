@@ -1,4 +1,8 @@
-import type { LoginResponse } from "../types/auth.types";
+import type {
+  AuthenticatedUser,
+  LoginResponse,
+  UserRole,
+} from "../types/auth.types";
 
 const SESSION_STORAGE_KEY = "agendoc.auth.session";
 const SESSION_CLEARED_EVENT = "agendoc.auth.session-cleared";
@@ -25,14 +29,27 @@ export function getSession(): LoginResponse | null {
   }
 }
 
+export function getAuthenticatedUser(): AuthenticatedUser | null {
+  return getSession()?.user ?? null;
+}
+
 export function getAccessToken(): string | null {
-  const session = getSession();
+  return getSession()?.accessToken ?? null;
+}
 
-  if (!session?.accessToken) {
-    return null;
+export function getUserRole(): UserRole | null {
+  return getAuthenticatedUser()?.role ?? null;
+}
+
+export function getDefaultRouteForRole(role: UserRole): string {
+  switch (role) {
+    case "RECEPTIONIST":
+      return "/dashboard";
+
+    case "PATIENT":
+    case "DOCTOR":
+      return "/account";
   }
-
-  return session.accessToken;
 }
 
 export function clearSession(): void {

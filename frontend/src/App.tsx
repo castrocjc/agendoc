@@ -5,15 +5,18 @@ import {
   Routes,
 } from "react-router-dom";
 
-import LoginPage from "./features/auth/pages/LoginPage";
+import AccountHomePage from "./features/account/pages/AccountHomePage";
+import MedicalAgendaPage from "./features/agenda/pages/MedicalAgendaPage";
+import AppointmentAgendaPage from "./features/appointment/pages/AppointmentAgendaPage";
+import AppointmentPage from "./features/appointment/pages/AppointmentPage";
 import ProtectedRoute from "./features/auth/components/ProtectedRoute";
+import RoleHomeRedirect from "./features/auth/components/RoleHomeRedirect";
+import LoginPage from "./features/auth/pages/LoginPage";
 import DashboardPage from "./features/dashboard/pages/DashboardPage";
 import RegisterDoctorPage from "./features/doctor/pages/RegisterDoctorPage";
 import RegisterPatientPage from "./features/patient/pages/RegisterPatientPage";
 import SearchPatientPage from "./features/patient/pages/SearchPatientPage";
-import MedicalAgendaPage from "./features/agenda/pages/MedicalAgendaPage";
-import AppointmentPage from "./features/appointment/pages/AppointmentPage";
-import AppointmentAgendaPage from "./features/appointment/pages/AppointmentAgendaPage";
+import PublicReceptionPage from "./features/publicReception/pages/PublicReceptionPage";
 
 function App() {
   return (
@@ -21,7 +24,7 @@ function App() {
       <Routes>
         <Route
           path="/"
-          element={<Navigate to="/login" replace />}
+          element={<RoleHomeRedirect />}
         />
 
         <Route
@@ -30,9 +33,27 @@ function App() {
         />
 
         <Route
+          path="/c/:clinicSlug"
+          element={<PublicReceptionPage />}
+        />
+
+        <Route
+          path="/account"
+          element={
+            <ProtectedRoute
+              allowedRoles={["PATIENT", "DOCTOR"]}
+            >
+              <AccountHomePage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
           path="/dashboard"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              allowedRoles={["RECEPTIONIST"]}
+            >
               <DashboardPage />
             </ProtectedRoute>
           }
@@ -41,7 +62,9 @@ function App() {
         <Route
           path="/doctors/new"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              allowedRoles={["RECEPTIONIST"]}
+            >
               <RegisterDoctorPage />
             </ProtectedRoute>
           }
@@ -50,7 +73,9 @@ function App() {
         <Route
           path="/patients/new"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              allowedRoles={["RECEPTIONIST"]}
+            >
               <RegisterPatientPage />
             </ProtectedRoute>
           }
@@ -59,7 +84,9 @@ function App() {
         <Route
           path="/patients/search"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              allowedRoles={["RECEPTIONIST"]}
+            >
               <SearchPatientPage />
             </ProtectedRoute>
           }
@@ -68,7 +95,9 @@ function App() {
         <Route
           path="/agenda"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              allowedRoles={["RECEPTIONIST"]}
+            >
               <MedicalAgendaPage />
             </ProtectedRoute>
           }
@@ -77,7 +106,9 @@ function App() {
         <Route
           path="/appointments"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              allowedRoles={["RECEPTIONIST"]}
+            >
               <AppointmentAgendaPage />
             </ProtectedRoute>
           }
@@ -86,7 +117,9 @@ function App() {
         <Route
           path="/appointments/new"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute
+              allowedRoles={["RECEPTIONIST"]}
+            >
               <AppointmentPage />
             </ProtectedRoute>
           }
@@ -94,7 +127,7 @@ function App() {
 
         <Route
           path="*"
-          element={<Navigate to="/login" replace />}
+          element={<Navigate to="/" replace />}
         />
       </Routes>
     </BrowserRouter>

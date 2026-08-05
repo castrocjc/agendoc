@@ -13,4 +13,8 @@ public interface ClinicRepository extends JpaRepository<ClinicEntity, Long> {
         Optional<ClinicEntity> findByIdAndRecordStatus(
                         Long id,
                         RecordStatus recordStatus);
+
+        Optional<ClinicEntity> findBySlugAndRecordStatus(
+                        String slug,
+                        RecordStatus recordStatus);
 }

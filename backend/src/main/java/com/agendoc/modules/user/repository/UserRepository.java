@@ -17,5 +17,21 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     );
 
     @EntityGraph(attributePaths = {"clinic", "role"})
+    Optional<UserEntity> findByUsernameIgnoreCase(
+            String username
+    );
+
+    @EntityGraph(attributePaths = {"clinic", "role"})
+    Optional<UserEntity> findByClinicIdAndEmail(
+            Long clinicId,
+            String email
+    );
+
+    boolean existsByClinicIdAndEmail(
+            Long clinicId,
+            String email
+    );
+
+    @EntityGraph(attributePaths = {"clinic", "role"})
     Optional<UserEntity> findWithClinicAndRoleById(Long id);
 }

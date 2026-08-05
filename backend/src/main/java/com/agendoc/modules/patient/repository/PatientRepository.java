@@ -21,24 +21,38 @@ public interface PatientRepository
        boolean existsByEmailIgnoreCase(
                      String email);
 
+       boolean existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                     Long clinicId,
+                     String documentType,
+                     String documentNumber);
+
+       boolean existsByClinicIdAndEmail(
+                     Long clinicId,
+                     String email);
+
+       Optional<PatientEntity> findByClinicIdAndEmailAndRecordStatus(
+                     Long clinicId,
+                     String email,
+                     RecordStatus recordStatus);
+
        Optional<PatientEntity> findByIdAndRecordStatus(
                      Long id,
                      RecordStatus recordStatus);
 
+       Optional<PatientEntity> findByIdAndClinicIdAndRecordStatus(
+                     Long id,
+                     Long clinicId,
+                     RecordStatus recordStatus);
+
        Optional<PatientEntity> findByUserIdAndClinicIdAndRecordStatus(
-              Long userId,
-              Long clinicId,
-              RecordStatus recordStatus
-       );
+                     Long userId,
+                     Long clinicId,
+                     RecordStatus recordStatus);
 
        List<PatientEntity> findAllByClinicIdAndRecordStatusOrderByLastNameAscFirstNameAsc(
                      Long clinicId,
                      RecordStatus recordStatus);
 
-       /**
-        * Searches active patients from a clinic by first name,
-        * last name, full name or document number.
-        */
        @Query("""
                      SELECT patient
                      FROM PatientEntity patient
