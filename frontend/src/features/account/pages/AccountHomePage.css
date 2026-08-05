@@ -157,3 +157,11 @@
     padding: var(--space-5);
   }
 }
+
+.account-home-page__card-content {
+  flex: 1;
+}
+
+.account-home-page__card-content .app-button {
+  margin-top: var(--space-4);
+}

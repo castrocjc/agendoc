@@ -6,6 +6,13 @@ export interface CreateAppointmentRequest {
   notes: string | null;
 }
 
+export interface CreatePatientAppointmentRequest {
+  doctorId: number;
+  agendaBlockId: number;
+  reason: string | null;
+  notes: string | null;
+}
+
 export interface CancelAppointmentRequest {
   reason: string | null;
 }

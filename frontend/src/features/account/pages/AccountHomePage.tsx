@@ -113,18 +113,30 @@ function AccountHomePage() {
               <CalendarCheck2 size={25} />
             </span>
 
-            <div>
+            <div className="account-home-page__card-content">
               <h2>
                 {isPatient
-                  ? "Tus citas"
+                  ? "Reservar una cita"
                   : "Tu espacio de trabajo"}
               </h2>
 
               <p>
                 {isPatient
-                  ? "La consulta y administración de tus citas estará disponible en una próxima historia del portal del paciente."
+                  ? "Consulta médicos, revisa horarios disponibles y reserva una nueva cita."
                   : "El portal específico para tu rol estará disponible en una próxima historia."}
               </p>
+
+              {isPatient && (
+                <AppButton
+                  type="button"
+                  fullWidth={false}
+                  onClick={() => {
+                    navigate("/account/appointments/new");
+                  }}
+                >
+                  Reservar cita
+                </AppButton>
+              )}
             </div>
           </AppCard>
         </section>

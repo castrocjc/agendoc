@@ -11,6 +11,7 @@ import type {
   AppointmentResponse,
   CancelAppointmentRequest,
   CreateAppointmentRequest,
+  CreatePatientAppointmentRequest,
   RegisterAppointmentNoShowRequest,
   RescheduleAppointmentRequest,
 } from "../types/appointment.types";
@@ -33,6 +34,7 @@ export class AppointmentServiceError extends Error {
 
 type AppointmentOperation =
   | "create"
+  | "createPatient"
   | "find"
   | "cancel"
   | "confirmArrival"
@@ -43,6 +45,28 @@ function getUserMessage(
   status: number,
   operation: AppointmentOperation,
 ): string {
+  if (operation === "createPatient") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "Revisa el médico, el horario y la información de la cita.";
+
+      case 403:
+        return "Tu cuenta no tiene autorización para reservar citas.";
+
+      case 404:
+        return "El médico o el horario seleccionado ya no se encuentra disponible.";
+
+      case 409:
+        return "El horario seleccionado ya fue reservado o coincide con otra cita programada.";
+
+      default:
+        return "No fue posible reservar tu cita. Inténtalo nuevamente.";
+    }
+  }
+
   if (operation === "find") {
     switch (status) {
       case 0:
@@ -203,6 +227,22 @@ export async function createAppointment(
     );
   } catch (error) {
     throw mapServiceError(error, "create");
+  }
+}
+
+export async function createPatientAppointment(
+  request: CreatePatientAppointmentRequest,
+): Promise<AppointmentResponse> {
+  try {
+    return await apiPost<
+      AppointmentResponse,
+      CreatePatientAppointmentRequest
+    >(
+      "/api/v1/appointments/patient",
+      request,
+    );
+  } catch (error) {
+    throw mapServiceError(error, "createPatient");
   }
 }
 

@@ -7,7 +7,7 @@
 |--------|-------|
 | Proyecto | AgenDoc |
 | Documento | Project Summary |
-| Versión | v1.1 |
+| Versión | v1.2 |
 | Estado | Vigente |
 | Ubicación | docs/project/AgenDoc Project Summary.md |
 
@@ -19,6 +19,7 @@
 |----------|--------|-------------|
 | v1.0 | Agosto 2026 | Creación del documento maestro del proyecto. |
 | v1.1 | Agosto 2026 | Incorporación del Product Backlog Maestro, resumen ejecutivo y reorganización del documento para soportar documentación modular por historias. |
+| v1.2 | Agosto 2026 | Incorporación de la HU-09 — Reservar una nueva cita como paciente autenticado y actualización del estado funcional del Portal del Paciente. |
 
 ---
 
@@ -29,8 +30,10 @@ Este documento constituye el punto único de entrada al proyecto.
 Resume el estado funcional, técnico y arquitectónico de AgenDoc y sirve como referencia para iniciar nuevas sesiones de desarrollo.
 
 Toda la información detallada de implementación se registra individualmente en:
-docs/project/history/
 
+```
+docs/project/history/
+```
 
 ---
 
@@ -42,8 +45,8 @@ docs/project/history/
 |-----------|------:|
 | Foundation | ✅ Completada |
 | Sprint actual | Sprint 4 |
-| Sprints completados | 4 |
-| Historias funcionales completadas | 13 / 20 |
+| Sprints completados | 3 |
+| Historias funcionales completadas | 14 / 20 |
 | Habilitadores técnicos | 5 / 5 |
 | Estado general | Desarrollo activo |
 
@@ -51,7 +54,7 @@ docs/project/history/
 
 ## Última historia completada
 
-**HU-20 — Explorar el consultorio y reservar una primera cita desde la Recepción Digital**
+**HU-09 — Reservar una nueva cita como paciente autenticado**
 
 Estado
 
@@ -61,7 +64,7 @@ Estado
 
 ## Próxima historia
 
-**HU-09 — Reservar una nueva cita como paciente autenticado**
+**HU-11 — Consultar mis citas como paciente**
 
 Estado
 
@@ -122,7 +125,7 @@ El desarrollo sigue una estrategia incremental basada en Historias de Usuario.
 
 | Historia | Estado |
 |----------|--------|
-| HU-09 — Reservar una nueva cita como paciente autenticado | ⏳ |
+| HU-09 — Reservar una nueva cita como paciente autenticado | ✅ |
 | HU-10 — Crear cita desde recepción | ✅ |
 | HU-11 — Consultar mis citas como paciente | ⏳ |
 | HU-12 — Consultar agenda del consultorio | ✅ |
@@ -178,6 +181,10 @@ El desarrollo sigue una estrategia incremental basada en Historias de Usuario.
 - React Router
 - Arquitectura Feature Based
 - Componentes reutilizables
+- Diseño Responsive
+- Mobile First
+- Portal del Paciente autenticado
+- Reutilización de componentes entre experiencias públicas y autenticadas
 
 ## Backend
 
@@ -188,6 +195,10 @@ El desarrollo sigue una estrategia incremental basada en Historias de Usuario.
 - Spring Data JPA
 - JWT
 - Arquitectura Modular
+- DTOs mediante Records
+- Constructor Injection
+- Authorization Policies
+- Domain Authorization
 
 ## Persistencia
 
@@ -202,173 +213,320 @@ El desarrollo sigue una estrategia incremental basada en Historias de Usuario.
 - Clinic Isolation
 - Domain Authorization
 - Public Endpoints Controlados
-
----
+- Contexto autenticado por dominio
+- Autorización por consultorio
 
 # 7. Estado funcional
 
-## Autenticación
+## Recepción Digital (Pública)
 
-✅ Completa
+Estado
 
-Incluye Login, Logout, JWT, Protected Routes, manejo de sesión y redirección por rol.
+✅ Completamente implementada
 
-## Gestión de Médicos
+Capacidades disponibles:
 
-✅ Completa
+- Landing pública del consultorio mediante URL personalizada.
+- Visualización de información pública del consultorio.
+- Catálogo público de especialidades.
+- Catálogo público de médicos.
+- Consulta de disponibilidad médica.
+- Registro del primer paciente.
+- Creación automática del usuario.
+- Reserva automática de la primera cita.
+- Inicio del ciclo de vida del paciente dentro de AgenDoc.
 
-## Gestión de Pacientes
+---
 
-✅ Completa
+## Portal de Recepción
 
-## Agenda Médica
+Estado
 
-✅ Completa
+✅ Operativo
 
-## Gestión de Citas
+Capacidades disponibles:
 
-✅ Completa para recepción.
+- Registro de pacientes.
+- Búsqueda de pacientes.
+- Registro de médicos.
+- Creación de agendas médicas.
+- Consulta de disponibilidad.
+- Creación de citas.
+- Consulta de agenda diaria.
+- Cancelación de citas.
+- Reprogramación de citas.
+- Confirmación de llegada.
+- Registro de inasistencia.
 
-Pendiente el Portal del Paciente.
-
-## Recepción Digital
-
-✅ HU-20 completada.
-
-Incluye:
-
-- Portal público
-- Identidad pública del consultorio
-- Especialidades
-- Médicos
-- Disponibilidad
-- Wizard de reserva
-- Registro automático del paciente
-- Creación automática del usuario
-- Primera cita
-- Responsive
-- Mobile Ready
+---
 
 ## Portal del Paciente
 
-🚧 En construcción
+Estado
 
-Incluye actualmente:
+🚧 Parcialmente implementado
 
-- Home del paciente
-- Redirección automática por rol
+Capacidades disponibles:
+
+- Inicio de sesión.
+- Acceso mediante JWT.
+- Contexto autenticado.
+- Consulta de médicos.
+- Consulta de disponibilidad.
+- Reserva de nuevas citas utilizando el paciente autenticado.
+- Navegación propia del paciente.
+- Experiencia visual consistente con la Recepción Digital.
 
 Pendiente:
 
-- Mis citas
-- Reservar citas
-- Cancelar citas
-- Perfil
-- Cambio de contraseña
+- HU-11 — Consultar mis citas.
+- HU-13 — Cancelación desde el portal del paciente (backend disponible, interfaz pendiente).
+- Mejoras futuras sobre historial y seguimiento.
 
 ---
 
-# 8. Estado técnico
+## Portal del Médico
+
+Estado
+
+⏳ No iniciado
+
+Historias planificadas:
+
+- HU-16
+- HU-17
+- HU-18
+- HU-19
+
+---
+
+# 8. Arquitectura funcional implementada
+
+Actualmente existen cuatro experiencias claramente diferenciadas.
+
+## Recepción Digital
+
+Acceso público.
+
+No requiere autenticación.
+
+Permite convertir visitantes en pacientes registrados.
+
+---
+
+## Recepción
+
+Acceso autenticado.
+
+Rol:
+
+RECEPTIONIST
+
+Funciones administrativas del consultorio.
+
+---
+
+## Paciente
+
+Acceso autenticado.
+
+Rol:
+
+PATIENT
+
+Actualmente permite:
+
+- consultar médicos,
+- consultar disponibilidad,
+- reservar nuevas citas.
+
+---
+
+## Médico
+
+Reservado para Sprint 5.
+
+---
+
+# 9. Principios arquitectónicos
+
+Durante todo el desarrollo del proyecto se mantienen las siguientes reglas.
 
 ## Backend
 
-- Arquitectura modular
-- Controllers
-- Services
-- DTO Records
-- Authorization Policies
-- Exception Handling
-- Seguridad por dominio
+- Arquitectura modular.
+- Servicios desacoplados.
+- DTOs mediante Records.
+- Constructor Injection.
+- Domain Authorization.
+- Authorization Policies.
+- Validaciones de negocio dentro del Service.
+- Controladores delgados.
+- Repositorios exclusivamente para acceso a datos.
+- Sin lógica de negocio en Controllers.
+
+---
 
 ## Frontend
 
-- Arquitectura Feature Based
-- Componentes reutilizables
-- Diseño Responsive
-- Servicios desacoplados
-- Wizard de navegación
-- Tipado completo
+- Arquitectura Feature Based.
+- Separación estricta entre:
+  - Pages
+  - Components
+  - Services
+  - Types
+  - Validation
+- Componentes reutilizables.
+- Diseño Responsive.
+- Mobile First.
+- Consistencia visual entre módulos.
+- Manejo homogéneo de errores.
+- Consumo tipado de APIs.
 
 ---
 
-# 9. Base de datos
+# 10. Estado de calidad
 
-Motor
+## Backend
 
-PostgreSQL
+Estado
 
-Migración vigente
+✅ Estable
 
-V12
-
----
-
-# 10. Calidad
-
-Backend
-
-- 140 pruebas automatizadas exitosas.
-
-Frontend
-
-- ESLint
-- TypeScript
-- Production Build
-
-Pruebas funcionales
-
-- Flujo End-to-End validado para HU-20.
+- 140 pruebas automáticas.
+- BUILD SUCCESS.
+- Sin errores.
+- Seguridad endurecida.
+- Autorización por dominio implementada.
 
 ---
 
-# 11. Documentación oficial
+## Frontend
 
-Documentación permanente
+Estado
 
-- AgenDoc Project Summary
+✅ Estable
+
+- ESLint sin errores.
+- Build exitoso.
+- TypeScript limpio.
+- Navegación validada.
+- Componentes reutilizables.
+
+---
+
+# 11. Funcionalidades incorporadas durante HU-09
+
+La historia HU-09 añadió una segunda experiencia de reserva de citas.
+
+Anteriormente existía únicamente la reserva realizada por recepción.
+
+Ahora también existe la reserva realizada por el paciente autenticado.
+
+La implementación reutiliza prácticamente toda la lógica del backend existente.
+
+Las diferencias principales son:
+
+Backend:
+
+- nuevo endpoint:
+
+```
+
+POST /api/v1/appointments/patient
+
+```
+
+- uso del contexto autenticado para obtener:
+  - clinicId
+  - patientId
+
+- eliminación del patientId del request.
+
+Frontend:
+
+Nuevo módulo:
+
+```
+
+features/patientAppointment
+
+```
+
+Compuesto por:
+
+- pages
+- types
+- validation
+
+Se reutilizan completamente:
+
+- DoctorService
+- AgendaService
+- AppointmentService
+
+El flujo visual replica la experiencia de la Recepción Digital, adaptándola al contexto de un usuario autenticado.
+
+---
+
+# 12. Organización documental
+
+La documentación oficial del proyecto está compuesta por:
+
+## Documentos estratégicos
+
+- AgenDoc Project Blueprint
 - AgenDoc Development Playbook
-- AgenDoc Codebase Guide
 - UI Design Guide
-
-Documentación evolutiva
-docs/
-
-architecture/
-product/
-ux/
-
-project/
-
-AgenDoc Project Summary.md
-
-history/
-
-HU-01 - ...
-HU-02 - ...
-...
-HU-20 - Public Digital Reception.md
-HU-09 - Reservar una nueva cita como paciente autenticado.md
-
+- AgenDoc Codebase Guide
+- AgenDoc Project Summary
 
 ---
 
-# 15. Flujo documental
+## Historial técnico
 
-Al finalizar cada Historia de Usuario:
+Cada historia funcional completada posee su propia documentación dentro de:
 
-1. Actualizar Project Summary.
-2. Crear o actualizar el documento de la historia.
-3. Ejecutar pruebas.
-4. Sincronizar documentación oficial.
-5. Versionar.
+```
+
+docs/project/history/
+
+```
+
+Esto permite mantener el documento maestro compacto y facilitar la trazabilidad histórica del proyecto.
 
 ---
 
-# 16. Observaciones
+# 13. Próximos pasos
 
-Este documento resume únicamente el estado vigente del proyecto.
+La siguiente historia planificada es:
 
-Las decisiones de implementación, pruebas, incidencias, cambios arquitectónicos y resultados de cada incremento se documentan exclusivamente en el archivo correspondiente de cada Historia de Usuario.
+## HU-11
 
-El objetivo es mantener este documento como el punto de entrada oficial al proyecto, facilitando el inicio de nuevas sesiones de desarrollo sin depender de la documentación histórica completa.
+Consultar mis citas como paciente.
+
+Objetivos principales:
+
+- listado de citas del paciente autenticado;
+- filtros por estado;
+- orden cronológico;
+- visualización del médico y especialidad;
+- reutilización del contexto autenticado;
+- preparación para cancelación desde el Portal del Paciente.
+
+---
+
+# 14. Estado final
+
+El proyecto mantiene un alto nivel de consistencia arquitectónica entre backend y frontend.
+
+Actualmente se dispone de tres experiencias funcionales:
+
+- Recepción Digital pública.
+- Portal de Recepción.
+- Portal del Paciente.
+
+La seguridad se basa en autenticación JWT, autorización por rol y aislamiento por dominio de consultorio.
+
+La reutilización de servicios y componentes permite acelerar el desarrollo de nuevas funcionalidades manteniendo una experiencia de usuario uniforme y una arquitectura escalable.
 
