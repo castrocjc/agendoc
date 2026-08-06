@@ -222,6 +222,15 @@ function DoctorAgendaPage() {
     setSelectedAppointment(null);
   }
 
+  function handleAppointmentAttended(): void {
+    setSelectedAppointment(null);
+
+    void loadAppointments(
+      selectedDate,
+      selectedStatus,
+    );
+  }
+
   return (
     <main className="doctor-agenda-page">
       <header className="doctor-agenda-page__header">
@@ -528,6 +537,7 @@ function DoctorAgendaPage() {
         appointment={selectedAppointment}
         open={selectedAppointment !== null}
         onClose={handleCloseMedicalObservation}
+        onAttended={handleAppointmentAttended}
       />
     </main>
   );

@@ -1564,6 +1564,306 @@ class AppointmentServiceImplTest {
         }
 
         @Test
+        void shouldMarkConfirmedAppointmentAsAttended() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity confirmedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CONFIRMADA,
+                                                "Confirmada");
+
+                AppointmentStatusEntity attendedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.ATENDIDA,
+                                                "Atendida");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                confirmedStatus);
+
+                appointment.setMedicalObservation(
+                                "Paciente atendido con evolución favorable.");
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                when(appointmentStatusRepository
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.ATENDIDA.name(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(attendedStatus));
+
+                when(appointmentRepository.save(appointment))
+                                .thenReturn(appointment);
+
+                AppointmentResponse response =
+                                appointmentService.markAppointmentAsAttended(
+                                                appointment.getId());
+
+                assertThat(appointment.getStatus())
+                                .isSameAs(attendedStatus);
+
+                assertThat(appointment.getMedicalObservation())
+                                .isEqualTo(
+                                                "Paciente atendido con evolución favorable.");
+
+                assertThat(response.statusCode())
+                                .isEqualTo(
+                                                AppointmentStatusCode.ATENDIDA.name());
+
+                assertThat(response.statusName())
+                                .isEqualTo("Atendida");
+
+                assertThat(agendaBlock.getAvailable())
+                                .isFalse();
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.DOCTOR);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentStatusRepository)
+                                .findByCodeAndRecordStatus(
+                                                AppointmentStatusCode.ATENDIDA.name(),
+                                                RecordStatus.ACTIVE);
+
+                verify(appointmentRepository)
+                                .save(appointment);
+        }
+
+        @Test
+        void shouldRejectAttendingScheduledAppointment() {
+
+                assertMarkAsAttendedRejectedForStatus(
+                                AppointmentStatusCode.PROGRAMADA,
+                                "Programada");
+        }
+
+        @Test
+        void shouldRejectAttendingAttendedAppointment() {
+
+                assertMarkAsAttendedRejectedForStatus(
+                                AppointmentStatusCode.ATENDIDA,
+                                "Atendida");
+        }
+
+        @Test
+        void shouldRejectAttendingCancelledAppointment() {
+
+                assertMarkAsAttendedRejectedForStatus(
+                                AppointmentStatusCode.CANCELADA,
+                                "Cancelada");
+        }
+
+        @Test
+        void shouldRejectAttendingNoShowAppointment() {
+
+                assertMarkAsAttendedRejectedForStatus(
+                                AppointmentStatusCode.NO_ASISTIO,
+                                "No asistió");
+        }
+
+        @Test
+        void shouldRejectAttendingAppointmentWithoutMedicalObservation() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity confirmedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CONFIRMADA,
+                                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                confirmedStatus);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(() ->
+                                appointmentService.markAppointmentAsAttended(
+                                                appointment.getId()))
+                                .isInstanceOf(BadRequestException.class)
+                                .hasMessage(
+                                                "Debe registrar una observación médica antes de marcar la cita como atendida.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRejectAttendingUnknownAppointment() {
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                99L,
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.empty());
+
+                assertThatThrownBy(() ->
+                                appointmentService.markAppointmentAsAttended(
+                                                99L))
+                                .isInstanceOf(ResourceNotFoundException.class)
+                                .hasMessage(
+                                                "La cita seleccionada no está disponible.");
+
+                verify(appointmentAuthorizationPolicy, never())
+                                .requireSameClinic(
+                                                any(),
+                                                any());
+
+                verify(appointmentAuthorizationPolicy, never())
+                                .requireAssignedDoctor(
+                                                any(),
+                                                any());
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRejectAttendingAppointmentAssignedToAnotherDoctor() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity confirmedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CONFIRMADA,
+                                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                confirmedStatus);
+
+                appointment.setMedicalObservation(
+                                "Observación médica registrada.");
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                org.mockito.Mockito.doThrow(
+                                new ResourceNotFoundException(
+                                                "La cita seleccionada no está disponible."))
+                                .when(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                assertThatThrownBy(() ->
+                                appointmentService.markAppointmentAsAttended(
+                                                appointment.getId()))
+                                .isInstanceOf(ResourceNotFoundException.class)
+                                .hasMessage(
+                                                "La cita seleccionada no está disponible.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
         void shouldCancelScheduledAppointment() {
 
                 ClinicEntity clinic = createClinic();
@@ -3265,6 +3565,71 @@ class AppointmentServiceImplTest {
 
                 assertThat(agendaBlock.getAvailable())
                                 .isFalse();
+
+                verify(appointmentStatusRepository, never())
+                                .findByCodeAndRecordStatus(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        private void assertMarkAsAttendedRejectedForStatus(
+                        AppointmentStatusCode statusCode,
+                        String statusName) {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity currentStatus =
+                                createAppointmentStatus(
+                                                statusCode,
+                                                statusName);
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                currentStatus);
+
+                appointment.setMedicalObservation(
+                                "Observación médica registrada.");
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(() ->
+                                appointmentService.markAppointmentAsAttended(
+                                                appointment.getId()))
+                                .isInstanceOf(ConflictException.class)
+                                .hasMessage(
+                                                "La cita no puede marcarse como atendida en su estado actual.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
 
                 verify(appointmentStatusRepository, never())
                                 .findByCodeAndRecordStatus(

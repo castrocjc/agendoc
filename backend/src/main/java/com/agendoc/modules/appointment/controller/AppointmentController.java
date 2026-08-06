@@ -154,6 +154,20 @@ public class AppointmentController {
         }
 
         @PreAuthorize("hasRole('DOCTOR')")
+        @PatchMapping("/{appointmentId}/attend")
+        public ResponseEntity<AppointmentResponse>
+                markAppointmentAsAttended(
+                        @PathVariable Long appointmentId) {
+
+                AppointmentResponse response =
+                        appointmentService.markAppointmentAsAttended(
+                                appointmentId
+                        );
+
+                return ResponseEntity.ok(response);
+        }
+
+        @PreAuthorize("hasRole('DOCTOR')")
         @GetMapping("/doctor")
         public ResponseEntity<List<AppointmentAgendaResponse>>
                 findDoctorAppointments(

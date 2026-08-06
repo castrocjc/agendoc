@@ -57,4 +57,7 @@ public interface AppointmentService {
         MedicalObservationResponse registerMedicalObservation(
                 Long appointmentId,
                 RegisterMedicalObservationRequest request);
+
+        AppointmentResponse markAppointmentAsAttended(
+                Long appointmentId);
 }

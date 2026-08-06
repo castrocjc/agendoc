@@ -96,6 +96,15 @@ public class AppointmentServiceImpl implements AppointmentService {
         private static final String MEDICAL_OBSERVATION_NOT_ALLOWED =
                 "La observación médica no puede registrarse en el estado actual de la cita.";
 
+        private static final String APPOINTMENT_CANNOT_BE_MARKED_AS_ATTENDED =
+                "La cita no puede marcarse como atendida en su estado actual.";
+
+        private static final String MEDICAL_OBSERVATION_REQUIRED =
+                "Debe registrar una observación médica antes de marcar la cita como atendida.";
+
+        private static final String ATTENDED_STATUS_NOT_AVAILABLE =
+                "El estado de atención de la cita no está disponible.";
+
         private final AppointmentRepository appointmentRepository;
         private final AppointmentRescheduleHistoryRepository appointmentRescheduleHistoryRepository;
         private final AppointmentStatusRepository appointmentStatusRepository;
@@ -200,6 +209,66 @@ public class AppointmentServiceImpl implements AppointmentService {
                         );
 
                 return toMedicalObservationResponse(
+                        savedAppointment
+                );
+        }
+
+        @Override
+        @Transactional
+        public AppointmentResponse markAppointmentAsAttended(
+                Long appointmentId) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR
+                        );
+
+                AppointmentEntity appointment =
+                        appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                        appointmentId,
+                                        context.clinicId(),
+                                        RecordStatus.ACTIVE
+                                )
+                                .orElseThrow(() ->
+                                        new ResourceNotFoundException(
+                                                APPOINTMENT_NOT_AVAILABLE
+                                        )
+                                );
+
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        appointment
+                );
+
+                appointmentAuthorizationPolicy.requireAssignedDoctor(
+                        context,
+                        appointment
+                );
+
+                validateAppointmentCanBeMarkedAsAttended(
+                        appointment
+                );
+
+                validateMedicalObservationExists(
+                        appointment
+                );
+
+                AppointmentStatusEntity attendedStatus =
+                        findAppointmentStatus(
+                                AppointmentStatusCode.ATENDIDA
+                        );
+
+                appointment.setStatus(
+                        attendedStatus
+                );
+
+                AppointmentEntity savedAppointment =
+                        appointmentRepository.save(
+                                appointment
+                        );
+
+                return toResponse(
                         savedAppointment
                 );
         }
@@ -1030,6 +1099,39 @@ public class AppointmentServiceImpl implements AppointmentService {
                                                                 statusCode)));
         }
 
+        private void validateAppointmentCanBeMarkedAsAttended(
+                AppointmentEntity appointment) {
+
+                String currentStatus =
+                        appointment.getStatus().getCode();
+
+                boolean confirmed =
+                        AppointmentStatusCode.CONFIRMADA
+                                .name()
+                                .equals(currentStatus);
+
+                if (!confirmed) {
+                        throw new ConflictException(
+                                APPOINTMENT_CANNOT_BE_MARKED_AS_ATTENDED
+                        );
+                }
+        }
+
+        private void validateMedicalObservationExists(
+                AppointmentEntity appointment) {
+
+                String medicalObservation =
+                        appointment.getMedicalObservation();
+
+                if (medicalObservation == null
+                        || medicalObservation.isBlank()) {
+
+                        throw new BadRequestException(
+                                MEDICAL_OBSERVATION_REQUIRED
+                        );
+                }
+        }
+
         private void validateMedicalObservationStatus(
                 AppointmentEntity appointment) {
 
@@ -1059,7 +1161,7 @@ public class AppointmentServiceImpl implements AppointmentService {
                         case CONFIRMADA -> CONFIRMATION_STATUS_NOT_AVAILABLE;
                         case CANCELADA -> CANCELLATION_STATUS_NOT_AVAILABLE;
                         case NO_ASISTIO -> NO_SHOW_STATUS_NOT_AVAILABLE;
-                        default -> APPOINTMENT_STATUS_NOT_AVAILABLE;
+                        case ATENDIDA -> ATTENDED_STATUS_NOT_AVAILABLE;
                 };
         }
 

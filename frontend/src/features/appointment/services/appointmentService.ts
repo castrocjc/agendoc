@@ -49,7 +49,8 @@ type AppointmentOperation =
   | "registerNoShow"
   | "reschedule"
   | "findMedicalObservation"
-  | "registerMedicalObservation";
+  | "registerMedicalObservation"
+  | "markAsAttended";
 
 function getUserMessage(
   status: number,
@@ -273,6 +274,28 @@ function getUserMessage(
 
       default:
         return "No fue posible guardar la observación médica. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "markAsAttended") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "Debe registrar una observación médica antes de marcar la cita como atendida.";
+
+      case 403:
+        return "Tu cuenta no tiene autorización para cerrar esta atención médica.";
+
+      case 404:
+        return "La cita seleccionada ya no se encuentra disponible.";
+
+      case 409:
+        return "La cita no puede marcarse como atendida en su estado actual.";
+
+      default:
+        return "No fue posible marcar la cita como atendida. Inténtalo nuevamente.";
     }
   }
 
@@ -529,6 +552,25 @@ export async function registerMedicalObservation(
     throw mapServiceError(
       error,
       "registerMedicalObservation",
+    );
+  }
+}
+
+export async function markAppointmentAsAttended(
+  appointmentId: number,
+): Promise<AppointmentResponse> {
+  try {
+    return await apiPatch<
+      AppointmentResponse,
+      undefined
+    >(
+      `/api/v1/appointments/${appointmentId}/attend`,
+      undefined,
+    );
+  } catch (error) {
+    throw mapServiceError(
+      error,
+      "markAsAttended",
     );
   }
 }

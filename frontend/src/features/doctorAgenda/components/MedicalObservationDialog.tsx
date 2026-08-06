@@ -7,6 +7,7 @@ import {
 
 import {
   CalendarDays,
+  CheckCircle2,
   Clock3,
   FileText,
   Save,
@@ -18,6 +19,7 @@ import AppButton from "../../../components/AppButton";
 import {
   AppointmentServiceError,
   findMedicalObservation,
+  markAppointmentAsAttended,
   registerMedicalObservation,
 } from "../../appointment/services/appointmentService";
 import type {
@@ -33,6 +35,7 @@ interface MedicalObservationDialogProps {
   open: boolean;
   onClose: () => void;
   onSaved?: () => void;
+  onAttended?: () => void;
 }
 
 function formatLongDate(value: string): string {
@@ -63,6 +66,7 @@ function MedicalObservationDialog({
   open,
   onClose,
   onSaved,
+  onAttended,
 }: MedicalObservationDialogProps) {
   const titleId = useId();
   const descriptionId = useId();
@@ -72,13 +76,18 @@ function MedicalObservationDialog({
 
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [
+    showAttendanceConfirmation,
+    setShowAttendanceConfirmation,
+  ] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [validationMessage, setValidationMessage] = useState("");
 
   const handleClose = useCallback((): void => {
-    if (isSubmitting) {
+    if (isSubmitting || isCompleting) {
       return;
     }
 
@@ -88,9 +97,11 @@ function MedicalObservationDialog({
     setErrorMessage("");
     setSuccessMessage("");
     setValidationMessage("");
+    setShowAttendanceConfirmation(false);
 
     onClose();
   }, [
+    isCompleting,
     isSubmitting,
     onClose,
   ]);
@@ -242,6 +253,43 @@ function MedicalObservationDialog({
     }
   }
 
+  async function handleMarkAsAttended(): Promise<void> {
+    if (!appointment) {
+      return;
+    }
+
+    setErrorMessage("");
+    setSuccessMessage("");
+    setValidationMessage("");
+    setIsCompleting(true);
+
+    try {
+      await markAppointmentAsAttended(
+        appointment.id,
+      );
+
+      setShowAttendanceConfirmation(false);
+
+      onAttended?.();
+    } catch (error) {
+      if (error instanceof AppointmentServiceError) {
+        setErrorMessage(error.message);
+      } else {
+        setErrorMessage(
+          "No fue posible marcar la cita como atendida. Inténtalo nuevamente.",
+        );
+      }
+    } finally {
+      setIsCompleting(false);
+    }
+  }
+
+  const operationInProgress =
+    isSubmitting || isCompleting;
+
+  const canMarkAsAttended =
+    appointment.statusCode === "CONFIRMADA";
+
   return (
     <div
       className="medical-observation-dialog"
@@ -263,7 +311,7 @@ function MedicalObservationDialog({
           type="button"
           className="medical-observation-dialog__close"
           aria-label="Cerrar diálogo"
-          disabled={isSubmitting}
+          disabled={operationInProgress}
           onClick={handleClose}
         >
           <X size={20} />
@@ -343,7 +391,7 @@ function MedicalObservationDialog({
                 value={observation}
                 maxLength={MAX_OBSERVATION_LENGTH}
                 rows={8}
-                disabled={isSubmitting}
+                disabled={operationInProgress}
                 placeholder="Describe brevemente la evaluación, evolución o indicaciones relevantes para la atención."
                 aria-invalid={Boolean(
                   validationMessage,
@@ -397,34 +445,100 @@ function MedicalObservationDialog({
               </p>
             )}
 
-            <div className="medical-observation-dialog__actions">
-              <AppButton
-                type="button"
-                variant="ghost"
-                fullWidth={false}
-                disabled={isSubmitting}
-                onClick={handleClose}
+            {showAttendanceConfirmation && (
+              <div
+                className="medical-observation-dialog__confirmation"
+                role="alert"
               >
-                Cerrar
-              </AppButton>
+                <strong>
+                  ¿Confirmar atención?
+                </strong>
 
-              <AppButton
-                type="button"
-                fullWidth={false}
-                leftIcon={<Save size={17} />}
-                disabled={
-                  isSubmitting
-                  || Boolean(errorMessage)
-                }
-                onClick={() => {
-                  void handleSubmit();
-                }}
-              >
-                {isSubmitting
-                  ? "Guardando..."
-                  : "Guardar observación"}
-              </AppButton>
-            </div>
+                <p>
+                  La cita cambiará al estado Atendida. Verifica que la observación médica esté guardada antes de continuar.
+                </p>
+
+                <div className="medical-observation-dialog__confirmation-actions">
+                  <AppButton
+                    type="button"
+                    variant="ghost"
+                    fullWidth={false}
+                    disabled={operationInProgress}
+                    onClick={() => {
+                      setShowAttendanceConfirmation(false);
+                    }}
+                  >
+                    Volver
+                  </AppButton>
+
+                  <AppButton
+                    type="button"
+                    fullWidth={false}
+                    leftIcon={<CheckCircle2 size={17} />}
+                    isLoading={isCompleting}
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      void handleMarkAsAttended();
+                    }}
+                  >
+                    Confirmar atención
+                  </AppButton>
+                </div>
+              </div>
+            )}
+
+            {!showAttendanceConfirmation && (
+              <div className="medical-observation-dialog__actions">
+                <AppButton
+                  type="button"
+                  variant="ghost"
+                  fullWidth={false}
+                  disabled={operationInProgress}
+                  onClick={handleClose}
+                >
+                  Cerrar
+                </AppButton>
+
+                <div className="medical-observation-dialog__primary-actions">
+                  {canMarkAsAttended && (
+                    <AppButton
+                      type="button"
+                      variant="secondary"
+                      fullWidth={false}
+                      leftIcon={<CheckCircle2 size={17} />}
+                      disabled={
+                        operationInProgress
+                        || Boolean(errorMessage)
+                      }
+                      onClick={() => {
+                        setErrorMessage("");
+                        setSuccessMessage("");
+                        setValidationMessage("");
+                        setShowAttendanceConfirmation(true);
+                      }}
+                    >
+                      Marcar como atendida
+                    </AppButton>
+                  )}
+
+                  <AppButton
+                    type="button"
+                    fullWidth={false}
+                    leftIcon={<Save size={17} />}
+                    isLoading={isSubmitting}
+                    disabled={
+                      isCompleting
+                      || Boolean(errorMessage)
+                    }
+                    onClick={() => {
+                      void handleSubmit();
+                    }}
+                  >
+                    Guardar observación
+                  </AppButton>
+                </div>
+              </div>
+            )}
           </>
         )}
       </section>

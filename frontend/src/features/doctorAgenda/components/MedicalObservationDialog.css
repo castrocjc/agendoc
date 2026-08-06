@@ -191,9 +191,38 @@
 .medical-observation-dialog__actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: var(--space-3);
   margin-top: var(--space-6);
+}
+
+.medical-observation-dialog__primary-actions,
+.medical-observation-dialog__confirmation-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+}
+
+.medical-observation-dialog__confirmation {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid rgba(14, 165, 233, 0.28);
+  border-radius: var(--radius-md);
+  background: rgba(14, 165, 233, 0.07);
+}
+
+.medical-observation-dialog__confirmation strong {
+  display: block;
+  color: var(--color-gray-900);
+  font-size: var(--font-size-small);
+}
+
+.medical-observation-dialog__confirmation p {
+  margin: var(--space-2) 0 var(--space-4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
 }
 
 .medical-observation-dialog__loading {
@@ -248,11 +277,16 @@
     gap: var(--space-1);
   }
 
-  .medical-observation-dialog__actions {
+  .medical-observation-dialog__actions,
+  .medical-observation-dialog__primary-actions,
+  .medical-observation-dialog__confirmation-actions {
+    width: 100%;
     flex-direction: column-reverse;
   }
 
-  .medical-observation-dialog__actions .app-button {
+  .medical-observation-dialog__actions .app-button,
+  .medical-observation-dialog__primary-actions .app-button,
+  .medical-observation-dialog__confirmation-actions .app-button {
     width: 100%;
   }
 }

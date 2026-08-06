@@ -9,7 +9,7 @@
   ----------- -----------------------------------------
   Proyecto    AgenDoc
   Documento   Project Summary
-  Versión     v1.6
+  Versión     v1.7
   Estado      Vigente
   Ubicación   docs/project/AgenDoc Project Summary.md
 
@@ -55,6 +55,11 @@
   v1.6                   Agosto 2026        Incorporación de la HU-17 ---
                                             Registrar observación médica
                                             básica.
+
+  v1.7                   Agosto 2026        Incorporación de la HU-18 ---
+                                            Marcar cita como atendida y
+                                            actualización del Portal del
+                                            Médico.
   -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -90,7 +95,7 @@ individualmente en:
 
 ## Última historia completada
 
-**HU-17 --- Registrar observación médica básica**
+**HU-19 --- Consultar historial básico del paciente**
 
 Estado
 
@@ -188,7 +193,7 @@ Usuario.
   --------------------------------------------------- --------
   HU-16 --- Consultar agenda del médico               ✅
   HU-17 --- Registrar observación médica básica       ✅
-  HU-18 --- Marcar cita como atendida                 ⏳
+  HU-18 --- Marcar cita como atendida                 ✅
   HU-19 --- Consultar historial básico del paciente   ⏳
 
 ------------------------------------------------------------------------
@@ -367,10 +372,10 @@ Historias implementadas:
 
 -   HU-16
 -   HU-17
+-   HU-18
 
 Historias pendientes:
 
--   HU-18
 -   HU-19
 
 ------------------------------------------------------------------------
@@ -428,7 +433,10 @@ Actualmente permite:
 - filtrar por fecha.
 - filtrar por estado.
 - registrar observaciones médicas básicas para citas PROGRAMADA y CONFIRMADA.
-- consultar y editar la observación médica básica antes de marcar la cita como atendida.
+- registrar observaciones médicas básicas.
+- consultar y editar observaciones médicas.
+- marcar citas confirmadas como atendidas.
+- cierre del ciclo básico de atención médica.
 - aislamiento por consultorio y por médico.
 
 
@@ -480,7 +488,7 @@ Estado
 
 ✅ Estable
 
--   155 pruebas automáticas.
+-   163 pruebas automáticas.
 -   BUILD SUCCESS.
 -   Sin errores.
 -   Seguridad endurecida.
@@ -597,7 +605,31 @@ Frontend:
 
 ------------------------------------------------------------------------
 
-# 15. Organización documental
+
+
+# 15. Funcionalidades incorporadas durante HU-18
+
+La historia HU-18 incorporó el cierre del ciclo básico de atención médica desde el Portal del Médico.
+
+## Backend
+
+- Nuevo endpoint para marcar una cita como atendida.
+- Validación de transición CONFIRMADA → ATENDIDA.
+- Validación de observación médica obligatoria.
+- Reutilización del contexto autenticado y autorización por dominio.
+- Cobertura completa mediante pruebas unitarias.
+
+## Frontend
+
+- Integración de la acción "Marcar como atendida" en el MedicalObservationDialog.
+- Confirmación previa al cierre de la atención.
+- Actualización automática de la agenda.
+- Experiencia responsive reutilizando componentes existentes.
+
+------------------------------------------------------------------------
+
+# 16. Organización documental
+
 
 La documentación oficial del proyecto está compuesta por:
 
@@ -624,17 +656,17 @@ trazabilidad histórica del proyecto.
 
 ------------------------------------------------------------------------
 
-# 16. Próximos pasos
+# 17. Próximos pasos
 
 La siguiente historia planificada es:
 
-## HU-18
+## HU-19
 
-Marcar cita como atendida.
+Consultar historial básico del paciente.
 
 ------------------------------------------------------------------------
 
-# 17. Estado final
+# 18. Estado final
 
 El proyecto mantiene un alto nivel de consistencia arquitectónica entre
 backend y frontend.
