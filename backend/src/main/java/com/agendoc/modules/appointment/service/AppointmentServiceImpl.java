@@ -12,6 +12,7 @@ import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
 import com.agendoc.modules.appointment.entity.AppointmentStatusCode;
@@ -435,6 +436,33 @@ public class AppointmentServiceImpl implements AppointmentService {
 
                 return toResponse(savedAppointment);
         }
+
+        @Override
+        @Transactional(readOnly = true)
+        public List<PatientAppointmentResponse> findPatientAppointments() {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.PATIENT
+                        );
+
+                if (context.patientId() == null) {
+                        throw new ResourceNotFoundException(
+                                PATIENT_NOT_AVAILABLE
+                        );
+                }
+
+                return appointmentRepository
+                        .findPatientAppointments(
+                                context.clinicId(),
+                                context.patientId(),
+                                RecordStatus.ACTIVE
+                        )
+                        .stream()
+                        .map(this::toPatientAppointmentResponse)
+                        .toList();
+        }
+
 
         @Override
         @Transactional(readOnly = true)
@@ -907,6 +935,40 @@ public class AppointmentServiceImpl implements AppointmentService {
 
                 return value.trim();
         }
+
+        private PatientAppointmentResponse toPatientAppointmentResponse(
+                AppointmentEntity appointment) {
+
+                AgendaBlockEntity agendaBlock =
+                        appointment.getAgendaBlock();
+
+                DoctorEntity doctor =
+                        appointment.getDoctor();
+
+                MedicalSpecialtyEntity specialty =
+                        doctor.getSpecialty();
+
+                AppointmentStatusEntity status =
+                        appointment.getStatus();
+
+                return new PatientAppointmentResponse(
+                        appointment.getId(),
+                        doctor.getId(),
+                        doctor.getFirstName(),
+                        doctor.getLastName(),
+                        specialty.getId(),
+                        specialty.getName(),
+                        agendaBlock.getId(),
+                        agendaBlock.getAppointmentDate(),
+                        agendaBlock.getStartTime(),
+                        agendaBlock.getEndTime(),
+                        status.getCode(),
+                        status.getName(),
+                        appointment.getReason(),
+                        appointment.getCancellationReason()
+                );
+        }
+
 
         private AppointmentAgendaResponse toAppointmentAgendaResponse(
                         AppointmentEntity appointment) {

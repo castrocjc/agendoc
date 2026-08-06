@@ -9,6 +9,8 @@ import type {
   AppointmentAgendaFilters,
   AppointmentAgendaResponse,
   AppointmentResponse,
+
+  PatientAppointmentResponse,
   CancelAppointmentRequest,
   CreateAppointmentRequest,
   CreatePatientAppointmentRequest,
@@ -36,6 +38,8 @@ type AppointmentOperation =
   | "create"
   | "createPatient"
   | "find"
+
+  | "findPatient"
   | "cancel"
   | "confirmArrival"
   | "registerNoShow"
@@ -66,6 +70,23 @@ function getUserMessage(
         return "No fue posible reservar tu cita. Inténtalo nuevamente.";
     }
   }
+
+  if (operation === "findPatient") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 403:
+        return "Tu cuenta no tiene autorización para consultar estas citas.";
+
+      case 404:
+        return "No fue posible encontrar el perfil de paciente asociado con tu cuenta.";
+
+      default:
+        return "No fue posible consultar tus citas. Inténtalo nuevamente.";
+    }
+  }
+
 
   if (operation === "find") {
     switch (status) {
@@ -342,5 +363,16 @@ export async function findAppointments(
     );
   } catch (error) {
     throw mapServiceError(error, "find");
+  }
+}
+export async function findPatientAppointments(): Promise<
+  PatientAppointmentResponse[]
+> {
+  try {
+    return await apiGet<PatientAppointmentResponse[]>(
+      "/api/v1/appointments/patient",
+    );
+  } catch (error) {
+    throw mapServiceError(error, "findPatient");
   }
 }

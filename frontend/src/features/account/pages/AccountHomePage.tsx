@@ -1,5 +1,6 @@
 import {
   CalendarCheck2,
+  CalendarDays,
   LogOut,
   ShieldCheck,
   UserRound,
@@ -101,6 +102,39 @@ function AccountHomePage() {
               </p>
             </div>
           </AppCard>
+
+          {isPatient && (
+            <AppCard
+              className="account-home-page__card"
+              elevation="low"
+            >
+              <span
+                className="account-home-page__card-icon"
+                aria-hidden="true"
+              >
+                <CalendarDays size={25} />
+              </span>
+
+              <div className="account-home-page__card-content">
+                <h2>Mis citas</h2>
+
+                <p>
+                  Consulta tus próximas citas y revisa las reservas anteriores asociadas con tu cuenta.
+                </p>
+
+                <AppButton
+                  type="button"
+                  fullWidth={false}
+                  onClick={() => {
+                    navigate("/account/appointments");
+                  }}
+                >
+                  Consultar citas
+                </AppButton>
+              </div>
+            </AppCard>
+          )}
+
 
           <AppCard
             className="account-home-page__card"

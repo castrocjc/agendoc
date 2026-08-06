@@ -7,6 +7,7 @@ import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -36,6 +37,9 @@ public interface AppointmentService {
         AppointmentResponse rescheduleAppointment(
                         Long appointmentId,
                         RescheduleAppointmentRequest request);
+
+        List<PatientAppointmentResponse> findPatientAppointments();
+
 
         List<AppointmentAgendaResponse> findAppointments(
                         LocalDate appointmentDate,

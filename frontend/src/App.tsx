@@ -17,6 +17,8 @@ import RegisterDoctorPage from "./features/doctor/pages/RegisterDoctorPage";
 import RegisterPatientPage from "./features/patient/pages/RegisterPatientPage";
 import SearchPatientPage from "./features/patient/pages/SearchPatientPage";
 import PatientAppointmentPage from "./features/patientAppointment/pages/PatientAppointmentPage";
+
+import PatientAppointmentsPage from "./features/patientAppointments/pages/PatientAppointmentsPage";
 import PublicReceptionPage from "./features/publicReception/pages/PublicReceptionPage";
 
 function App() {
@@ -48,6 +50,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/account/appointments"
+          element={
+            <ProtectedRoute
+              allowedRoles={["PATIENT"]}
+            >
+              <PatientAppointmentsPage />
+            </ProtectedRoute>
+          }
+        />
+
 
         <Route
           path="/account/appointments/new"

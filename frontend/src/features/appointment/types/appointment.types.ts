@@ -84,3 +84,31 @@ export interface AppointmentAgendaFilters {
   doctorId?: number;
   status?: string;
 }
+export type AppointmentStatusCode =
+  | "PROGRAMADA"
+  | "CONFIRMADA"
+  | "ATENDIDA"
+  | "CANCELADA"
+  | "NO_ASISTIO";
+
+export interface PatientAppointmentResponse {
+  id: number;
+
+  doctorId: number;
+  doctorFirstName: string;
+  doctorLastName: string;
+
+  specialtyId: number;
+  specialtyName: string;
+
+  agendaBlockId: number;
+  appointmentDate: string;
+  startTime: string;
+  endTime: string;
+
+  statusCode: AppointmentStatusCode;
+  statusName: string;
+
+  reason: string | null;
+  cancellationReason: string | null;
+}

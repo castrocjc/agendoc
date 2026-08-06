@@ -6,6 +6,7 @@ import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -58,6 +59,18 @@ public class AppointmentController {
                         .status(HttpStatus.CREATED)
                         .body(response);
         }
+
+        @PreAuthorize("hasRole('PATIENT')")
+        @GetMapping("/patient")
+        public ResponseEntity<List<PatientAppointmentResponse>>
+                findPatientAppointments() {
+
+                List<PatientAppointmentResponse> response =
+                        appointmentService.findPatientAppointments();
+
+                return ResponseEntity.ok(response);
+        }
+
 
         @PreAuthorize("hasAnyRole('RECEPTIONIST', 'PATIENT')")
         @PatchMapping("/{appointmentId}/cancel")

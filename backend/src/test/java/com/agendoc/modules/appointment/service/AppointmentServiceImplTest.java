@@ -15,6 +15,7 @@ import com.agendoc.modules.agenda.entity.AgendaBlockEntity;
 import com.agendoc.modules.agenda.entity.MedicalAgendaEntity;
 import com.agendoc.modules.agenda.repository.AgendaBlockRepository;
 import com.agendoc.modules.appointment.dto.AppointmentResponse;
+import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
@@ -626,6 +627,174 @@ class AppointmentServiceImplTest {
                 verify(appointmentRepository, never())
                         .save(any(AppointmentEntity.class));
         }
+
+        @Test
+        void shouldFindAuthenticatedPatientAppointments() {
+
+                ClinicEntity clinic = createClinic();
+
+                PatientEntity patient = createPatient(clinic);
+
+                DoctorEntity doctor =
+                        createDoctorWithSpecialty(clinic);
+
+                LocalDate appointmentDate =
+                        LocalDate.of(2026, 8, 10);
+
+                AgendaBlockEntity agendaBlock =
+                        createAgendaBlock(
+                                clinic,
+                                doctor,
+                                appointmentDate
+                        );
+
+                AppointmentStatusEntity appointmentStatus =
+                        createAppointmentStatus();
+
+                AppointmentEntity appointment =
+                        createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                appointmentStatus
+                        );
+
+                appointment.setCancellationReason(
+                        "Cambio de disponibilidad médica"
+                );
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(patientContext);
+
+                when(appointmentRepository.findPatientAppointments(
+                        patientContext.clinicId(),
+                        patientContext.patientId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(List.of(appointment));
+
+                List<PatientAppointmentResponse> response =
+                        appointmentService.findPatientAppointments();
+
+                verify(authenticatedUserAuthorization)
+                        .requireRole(SecurityRoleCode.PATIENT);
+
+                verify(appointmentRepository)
+                        .findPatientAppointments(
+                                patientContext.clinicId(),
+                                patientContext.patientId(),
+                                RecordStatus.ACTIVE
+                        );
+
+                assertThat(response).hasSize(1);
+
+                PatientAppointmentResponse result =
+                        response.getFirst();
+
+                assertThat(result.id()).isEqualTo(20L);
+
+                assertThat(result.doctorId()).isEqualTo(2L);
+                assertThat(result.doctorFirstName())
+                        .isEqualTo("Ana");
+                assertThat(result.doctorLastName())
+                        .isEqualTo("Torres");
+
+                assertThat(result.specialtyId()).isEqualTo(3L);
+                assertThat(result.specialtyName())
+                        .isEqualTo("Medicina general");
+
+                assertThat(result.agendaBlockId())
+                        .isEqualTo(12L);
+
+                assertThat(result.appointmentDate())
+                        .isEqualTo(appointmentDate);
+
+                assertThat(result.startTime())
+                        .isEqualTo(LocalTime.of(9, 0));
+
+                assertThat(result.endTime())
+                        .isEqualTo(LocalTime.of(9, 30));
+
+                assertThat(result.statusCode())
+                        .isEqualTo("PROGRAMADA");
+
+                assertThat(result.statusName())
+                        .isEqualTo("Programada");
+
+                assertThat(result.reason())
+                        .isEqualTo("Consulta médica general");
+
+                assertThat(result.cancellationReason())
+                        .isEqualTo(
+                                "Cambio de disponibilidad médica"
+                        );
+        }
+
+        @Test
+        void shouldReturnEmptyListWhenAuthenticatedPatientHasNoAppointments() {
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(patientContext);
+
+                when(appointmentRepository.findPatientAppointments(
+                        patientContext.clinicId(),
+                        patientContext.patientId(),
+                        RecordStatus.ACTIVE
+                )).thenReturn(List.of());
+
+                List<PatientAppointmentResponse> response =
+                        appointmentService.findPatientAppointments();
+
+                assertThat(response).isEmpty();
+
+                verify(authenticatedUserAuthorization)
+                        .requireRole(SecurityRoleCode.PATIENT);
+
+                verify(appointmentRepository)
+                        .findPatientAppointments(
+                                patientContext.clinicId(),
+                                patientContext.patientId(),
+                                RecordStatus.ACTIVE
+                        );
+        }
+
+        @Test
+        void shouldRejectPatientAppointmentsWhenContextHasNoPatientProfile() {
+
+                AuthenticatedUserContext patientWithoutProfile =
+                        new AuthenticatedUserContext(
+                                200L,
+                                "patient.user",
+                                1L,
+                                SecurityRoleCode.PATIENT.name(),
+                                null,
+                                null
+                        );
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.PATIENT
+                )).thenReturn(patientWithoutProfile);
+
+                assertThatThrownBy(
+                        appointmentService::findPatientAppointments
+                )
+                        .isInstanceOf(
+                                ResourceNotFoundException.class
+                        )
+                        .hasMessage(
+                                "El paciente seleccionado no está disponible."
+                        );
+
+                verify(appointmentRepository, never())
+                        .findPatientAppointments(
+                                any(),
+                                any(),
+                                any()
+                        );
+        }
+
 
         @Test
         void shouldFindAppointmentsByDate() {

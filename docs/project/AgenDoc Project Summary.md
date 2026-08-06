@@ -7,7 +7,7 @@
 |--------|-------|
 | Proyecto | AgenDoc |
 | Documento | Project Summary |
-| Versión | v1.2 |
+| Versión | v1.3 |
 | Estado | Vigente |
 | Ubicación | docs/project/AgenDoc Project Summary.md |
 
@@ -20,6 +20,7 @@
 | v1.0 | Agosto 2026 | Creación del documento maestro del proyecto. |
 | v1.1 | Agosto 2026 | Incorporación del Product Backlog Maestro, resumen ejecutivo y reorganización del documento para soportar documentación modular por historias. |
 | v1.2 | Agosto 2026 | Incorporación de la HU-09 — Reservar una nueva cita como paciente autenticado y actualización del estado funcional del Portal del Paciente. |
+| v1.3 | Agosto 2026 | Incorporación de la HU-11 — Consultar mis citas como paciente autenticado y actualización del Portal del Paciente. |
 
 ---
 
@@ -46,7 +47,7 @@ docs/project/history/
 | Foundation | ✅ Completada |
 | Sprint actual | Sprint 4 |
 | Sprints completados | 3 |
-| Historias funcionales completadas | 14 / 20 |
+| Historias funcionales completadas | 15 / 20 |
 | Habilitadores técnicos | 5 / 5 |
 | Estado general | Desarrollo activo |
 
@@ -54,7 +55,7 @@ docs/project/history/
 
 ## Última historia completada
 
-**HU-09 — Reservar una nueva cita como paciente autenticado**
+**HU-11 — Consultar mis citas como paciente autenticado**
 
 Estado
 
@@ -64,11 +65,11 @@ Estado
 
 ## Próxima historia
 
-**HU-11 — Consultar mis citas como paciente**
+**HU-13 — Cancelar cita desde el Portal del Paciente (Interfaz)**
 
 Estado
 
-⏳ Lista para iniciar
+⏳ Pendiente
 
 ---
 
@@ -127,7 +128,7 @@ El desarrollo sigue una estrategia incremental basada en Historias de Usuario.
 |----------|--------|
 | HU-09 — Reservar una nueva cita como paciente autenticado | ✅ |
 | HU-10 — Crear cita desde recepción | ✅ |
-| HU-11 — Consultar mis citas como paciente | ⏳ |
+| HU-11 — Consultar mis citas como paciente | ✅ |
 | HU-12 — Consultar agenda del consultorio | ✅ |
 | HU-13 — Cancelar cita | ✅ |
 | HU-14 — Reprogramar cita | ✅ |
@@ -274,12 +275,13 @@ Capacidades disponibles:
 - Consulta de médicos.
 - Consulta de disponibilidad.
 - Reserva de nuevas citas utilizando el paciente autenticado.
+- Consulta del historial de citas del paciente autenticado.
+- Filtros por próximas, anteriores, canceladas y todas.
 - Navegación propia del paciente.
 - Experiencia visual consistente con la Recepción Digital.
 
 Pendiente:
 
-- HU-11 — Consultar mis citas.
 - HU-13 — Cancelación desde el portal del paciente (backend disponible, interfaz pendiente).
 - Mejoras futuras sobre historial y seguimiento.
 
@@ -338,7 +340,8 @@ Actualmente permite:
 
 - consultar médicos,
 - consultar disponibilidad,
-- reservar nuevas citas.
+- reservar nuevas citas,
+- consultar sus propias citas.
 
 ---
 
@@ -393,7 +396,7 @@ Estado
 
 ✅ Estable
 
-- 140 pruebas automáticas.
+- 143 pruebas automáticas.
 - BUILD SUCCESS.
 - Sin errores.
 - Seguridad endurecida.
@@ -415,57 +418,32 @@ Estado
 
 ---
 
-# 11. Funcionalidades incorporadas durante HU-09
+# 11. Funcionalidades incorporadas durante HU-11
 
-La historia HU-09 añadió una segunda experiencia de reserva de citas.
-
-Anteriormente existía únicamente la reserva realizada por recepción.
-
-Ahora también existe la reserva realizada por el paciente autenticado.
-
-La implementación reutiliza prácticamente toda la lógica del backend existente.
-
-Las diferencias principales son:
+La historia HU-11 incorporó la consulta de citas para el paciente autenticado.
 
 Backend:
 
-- nuevo endpoint:
-
-```
-
-POST /api/v1/appointments/patient
-
-```
-
-- uso del contexto autenticado para obtener:
-  - clinicId
-  - patientId
-
-- eliminación del patientId del request.
+- nuevo endpoint GET /api/v1/appointments/patient.
+- reutilización del contexto autenticado (clinicId y patientId).
+- aislamiento por dominio y paciente.
+- listado cronológico de citas.
 
 Frontend:
 
 Nuevo módulo:
 
 ```
-
-features/patientAppointment
-
+features/patientAppointments
 ```
 
-Compuesto por:
+Capacidades:
 
-- pages
-- types
-- validation
-
-Se reutilizan completamente:
-
-- DoctorService
-- AgendaService
-- AppointmentService
-
-El flujo visual replica la experiencia de la Recepción Digital, adaptándola al contexto de un usuario autenticado.
+- listado de citas.
+- filtros por próximas, anteriores, canceladas y todas.
+- navegación hacia la reserva de una nueva cita.
+- reutilización de AppointmentService.
+- integración con el Portal del Paciente.
 
 ---
 
@@ -501,18 +479,9 @@ Esto permite mantener el documento maestro compacto y facilitar la trazabilidad 
 
 La siguiente historia planificada es:
 
-## HU-11
+## HU-13
 
-Consultar mis citas como paciente.
-
-Objetivos principales:
-
-- listado de citas del paciente autenticado;
-- filtros por estado;
-- orden cronológico;
-- visualización del médico y especialidad;
-- reutilización del contexto autenticado;
-- preparación para cancelación desde el Portal del Paciente.
+Incorporar la cancelación de citas directamente desde el Portal del Paciente.
 
 ---
 

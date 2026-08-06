@@ -127,6 +127,31 @@ public interface AppointmentRepository
                 RecordStatus recordStatus
         );
 
+        /**
+         * Retrieves all active appointments belonging to an authenticated
+         * patient within their clinic domain.
+         */
+        @Query("""
+                SELECT DISTINCT appointment
+                FROM AppointmentEntity appointment
+                JOIN FETCH appointment.doctor doctor
+                JOIN FETCH doctor.specialty specialty
+                JOIN FETCH appointment.agendaBlock agendaBlock
+                JOIN FETCH appointment.status appointmentStatus
+                WHERE appointment.clinic.id = :clinicId
+                AND appointment.patient.id = :patientId
+                AND appointment.recordStatus = :recordStatus
+                ORDER BY
+                    agendaBlock.appointmentDate ASC,
+                    agendaBlock.startTime ASC
+                """)
+        List<AppointmentEntity> findPatientAppointments(
+                Long clinicId,
+                Long patientId,
+                RecordStatus recordStatus
+        );
+
+
         @Query("""
                 SELECT COUNT(appointment) > 0
                 FROM AppointmentEntity appointment
