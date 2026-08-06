@@ -532,7 +532,22 @@ public class AppointmentServiceImpl implements AppointmentService {
                                 .name()
                                 .equals(currentStatusCode);
 
-                if (!scheduled) {
+                LocalDateTime appointmentDateTime =
+                        LocalDateTime.of(
+                                appointment
+                                        .getAgendaBlock()
+                                        .getAppointmentDate(),
+                                appointment
+                                        .getAgendaBlock()
+                                        .getStartTime()
+                        );
+
+                boolean appointmentAlreadyStarted =
+                        !appointmentDateTime.isAfter(
+                                LocalDateTime.now()
+                        );
+
+                if (!scheduled || appointmentAlreadyStarted) {
                         throw new ConflictException(
                                 APPOINTMENT_CANNOT_BE_CANCELLED
                         );

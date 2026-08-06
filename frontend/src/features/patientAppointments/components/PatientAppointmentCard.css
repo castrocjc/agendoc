@@ -1,0 +1,168 @@
+.patient-appointment-card {
+  box-sizing: border-box;
+  padding: var(--space-6);
+}
+
+.patient-appointment-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-5);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.patient-appointment-card__date {
+  margin: 0 0 var(--space-2);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+  font-weight: var(--font-weight-bold);
+}
+
+.patient-appointment-card__time {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.patient-appointment-card__status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding: var(--space-2) var(--space-3);
+  border-radius: 999px;
+  font-size: var(--font-size-caption);
+  line-height: 1;
+  font-weight: var(--font-weight-bold);
+}
+
+.patient-appointment-card__status--programada {
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+}
+
+.patient-appointment-card__status--confirmada,
+.patient-appointment-card__status--atendida {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.patient-appointment-card__status--cancelada,
+.patient-appointment-card__status--no-asistio {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.patient-appointment-card__doctor {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.patient-appointment-card__doctor-icon {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: var(--radius-md);
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+}
+
+.patient-appointment-card__doctor h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+}
+
+.patient-appointment-card__doctor p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.patient-appointment-card__detail {
+  margin-top: var(--space-5);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-gray-50);
+}
+
+.patient-appointment-card__detail span {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+}
+
+.patient-appointment-card__detail p {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.patient-appointment-card__detail--cancelled {
+  background: #fef2f2;
+}
+
+.patient-appointment-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-5);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border);
+}
+
+.patient-appointment-card__actions svg {
+  flex: 0 0 auto;
+}
+
+.patient-appointment-card__actions .lucide-loader-circle {
+  animation: patient-appointment-card-spin 1s linear infinite;
+}
+
+@keyframes patient-appointment-card-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 520px) {
+  .patient-appointment-card {
+    padding: var(--space-5);
+  }
+
+  .patient-appointment-card__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .patient-appointment-card__status {
+    align-self: flex-start;
+  }
+
+  .patient-appointment-card__date {
+    font-size: var(--font-size-body);
+    line-height: var(--line-height-body);
+  }
+
+  .patient-appointment-card__actions .app-button {
+    width: 100%;
+  }
+}

@@ -38,9 +38,9 @@ type AppointmentOperation =
   | "create"
   | "createPatient"
   | "find"
-
   | "findPatient"
   | "cancel"
+  | "cancelPatient"
   | "confirmArrival"
   | "registerNoShow"
   | "reschedule";
@@ -87,6 +87,27 @@ function getUserMessage(
     }
   }
 
+  if (operation === "cancelPatient") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "El motivo de cancelación no puede exceder 500 caracteres.";
+
+      case 403:
+        return "No tienes autorización para cancelar esta cita.";
+
+      case 404:
+        return "La cita seleccionada ya no se encuentra disponible.";
+
+      case 409:
+        return "Esta cita ya no puede ser cancelada.";
+
+      default:
+        return "No fue posible cancelar tu cita. Inténtalo nuevamente.";
+    }
+  }
 
   if (operation === "find") {
     switch (status) {
@@ -281,6 +302,30 @@ export async function cancelAppointment(
     );
   } catch (error) {
     throw mapServiceError(error, "cancel");
+  }
+}
+
+export async function cancelPatientAppointment(
+  appointmentId: number,
+  reason: string | null,
+): Promise<AppointmentResponse> {
+  const request: CancelAppointmentRequest = {
+    reason,
+  };
+
+  try {
+    return await apiPatch<
+      AppointmentResponse,
+      CancelAppointmentRequest
+    >(
+      `/api/v1/appointments/${appointmentId}/cancel`,
+      request,
+    );
+  } catch (error) {
+    throw mapServiceError(
+      error,
+      "cancelPatient",
+    );
   }
 }
 

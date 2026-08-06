@@ -9,10 +9,9 @@ import {
   ArrowLeft,
   CalendarDays,
   CalendarPlus,
+  CheckCircle2,
   CircleAlert,
-  Clock3,
   RefreshCw,
-  Stethoscope,
 } from "lucide-react";
 import {
   useNavigate,
@@ -22,12 +21,15 @@ import AppButton from "../../../components/AppButton";
 import AppCard from "../../../components/AppCard";
 import {
   AppointmentServiceError,
+  cancelPatientAppointment,
   findPatientAppointments,
 } from "../../appointment/services/appointmentService";
 import type {
   AppointmentStatusCode,
   PatientAppointmentResponse,
 } from "../../appointment/types/appointment.types";
+import CancelPatientAppointmentDialog from "../components/CancelPatientAppointmentDialog";
+import PatientAppointmentCard from "../components/PatientAppointmentCard";
 import type {
   PatientAppointmentsFilter,
   PatientAppointmentsStatus,
@@ -85,6 +87,16 @@ function isUpcomingAppointment(
   );
 }
 
+function canPatientCancelAppointment(
+  appointment: PatientAppointmentResponse,
+  now: Date,
+): boolean {
+  return (
+    appointment.statusCode === "PROGRAMADA"
+    && buildAppointmentDateTime(appointment) > now
+  );
+}
+
 function matchesFilter(
   appointment: PatientAppointmentResponse,
   filter: PatientAppointmentsFilter,
@@ -133,43 +145,6 @@ function sortAppointments(
       return secondTime - firstTime;
     },
   );
-}
-
-function formatLongDate(value: string): string {
-  const date = new Date(`${value}T00:00:00`);
-
-  const formattedDate = new Intl.DateTimeFormat(
-    "es-MX",
-    {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-    },
-  ).format(date);
-
-  return (
-    formattedDate.charAt(0).toUpperCase()
-    + formattedDate.slice(1)
-  );
-}
-
-function formatTime(value: string): string {
-  return value.slice(0, 5);
-}
-
-function getDoctorName(
-  appointment: PatientAppointmentResponse,
-): string {
-  return `Dr. ${appointment.doctorFirstName} ${appointment.doctorLastName}`;
-}
-
-function getStatusClassName(
-  statusCode: AppointmentStatusCode,
-): string {
-  return statusCode
-    .toLowerCase()
-    .replace("_", "-");
 }
 
 function getEmptyStateCopy(
@@ -224,8 +199,26 @@ function PatientAppointmentsPage() {
   const [selectedFilter, setSelectedFilter] =
     useState<PatientAppointmentsFilter>("upcoming");
 
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<PatientAppointmentResponse | null>(null);
+
+  const [
+    cancellingAppointmentId,
+    setCancellingAppointmentId,
+  ] = useState<number | null>(null);
+
+  const [
+    operationErrorMessage,
+    setOperationErrorMessage,
+  ] = useState("");
+
+  const [successMessage, setSuccessMessage] =
+    useState("");
+
   const handleAppointmentsSuccess = useCallback(
-    (response: PatientAppointmentResponse[]): void => {
+    (
+      response: PatientAppointmentResponse[],
+    ): void => {
       setAppointments(response);
       setStatus("success");
     },
@@ -325,6 +318,75 @@ function PatientAppointmentsPage() {
     );
   }, [appointments]);
 
+  const handleCancelRequest = useCallback(
+    (
+      appointment: PatientAppointmentResponse,
+    ): void => {
+      setSelectedAppointment(appointment);
+      setOperationErrorMessage("");
+      setSuccessMessage("");
+    },
+    [],
+  );
+
+  const handleCancelDialogClose =
+    useCallback((): void => {
+      if (cancellingAppointmentId !== null) {
+        return;
+      }
+
+      setSelectedAppointment(null);
+      setOperationErrorMessage("");
+    }, [
+      cancellingAppointmentId,
+    ]);
+
+  const handleCancelConfirm = useCallback(
+    async (
+      reason: string | null,
+    ): Promise<void> => {
+      if (!selectedAppointment) {
+        return;
+      }
+
+      try {
+        setCancellingAppointmentId(
+          selectedAppointment.id,
+        );
+
+        setOperationErrorMessage("");
+        setSuccessMessage("");
+
+        await cancelPatientAppointment(
+          selectedAppointment.id,
+          reason,
+        );
+
+        const response =
+          await findPatientAppointments();
+
+        setAppointments(response);
+        setStatus("success");
+        setSelectedAppointment(null);
+        setSuccessMessage(
+          "Tu cita fue cancelada correctamente.",
+        );
+      } catch (error) {
+        const message =
+          error instanceof AppointmentServiceError
+            ? error.message
+            : "No fue posible cancelar tu cita. Inténtalo nuevamente.";
+
+        setOperationErrorMessage(message);
+      } finally {
+        setCancellingAppointmentId(null);
+      }
+    },
+    [
+      selectedAppointment,
+    ],
+  );
+
   const emptyState =
     getEmptyStateCopy(selectedFilter);
 
@@ -375,6 +437,20 @@ function PatientAppointmentsPage() {
             Reservar nueva cita
           </AppButton>
         </section>
+
+        {successMessage && (
+          <AppCard
+            className="patient-appointments-page__operation-success"
+            elevation="low"
+          >
+            <CheckCircle2
+              size={22}
+              aria-hidden="true"
+            />
+
+            <p>{successMessage}</p>
+          </AppCard>
+        )}
 
         {status === "loading" && (
           <AppCard
@@ -487,7 +563,9 @@ function PatientAppointmentsPage() {
                   fullWidth={false}
                   leftIcon={<CalendarPlus size={18} />}
                   onClick={() => {
-                    navigate("/account/appointments/new");
+                    navigate(
+                      "/account/appointments/new",
+                    );
                   }}
                 >
                   Reservar una cita
@@ -500,83 +578,23 @@ function PatientAppointmentsPage() {
               >
                 {visibleAppointments.map(
                   (appointment) => (
-                    <AppCard
+                    <PatientAppointmentCard
                       key={appointment.id}
-                      className="patient-appointments-page__appointment"
-                      elevation="low"
-                    >
-                      <div className="patient-appointments-page__appointment-header">
-                        <div>
-                          <p className="patient-appointments-page__date">
-                            {formatLongDate(
-                              appointment.appointmentDate,
-                            )}
-                          </p>
-
-                          <p className="patient-appointments-page__time">
-                            <Clock3 size={17} />
-
-                            <span>
-                              {formatTime(
-                                appointment.startTime,
-                              )}
-                              {" - "}
-                              {formatTime(
-                                appointment.endTime,
-                              )}
-                            </span>
-                          </p>
-                        </div>
-
-                        <span
-                          className={`patient-appointments-page__status patient-appointments-page__status--${getStatusClassName(
-                            appointment.statusCode,
-                          )}`}
-                        >
-                          {appointment.statusName}
-                        </span>
-                      </div>
-
-                      <div className="patient-appointments-page__doctor">
-                        <span
-                          className="patient-appointments-page__doctor-icon"
-                          aria-hidden="true"
-                        >
-                          <Stethoscope size={22} />
-                        </span>
-
-                        <div>
-                          <h2>
-                            {getDoctorName(appointment)}
-                          </h2>
-
-                          <p>
-                            {appointment.specialtyName}
-                          </p>
-                        </div>
-                      </div>
-
-                      {appointment.reason && (
-                        <div className="patient-appointments-page__detail">
-                          <span>Motivo de consulta</span>
-
-                          <p>{appointment.reason}</p>
-                        </div>
-                      )}
-
-                      {appointment.statusCode === "CANCELADA"
-                        && appointment.cancellationReason && (
-                          <div className="patient-appointments-page__detail patient-appointments-page__detail--cancelled">
-                            <span>Motivo de cancelación</span>
-
-                            <p>
-                              {
-                                appointment.cancellationReason
-                              }
-                            </p>
-                          </div>
-                        )}
-                    </AppCard>
+                      appointment={appointment}
+                      cancellable={
+                        canPatientCancelAppointment(
+                          appointment,
+                          new Date(),
+                        )
+                      }
+                      cancelling={
+                        cancellingAppointmentId
+                        === appointment.id
+                      }
+                      onCancelRequest={
+                        handleCancelRequest
+                      }
+                    />
                   ),
                 )}
               </section>
@@ -584,6 +602,17 @@ function PatientAppointmentsPage() {
           </>
         )}
       </section>
+
+      <CancelPatientAppointmentDialog
+        appointment={selectedAppointment}
+        open={selectedAppointment !== null}
+        submitting={
+          cancellingAppointmentId !== null
+        }
+        errorMessage={operationErrorMessage}
+        onClose={handleCancelDialogClose}
+        onConfirm={handleCancelConfirm}
+      />
     </main>
   );
 }

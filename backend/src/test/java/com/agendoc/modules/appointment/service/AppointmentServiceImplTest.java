@@ -2265,6 +2265,86 @@ class AppointmentServiceImplTest {
         }
 
         @Test
+        void shouldRejectPatientCancellationForPastScheduledAppointment() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                        clinic,
+                        doctor,
+                        LocalDate.now().minusDays(1));
+
+                AppointmentStatusEntity scheduledStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.PROGRAMADA,
+                                "Programada");
+
+                AppointmentEntity appointment = createAppointment(
+                        clinic,
+                        patient,
+                        doctor,
+                        agendaBlock,
+                        scheduledStatus);
+
+                CancelAppointmentRequest request =
+                        new CancelAppointmentRequest(
+                                "No podré asistir");
+
+                when(authenticatedUserAuthorization.requireAnyRole(
+                        SecurityRoleCode.RECEPTIONIST,
+                        SecurityRoleCode.PATIENT))
+                        .thenReturn(patientContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndPatientIdAndRecordStatusForUpdate(
+                                20L,
+                                patientContext.clinicId(),
+                                patientContext.patientId(),
+                                RecordStatus.ACTIVE))
+                        .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(
+                        () -> appointmentService.cancelAppointment(
+                                20L,
+                                request))
+                        .isInstanceOf(ConflictException.class)
+                        .hasMessage(
+                                "La cita no puede ser cancelada en su estado actual.");
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                patientContext,
+                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                        .requirePatientOwnership(
+                                patientContext,
+                                appointment);
+
+                verify(appointmentStatusRepository, never())
+                        .findByCodeAndRecordStatus(
+                                any(),
+                                any());
+
+                verify(appointmentRepository, never())
+                        .save(any(AppointmentEntity.class));
+
+                assertThat(appointment.getStatus())
+                        .isSameAs(scheduledStatus);
+
+                assertThat(appointment.getCancellationReason())
+                        .isNull();
+
+                assertThat(appointment.getCancelledAt())
+                        .isNull();
+
+                assertThat(appointment.getAgendaBlock().getAvailable())
+                        .isFalse();
+        }
+
+        @Test
         void shouldRejectPatientCancellationForAnotherPatientAppointment() {
 
                 CancelAppointmentRequest request =
