@@ -92,9 +92,9 @@ individualmente en:
   Foundation                                ✅ Completada
   Sprint actual                              Sprint 5 completado
   Sprints completados                                   5
-  Historias funcionales completadas               19 / 21
+  Historias funcionales completadas               21 / 21
   Habilitadores técnicos                            5 / 5
-  Estado general                        Desarrollo activo
+  Estado general                        Release 1 completada (o "MVP completado", según cómo quieras denominar esta etapa)
 
 ------------------------------------------------------------------------
 
