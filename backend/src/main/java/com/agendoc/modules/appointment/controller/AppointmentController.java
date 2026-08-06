@@ -8,6 +8,8 @@ import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
+import com.agendoc.modules.appointment.dto.RegisterMedicalObservationRequest;
+import com.agendoc.modules.appointment.dto.MedicalObservationResponse;
 import com.agendoc.modules.appointment.service.AppointmentService;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
@@ -116,6 +118,37 @@ public class AppointmentController {
                 AppointmentResponse response = appointmentService.rescheduleAppointment(
                                 appointmentId,
                                 request);
+
+                return ResponseEntity.ok(response);
+        }
+
+        @PreAuthorize("hasRole('DOCTOR')")
+        @GetMapping("/{appointmentId}/medical-observation")
+        public ResponseEntity<MedicalObservationResponse>
+                findMedicalObservation(
+                        @PathVariable Long appointmentId) {
+
+                MedicalObservationResponse response =
+                        appointmentService.findMedicalObservation(
+                                appointmentId
+                        );
+
+                return ResponseEntity.ok(response);
+        }
+
+        @PreAuthorize("hasRole('DOCTOR')")
+        @PatchMapping("/{appointmentId}/medical-observation")
+        public ResponseEntity<MedicalObservationResponse>
+                registerMedicalObservation(
+                        @PathVariable Long appointmentId,
+                        @Valid @RequestBody
+                        RegisterMedicalObservationRequest request) {
+
+                MedicalObservationResponse response =
+                        appointmentService.registerMedicalObservation(
+                                appointmentId,
+                                request
+                        );
 
                 return ResponseEntity.ok(response);
         }

@@ -22,6 +22,11 @@ public interface AppointmentRepository
                         Long id,
                         RecordStatus recordStatus);
 
+        Optional<AppointmentEntity> findByIdAndClinicIdAndRecordStatus(
+                        Long id,
+                        Long clinicId,
+                        RecordStatus recordStatus);
+
         /**
          * Retrieves an active appointment using a pessimistic write lock.
          *

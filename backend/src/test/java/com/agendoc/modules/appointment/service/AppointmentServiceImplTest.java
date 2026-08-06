@@ -22,6 +22,8 @@ import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.RegisterMedicalObservationRequest;
+import com.agendoc.modules.appointment.dto.MedicalObservationResponse;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
 import com.agendoc.modules.appointment.entity.AppointmentStatusCode;
 import com.agendoc.modules.appointment.entity.AppointmentStatusEntity;
@@ -1128,6 +1130,437 @@ class AppointmentServiceImplTest {
                                                 any(),
                                                 any(),
                                                 any());
+        }
+
+        @Test
+        void shouldFindExistingMedicalObservationForAssignedDoctor() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity confirmedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CONFIRMADA,
+                                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                confirmedStatus);
+
+                appointment.setMedicalObservation(
+                                "Paciente estable y sin signos de alarma.");
+                appointment.setMedicalObservationRecordedBy(
+                                "doctor.user");
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatus(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                MedicalObservationResponse response =
+                                appointmentService.findMedicalObservation(
+                                                appointment.getId());
+
+                assertThat(response.appointmentId())
+                                .isEqualTo(appointment.getId());
+
+                assertThat(response.observation())
+                                .isEqualTo(
+                                                "Paciente estable y sin signos de alarma.");
+
+                assertThat(response.recordedBy())
+                                .isEqualTo("doctor.user");
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.DOCTOR);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+        }
+
+        @Test
+        void shouldReturnEmptyMedicalObservationWhenNotYetRegistered() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity confirmedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CONFIRMADA,
+                                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                confirmedStatus);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatus(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                MedicalObservationResponse response =
+                                appointmentService.findMedicalObservation(
+                                                appointment.getId());
+
+                assertThat(response.appointmentId())
+                                .isEqualTo(appointment.getId());
+
+                assertThat(response.observation()).isNull();
+                assertThat(response.recordedAt()).isNull();
+                assertThat(response.recordedBy()).isNull();
+        }
+
+        @Test
+        void shouldRegisterMedicalObservationForConfirmedAppointment() {
+
+                RegisterMedicalObservationRequest request =
+                                new RegisterMedicalObservationRequest(
+                                                "  Paciente con evolución favorable.  ");
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity confirmedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CONFIRMADA,
+                                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                confirmedStatus);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                when(appointmentRepository.save(appointment))
+                                .thenReturn(appointment);
+
+                MedicalObservationResponse response =
+                                appointmentService.registerMedicalObservation(
+                                                appointment.getId(),
+                                                request);
+
+                assertThat(appointment.getMedicalObservation())
+                                .isEqualTo(
+                                                "Paciente con evolución favorable.");
+
+                assertThat(
+                                appointment.getMedicalObservationRecordedAt())
+                                .isNotNull();
+
+                assertThat(
+                                appointment.getMedicalObservationRecordedBy())
+                                .isEqualTo(doctorContext.username());
+
+                assertThat(response.observation())
+                                .isEqualTo(
+                                                "Paciente con evolución favorable.");
+
+                assertThat(response.recordedAt()).isNotNull();
+
+                assertThat(response.recordedBy())
+                                .isEqualTo(doctorContext.username());
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentRepository)
+                                .save(appointment);
+        }
+
+        @Test
+        void shouldUpdateMedicalObservationForAttendedAppointment() {
+
+                RegisterMedicalObservationRequest request =
+                                new RegisterMedicalObservationRequest(
+                                                "Se actualiza la indicación médica.");
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity attendedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.ATENDIDA,
+                                                "Atendida");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                attendedStatus);
+
+                appointment.setMedicalObservation(
+                                "Observación inicial.");
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                when(appointmentRepository.save(appointment))
+                                .thenReturn(appointment);
+
+                MedicalObservationResponse response =
+                                appointmentService.registerMedicalObservation(
+                                                appointment.getId(),
+                                                request);
+
+                assertThat(appointment.getMedicalObservation())
+                                .isEqualTo(
+                                                "Se actualiza la indicación médica.");
+
+                assertThat(response.observation())
+                                .isEqualTo(
+                                                "Se actualiza la indicación médica.");
+
+                assertThat(response.recordedAt()).isNotNull();
+
+                verify(appointmentRepository)
+                                .save(appointment);
+        }
+
+        @Test
+        void shouldRejectMedicalObservationForScheduledAppointment() {
+
+                RegisterMedicalObservationRequest request =
+                                new RegisterMedicalObservationRequest(
+                                                "Observación no permitida.");
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity scheduledStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.PROGRAMADA,
+                                                "Programada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                scheduledStatus);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                assertThatThrownBy(() ->
+                                appointmentService.registerMedicalObservation(
+                                                appointment.getId(),
+                                                request))
+                                .isInstanceOf(ConflictException.class)
+                                .hasMessage(
+                                                "La observación médica no puede registrarse en el estado actual de la cita.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRejectMedicalObservationWhenAppointmentDoesNotExist() {
+
+                RegisterMedicalObservationRequest request =
+                                new RegisterMedicalObservationRequest(
+                                                "Observación médica.");
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                99L,
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.empty());
+
+                assertThatThrownBy(() ->
+                                appointmentService.registerMedicalObservation(
+                                                99L,
+                                                request))
+                                .isInstanceOf(ResourceNotFoundException.class)
+                                .hasMessage(
+                                                "La cita seleccionada no está disponible.");
+
+                verify(appointmentAuthorizationPolicy, never())
+                                .requireSameClinic(
+                                                any(),
+                                                any());
+
+                verify(appointmentAuthorizationPolicy, never())
+                                .requireAssignedDoctor(
+                                                any(),
+                                                any());
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
+        }
+
+        @Test
+        void shouldRejectMedicalObservationWhenAppointmentIsNotAssignedToDoctor() {
+
+                RegisterMedicalObservationRequest request =
+                                new RegisterMedicalObservationRequest(
+                                                "Observación médica.");
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctor(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 6));
+
+                AppointmentStatusEntity confirmedStatus =
+                                createAppointmentStatus(
+                                                AppointmentStatusCode.CONFIRMADA,
+                                                "Confirmada");
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                confirmedStatus);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                                appointment.getId(),
+                                                doctorContext.clinicId(),
+                                                RecordStatus.ACTIVE))
+                                .thenReturn(Optional.of(appointment));
+
+                org.mockito.Mockito.doThrow(
+                                new ResourceNotFoundException(
+                                                "La cita seleccionada no está disponible."))
+                                .when(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                assertThatThrownBy(() ->
+                                appointmentService.registerMedicalObservation(
+                                                appointment.getId(),
+                                                request))
+                                .isInstanceOf(ResourceNotFoundException.class)
+                                .hasMessage(
+                                                "La cita seleccionada no está disponible.");
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireSameClinic(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentAuthorizationPolicy)
+                                .requireAssignedDoctor(
+                                                doctorContext,
+                                                appointment);
+
+                verify(appointmentRepository, never())
+                                .save(any(AppointmentEntity.class));
         }
 
         @Test

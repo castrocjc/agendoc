@@ -5,9 +5,11 @@ import com.agendoc.modules.appointment.dto.AppointmentResponse;
 import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
-import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
-import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.MedicalObservationResponse;
 import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
+import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.RegisterMedicalObservationRequest;
+import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,35 +20,41 @@ import java.util.List;
 public interface AppointmentService {
 
         AppointmentResponse createAppointment(
-                        CreateAppointmentRequest request);
+                CreateAppointmentRequest request);
 
         AppointmentResponse createPatientAppointment(
                 CreatePatientAppointmentRequest request);
 
         AppointmentResponse cancelAppointment(
-                        Long appointmentId,
-                        CancelAppointmentRequest request);
+                Long appointmentId,
+                CancelAppointmentRequest request);
 
         AppointmentResponse confirmArrival(
-                        Long appointmentId);
+                Long appointmentId);
 
         AppointmentResponse registerNoShow(
-                        Long appointmentId,
-                        RegisterAppointmentNoShowRequest request);
+                Long appointmentId,
+                RegisterAppointmentNoShowRequest request);
 
         AppointmentResponse rescheduleAppointment(
-                        Long appointmentId,
-                        RescheduleAppointmentRequest request);
+                Long appointmentId,
+                RescheduleAppointmentRequest request);
 
         List<PatientAppointmentResponse> findPatientAppointments();
 
-
         List<AppointmentAgendaResponse> findAppointments(
-                        LocalDate appointmentDate,
-                        Long doctorId,
-                        String statusCode);
+                LocalDate appointmentDate,
+                Long doctorId,
+                String statusCode);
 
         List<AppointmentAgendaResponse> findDoctorAppointments(
-                        LocalDate appointmentDate,
-                        String statusCode);
+                LocalDate appointmentDate,
+                String statusCode);
+
+        MedicalObservationResponse findMedicalObservation(
+                Long appointmentId);
+
+        MedicalObservationResponse registerMedicalObservation(
+                Long appointmentId,
+                RegisterMedicalObservationRequest request);
 }

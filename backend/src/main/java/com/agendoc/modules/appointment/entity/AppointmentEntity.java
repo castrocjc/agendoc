@@ -72,5 +72,14 @@ public class AppointmentEntity extends BaseEntity {
         private String noShowBy;
 
         @Column(name = "no_show_comment", length = 500)
-        private String noShowComment;        
+        private String noShowComment;
+
+        @Column(name = "medical_observation", length = 2000)
+        private String medicalObservation;
+
+        @Column(name = "medical_observation_recorded_at")
+        private OffsetDateTime medicalObservationRecordedAt;
+
+        @Column(name = "medical_observation_recorded_by", length = 100)
+        private String medicalObservationRecordedBy;
 }

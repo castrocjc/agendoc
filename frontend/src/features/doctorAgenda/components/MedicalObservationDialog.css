@@ -1,0 +1,258 @@
+.medical-observation-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  padding: var(--space-5);
+  background: rgba(15, 23, 42, 0.56);
+  backdrop-filter: blur(3px);
+}
+
+.medical-observation-dialog__panel {
+  position: relative;
+  width: min(100%, 680px);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: var(--space-7);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+}
+
+.medical-observation-dialog__close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  background: transparent;
+  cursor: pointer;
+}
+
+.medical-observation-dialog__close:hover {
+  color: var(--color-gray-900);
+  background: var(--color-gray-100);
+}
+
+.medical-observation-dialog__close:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.medical-observation-dialog__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+}
+
+.medical-observation-dialog__panel h2 {
+  margin: var(--space-4) 0 var(--space-2);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+}
+
+.medical-observation-dialog__description {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.medical-observation-dialog__summary {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-5) 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+  background: var(--color-gray-50);
+}
+
+.medical-observation-dialog__summary div {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-primary-600);
+}
+
+.medical-observation-dialog__summary span {
+  color: var(--color-gray-900);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.medical-observation-dialog__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.medical-observation-dialog__field > span {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.medical-observation-dialog__field small {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-regular);
+}
+
+.medical-observation-dialog__field textarea {
+  width: 100%;
+  min-height: 180px;
+  resize: vertical;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-md);
+  color: var(--color-gray-900);
+  background: var(--color-surface);
+  font: inherit;
+  font-size: var(--font-size-small);
+  line-height: 1.55;
+  outline: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.medical-observation-dialog__field textarea::placeholder {
+  color: var(--color-text-muted);
+}
+
+.medical-observation-dialog__field textarea:focus {
+  border-color: var(--color-primary-500);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.medical-observation-dialog__field textarea[aria-invalid="true"] {
+  border-color: var(--color-danger-600);
+}
+
+.medical-observation-dialog__field textarea:disabled {
+  cursor: not-allowed;
+  background: var(--color-gray-50);
+  opacity: 0.75;
+}
+
+.medical-observation-dialog__field-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+}
+
+.medical-observation-dialog__error,
+.medical-observation-dialog__success {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.medical-observation-dialog__error {
+  color: var(--color-danger-600);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.medical-observation-dialog__success {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.medical-observation-dialog__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.medical-observation-dialog__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+.medical-observation-dialog__loading p {
+  margin: var(--space-4) 0 0;
+  font-size: var(--font-size-small);
+}
+
+.medical-observation-dialog__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-primary-600);
+  border-radius: 50%;
+  animation: medical-observation-dialog-spin 800ms linear infinite;
+}
+
+@keyframes medical-observation-dialog-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .medical-observation-dialog {
+    align-items: end;
+    padding: 0;
+  }
+
+  .medical-observation-dialog__panel {
+    width: 100%;
+    max-height: 94vh;
+    padding: var(--space-6) var(--space-5);
+    border-radius:
+      var(--radius-lg)
+      var(--radius-lg)
+      0
+      0;
+  }
+
+  .medical-observation-dialog__field-meta {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .medical-observation-dialog__actions {
+    flex-direction: column-reverse;
+  }
+
+  .medical-observation-dialog__actions .app-button {
+    width: 100%;
+  }
+}

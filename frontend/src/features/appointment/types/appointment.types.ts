@@ -25,6 +25,17 @@ export interface RescheduleAppointmentRequest {
   agendaBlockId: number;
 }
 
+export interface RegisterMedicalObservationRequest {
+  observation: string;
+}
+
+export interface MedicalObservationResponse {
+  appointmentId: number;
+  observation: string | null;
+  recordedAt: string | null;
+  recordedBy: string | null;
+}
+
 export interface AppointmentResponse {
   id: number;
   clinicId: number;

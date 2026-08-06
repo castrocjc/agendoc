@@ -16,6 +16,8 @@ import type {
   CreateAppointmentRequest,
   CreatePatientAppointmentRequest,
   RegisterAppointmentNoShowRequest,
+  RegisterMedicalObservationRequest,
+  MedicalObservationResponse,
   RescheduleAppointmentRequest,
 } from "../types/appointment.types";
 
@@ -45,7 +47,9 @@ type AppointmentOperation =
   | "cancelPatient"
   | "confirmArrival"
   | "registerNoShow"
-  | "reschedule";
+  | "reschedule"
+  | "findMedicalObservation"
+  | "registerMedicalObservation";
 
 function getUserMessage(
   status: number,
@@ -231,6 +235,44 @@ function getUserMessage(
 
       default:
         return "No fue posible reprogramar la cita médica. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "findMedicalObservation") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 403:
+        return "Tu cuenta no tiene autorización para consultar esta observación médica.";
+
+      case 404:
+        return "La cita seleccionada ya no se encuentra disponible.";
+
+      default:
+        return "No fue posible consultar la observación médica. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "registerMedicalObservation") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "Revisa el contenido de la observación médica.";
+
+      case 403:
+        return "Tu cuenta no tiene autorización para registrar esta observación médica.";
+
+      case 404:
+        return "La cita seleccionada ya no se encuentra disponible.";
+
+      case 409:
+        return "La observación médica no puede registrarse en el estado actual de la cita.";
+
+      default:
+        return "No fue posible guardar la observación médica. Inténtalo nuevamente.";
     }
   }
 
@@ -453,6 +495,41 @@ export async function findDoctorAppointments(
     );
   } catch (error) {
     throw mapServiceError(error, "findDoctor");
+  }
+}
+
+export async function findMedicalObservation(
+  appointmentId: number,
+): Promise<MedicalObservationResponse> {
+  try {
+    return await apiGet<MedicalObservationResponse>(
+      `/api/v1/appointments/${appointmentId}/medical-observation`,
+    );
+  } catch (error) {
+    throw mapServiceError(
+      error,
+      "findMedicalObservation",
+    );
+  }
+}
+
+export async function registerMedicalObservation(
+  appointmentId: number,
+  request: RegisterMedicalObservationRequest,
+): Promise<MedicalObservationResponse> {
+  try {
+    return await apiPatch<
+      MedicalObservationResponse,
+      RegisterMedicalObservationRequest
+    >(
+      `/api/v1/appointments/${appointmentId}/medical-observation`,
+      request,
+    );
+  } catch (error) {
+    throw mapServiceError(
+      error,
+      "registerMedicalObservation",
+    );
   }
 }
 

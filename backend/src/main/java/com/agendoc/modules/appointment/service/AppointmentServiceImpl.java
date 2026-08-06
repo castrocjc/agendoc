@@ -12,6 +12,8 @@ import com.agendoc.modules.appointment.dto.CancelAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
+import com.agendoc.modules.appointment.dto.RegisterMedicalObservationRequest;
+import com.agendoc.modules.appointment.dto.MedicalObservationResponse;
 import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
@@ -91,6 +93,9 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         private static final String APPOINTMENT_STATUS_NOT_AVAILABLE = "El estado de la cita no está disponible.";
 
+        private static final String MEDICAL_OBSERVATION_NOT_ALLOWED =
+                "La observación médica no puede registrarse en el estado actual de la cita.";
+
         private final AppointmentRepository appointmentRepository;
         private final AppointmentRescheduleHistoryRepository appointmentRescheduleHistoryRepository;
         private final AppointmentStatusRepository appointmentStatusRepository;
@@ -100,6 +105,104 @@ public class AppointmentServiceImpl implements AppointmentService {
         private final ClinicRepository clinicRepository;
         private final AuthenticatedUserAuthorization authenticatedUserAuthorization;
         private final AppointmentAuthorizationPolicy appointmentAuthorizationPolicy;
+
+        @Override
+        @Transactional(readOnly = true)
+        public MedicalObservationResponse findMedicalObservation(
+                Long appointmentId) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR
+                        );
+
+                AppointmentEntity appointment =
+                        appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatus(
+                                        appointmentId,
+                                        context.clinicId(),
+                                        RecordStatus.ACTIVE
+                                )
+                                .orElseThrow(() ->
+                                        new ResourceNotFoundException(
+                                                APPOINTMENT_NOT_AVAILABLE
+                                        )
+                                );
+
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        appointment
+                );
+
+                appointmentAuthorizationPolicy.requireAssignedDoctor(
+                        context,
+                        appointment
+                );
+
+                return toMedicalObservationResponse(
+                        appointment
+                );
+        }
+
+        @Override
+        @Transactional
+        public MedicalObservationResponse registerMedicalObservation(
+                Long appointmentId,
+                RegisterMedicalObservationRequest request) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR
+                        );
+
+                AppointmentEntity appointment =
+                        appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatusForUpdate(
+                                        appointmentId,
+                                        context.clinicId(),
+                                        RecordStatus.ACTIVE
+                                )
+                                .orElseThrow(() ->
+                                        new ResourceNotFoundException(
+                                                APPOINTMENT_NOT_AVAILABLE
+                                        )
+                                );
+
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        appointment
+                );
+
+                appointmentAuthorizationPolicy.requireAssignedDoctor(
+                        context,
+                        appointment
+                );
+
+                validateMedicalObservationStatus(
+                        appointment
+                );
+
+                appointment.setMedicalObservation(
+                        request.observation().trim()
+                );
+
+                appointment.setMedicalObservationRecordedAt(
+                        OffsetDateTime.now()
+                );
+
+                appointment.setMedicalObservationRecordedBy(
+                        context.username()
+                );
+
+                AppointmentEntity savedAppointment =
+                        appointmentRepository.save(
+                                appointment
+                        );
+
+                return toMedicalObservationResponse(
+                        savedAppointment
+                );
+        }
 
         @Override
         @Transactional
@@ -927,6 +1030,27 @@ public class AppointmentServiceImpl implements AppointmentService {
                                                                 statusCode)));
         }
 
+        private void validateMedicalObservationStatus(
+                AppointmentEntity appointment) {
+
+                String currentStatus =
+                        appointment.getStatus().getCode();
+
+                boolean allowed =
+                        AppointmentStatusCode.CONFIRMADA
+                                .name()
+                                .equals(currentStatus)
+                        || AppointmentStatusCode.ATENDIDA
+                                .name()
+                                .equals(currentStatus);
+
+                if (!allowed) {
+                        throw new ConflictException(
+                                MEDICAL_OBSERVATION_NOT_ALLOWED
+                        );
+                }
+        }
+
         private String getAppointmentStatusNotAvailableMessage(
                         AppointmentStatusCode statusCode) {
 
@@ -982,6 +1106,17 @@ public class AppointmentServiceImpl implements AppointmentService {
                 }
 
                 return value.trim();
+        }
+
+        private MedicalObservationResponse toMedicalObservationResponse(
+                AppointmentEntity appointment) {
+
+                return new MedicalObservationResponse(
+                        appointment.getId(),
+                        appointment.getMedicalObservation(),
+                        appointment.getMedicalObservationRecordedAt(),
+                        appointment.getMedicalObservationRecordedBy()
+                );
         }
 
         private PatientAppointmentResponse toPatientAppointmentResponse(

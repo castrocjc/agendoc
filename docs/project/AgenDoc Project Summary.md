@@ -9,7 +9,7 @@
   ----------- -----------------------------------------
   Proyecto    AgenDoc
   Documento   Project Summary
-  Versión     v1.5
+  Versión     v1.6
   Estado      Vigente
   Ubicación   docs/project/AgenDoc Project Summary.md
 
@@ -51,6 +51,10 @@
   v1.5                   Agosto 2026        Incorporación de la HU-16 ---
                                             Consultar agenda del médico e
                                             inicio oficial del Sprint 5.
+
+  v1.6                   Agosto 2026        Incorporación de la HU-17 ---
+                                            Registrar observación médica
+                                            básica.
   -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -78,7 +82,7 @@ individualmente en:
   Foundation                                ✅ Completada
   Sprint actual                                  Sprint 5
   Sprints completados                                   3
-  Historias funcionales completadas               17 / 21
+  Historias funcionales completadas               18 / 21
   Habilitadores técnicos                            5 / 5
   Estado general                        Desarrollo activo
 
@@ -86,7 +90,7 @@ individualmente en:
 
 ## Última historia completada
 
-**HU-16 --- Consultar agenda del médico**
+**HU-17 --- Registrar observación médica básica**
 
 Estado
 
@@ -96,7 +100,7 @@ Estado
 
 ## Próxima historia
 
-**HU-17 --- Registrar observación médica básica**
+**HU-18 --- Marcar cita como atendida**
 
 Estado
 
@@ -183,7 +187,7 @@ Usuario.
   Historia                                            Estado
   --------------------------------------------------- --------
   HU-16 --- Consultar agenda del médico               ✅
-  HU-17 --- Registrar observación médica básica       ⏳
+  HU-17 --- Registrar observación médica básica       ✅
   HU-18 --- Marcar cita como atendida                 ⏳
   HU-19 --- Consultar historial básico del paciente   ⏳
 
@@ -359,10 +363,13 @@ Estado
 
 🚧 Parcialmente implementado
 
-Historias planificadas:
+Historias implementadas:
 
 -   HU-16
 -   HU-17
+
+Historias pendientes:
+
 -   HU-18
 -   HU-19
 
@@ -420,6 +427,8 @@ Actualmente permite:
 - consultar únicamente la agenda del médico autenticado.
 - filtrar por fecha.
 - filtrar por estado.
+- registrar observaciones médicas básicas para citas PROGRAMADA y CONFIRMADA.
+- consultar y editar la observación médica básica antes de marcar la cita como atendida.
 - aislamiento por consultorio y por médico.
 
 
@@ -471,7 +480,7 @@ Estado
 
 ✅ Estable
 
--   148 pruebas automáticas.
+-   155 pruebas automáticas.
 -   BUILD SUCCESS.
 -   Sin errores.
 -   Seguridad endurecida.
@@ -567,7 +576,28 @@ Frontend:
 - Filtros por fecha y estado.
 - Navegación protegida para el rol DOCTOR.
 
-# 14. Organización documental
+# 14. Funcionalidades incorporadas durante HU-17
+
+La historia HU-17 incorporó el registro de observaciones médicas básicas desde el Portal del Médico.
+
+Backend:
+
+- Nuevos casos de uso para consultar y registrar observaciones médicas.
+- Persistencia de notas clínicas reutilizando el campo notes de la cita.
+- Validaciones por rol, consultorio, médico asignado y estado de la cita.
+- Cobertura completa mediante pruebas unitarias.
+
+Frontend:
+
+- Nuevo componente MedicalObservationDialog.
+- Integración con la agenda del médico.
+- Consulta automática de la observación existente.
+- Registro y actualización de observaciones médicas.
+- Validaciones, mensajes y experiencia responsive.
+
+------------------------------------------------------------------------
+
+# 15. Organización documental
 
 La documentación oficial del proyecto está compuesta por:
 
@@ -594,17 +624,17 @@ trazabilidad histórica del proyecto.
 
 ------------------------------------------------------------------------
 
-# 15. Próximos pasos
+# 16. Próximos pasos
 
 La siguiente historia planificada es:
 
-## HU-16
+## HU-18
 
-Consultar agenda del médico.
+Marcar cita como atendida.
 
 ------------------------------------------------------------------------
 
-# 16. Estado final
+# 17. Estado final
 
 El proyecto mantiene un alto nivel de consistencia arquitectónica entre
 backend y frontend.

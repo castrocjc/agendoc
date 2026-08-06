@@ -17,6 +17,7 @@ import {
 import AppButton from "../../../components/AppButton";
 import AppInput from "../../../components/AppInput";
 import AppSelect from "../../../components/AppSelect";
+import MedicalObservationDialog from "../components/MedicalObservationDialog";
 import {
   clearSession,
 } from "../../auth/services/sessionService";
@@ -83,6 +84,13 @@ function getStatusClass(statusCode: string): string {
     .replaceAll("_", "-")}`;
 }
 
+function canManageMedicalObservation(
+  statusCode: string,
+): boolean {
+  return statusCode === "CONFIRMADA"
+    || statusCode === "ATENDIDA";
+}
+
 function DoctorAgendaPage() {
   const navigate = useNavigate();
 
@@ -95,6 +103,13 @@ function DoctorAgendaPage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [
+    selectedAppointment,
+    setSelectedAppointment,
+  ] = useState<AppointmentAgendaResponse | null>(
+    null,
+  );
 
   async function loadAppointments(
     date: string,
@@ -195,6 +210,16 @@ function DoctorAgendaPage() {
       selectedDate,
       selectedStatus,
     );
+  }
+
+  function handleOpenMedicalObservation(
+    appointment: AppointmentAgendaResponse,
+  ): void {
+    setSelectedAppointment(appointment);
+  }
+
+  function handleCloseMedicalObservation(): void {
+    setSelectedAppointment(null);
   }
 
   return (
@@ -348,6 +373,7 @@ function DoctorAgendaPage() {
                         <th>Paciente</th>
                         <th>Estado</th>
                         <th>Motivo</th>
+                        <th>Acciones</th>
                       </tr>
                     </thead>
 
@@ -382,6 +408,31 @@ function DoctorAgendaPage() {
 
                           <td>
                             {appointment.reason || "Sin motivo registrado"}
+                          </td>
+
+                          <td>
+                            {canManageMedicalObservation(
+                              appointment.statusCode,
+                            ) ? (
+                              <AppButton
+                                type="button"
+                                variant="secondary"
+                                fullWidth={false}
+                                onClick={() => {
+                                  handleOpenMedicalObservation(
+                                    appointment,
+                                  );
+                                }}
+                              >
+                                {appointment.statusCode === "ATENDIDA"
+                                  ? "Ver observación"
+                                  : "Registrar observación"}
+                              </AppButton>
+                            ) : (
+                              <span className="doctor-agenda-page__action-unavailable">
+                                No disponible
+                              </span>
+                            )}
                           </td>
                         </tr>
                       ))}
@@ -445,6 +496,26 @@ function DoctorAgendaPage() {
                           </strong>
                         </div>
                       </div>
+
+                      {canManageMedicalObservation(
+                        appointment.statusCode,
+                      ) && (
+                        <div className="doctor-agenda-page__appointment-actions">
+                          <AppButton
+                            type="button"
+                            variant="secondary"
+                            onClick={() => {
+                              handleOpenMedicalObservation(
+                                appointment,
+                              );
+                            }}
+                          >
+                            {appointment.statusCode === "ATENDIDA"
+                              ? "Ver o editar observación"
+                              : "Registrar observación"}
+                          </AppButton>
+                        </div>
+                      )}
                     </article>
                   ))}
                 </div>
@@ -452,6 +523,12 @@ function DoctorAgendaPage() {
             )}
         </section>
       </section>
+
+      <MedicalObservationDialog
+        appointment={selectedAppointment}
+        open={selectedAppointment !== null}
+        onClose={handleCloseMedicalObservation}
+      />
     </main>
   );
 }
