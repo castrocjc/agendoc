@@ -15,6 +15,7 @@ import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import com.agendoc.modules.appointment.dto.RegisterMedicalObservationRequest;
 import com.agendoc.modules.appointment.dto.MedicalObservationResponse;
 import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
+import com.agendoc.modules.appointment.dto.PatientMedicalHistoryResponse;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.entity.AppointmentEntity;
 import com.agendoc.modules.appointment.entity.AppointmentStatusCode;
@@ -91,8 +92,6 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         private static final String SAME_AGENDA_BLOCK = "El nuevo bloque de agenda debe ser diferente al bloque actual.";
 
-        private static final String APPOINTMENT_STATUS_NOT_AVAILABLE = "El estado de la cita no está disponible.";
-
         private static final String MEDICAL_OBSERVATION_NOT_ALLOWED =
                 "La observación médica no puede registrarse en el estado actual de la cita.";
 
@@ -114,6 +113,63 @@ public class AppointmentServiceImpl implements AppointmentService {
         private final ClinicRepository clinicRepository;
         private final AuthenticatedUserAuthorization authenticatedUserAuthorization;
         private final AppointmentAuthorizationPolicy appointmentAuthorizationPolicy;
+
+        @Override
+        @Transactional(readOnly = true)
+        public List<PatientMedicalHistoryResponse>
+                findPatientMedicalHistory(
+                        Long appointmentId) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR
+                        );
+
+                AppointmentEntity referenceAppointment =
+                        appointmentRepository
+                                .findByIdAndClinicIdAndRecordStatus(
+                                        appointmentId,
+                                        context.clinicId(),
+                                        RecordStatus.ACTIVE
+                                )
+                                .orElseThrow(() ->
+                                        new ResourceNotFoundException(
+                                                APPOINTMENT_NOT_AVAILABLE
+                                        )
+                                );
+
+                appointmentAuthorizationPolicy.requireSameClinic(
+                        context,
+                        referenceAppointment
+                );
+
+                appointmentAuthorizationPolicy.requireAssignedDoctor(
+                        context,
+                        referenceAppointment
+                );
+
+                AgendaBlockEntity referenceAgendaBlock =
+                        referenceAppointment.getAgendaBlock();
+
+                return appointmentRepository
+                        .findPatientMedicalHistory(
+                                context.clinicId(),
+                                referenceAppointment
+                                        .getPatient()
+                                        .getId(),
+                                AppointmentStatusCode.ATENDIDA.name(),
+                                referenceAgendaBlock
+                                        .getAppointmentDate(),
+                                referenceAgendaBlock
+                                        .getStartTime(),
+                                RecordStatus.ACTIVE
+                        )
+                        .stream()
+                        .map(this::toPatientMedicalHistoryResponse)
+                        .toList();
+        }
+
+
 
         @Override
         @Transactional(readOnly = true)
@@ -1209,6 +1265,36 @@ public class AppointmentServiceImpl implements AppointmentService {
 
                 return value.trim();
         }
+
+        private PatientMedicalHistoryResponse
+                toPatientMedicalHistoryResponse(
+                        AppointmentEntity appointment) {
+
+                AgendaBlockEntity agendaBlock =
+                        appointment.getAgendaBlock();
+
+                DoctorEntity doctor =
+                        appointment.getDoctor();
+
+                MedicalSpecialtyEntity specialty =
+                        doctor.getSpecialty();
+
+                return new PatientMedicalHistoryResponse(
+                        appointment.getId(),
+                        agendaBlock.getAppointmentDate(),
+                        agendaBlock.getStartTime(),
+                        doctor.getId(),
+                        doctor.getFirstName(),
+                        doctor.getLastName(),
+                        specialty.getId(),
+                        specialty.getName(),
+                        appointment.getMedicalObservation(),
+                        appointment.getMedicalObservationRecordedAt(),
+                        appointment.getMedicalObservationRecordedBy()
+                );
+        }
+
+
 
         private MedicalObservationResponse toMedicalObservationResponse(
                 AppointmentEntity appointment) {

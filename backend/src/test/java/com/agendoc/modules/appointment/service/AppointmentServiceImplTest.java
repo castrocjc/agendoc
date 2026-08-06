@@ -16,6 +16,7 @@ import com.agendoc.modules.agenda.entity.MedicalAgendaEntity;
 import com.agendoc.modules.agenda.repository.AgendaBlockRepository;
 import com.agendoc.modules.appointment.dto.AppointmentResponse;
 import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
+import com.agendoc.modules.appointment.dto.PatientMedicalHistoryResponse;
 import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.AppointmentAgendaResponse;
@@ -45,6 +46,7 @@ import com.agendoc.modules.patient.repository.PatientRepository;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -1131,6 +1133,402 @@ class AppointmentServiceImplTest {
                                                 any(),
                                                 any());
         }
+
+        @Test
+        void shouldFindPatientMedicalHistoryForAssignedDoctor() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor =
+                        createDoctorWithSpecialty(clinic);
+
+                LocalDate referenceDate =
+                        LocalDate.of(2026, 8, 10);
+
+                AgendaBlockEntity referenceAgendaBlock =
+                        createAgendaBlock(
+                                clinic,
+                                doctor,
+                                referenceDate
+                        );
+
+                AppointmentStatusEntity confirmedStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.CONFIRMADA,
+                                "Confirmada"
+                        );
+
+                AppointmentEntity referenceAppointment =
+                        createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                referenceAgendaBlock,
+                                confirmedStatus
+                        );
+
+                LocalDate historyDate =
+                        LocalDate.of(2026, 8, 1);
+
+                AgendaBlockEntity historyAgendaBlock =
+                        createAgendaBlock(
+                                clinic,
+                                doctor,
+                                historyDate
+                        );
+
+                AppointmentStatusEntity attendedStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.ATENDIDA,
+                                "Atendida"
+                        );
+
+                AppointmentEntity historyAppointment =
+                        createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                historyAgendaBlock,
+                                attendedStatus
+                        );
+
+                historyAppointment.setId(19L);
+                historyAppointment.setMedicalObservation(
+                        "Paciente con evolución favorable."
+                );
+                historyAppointment.setMedicalObservationRecordedAt(
+                        OffsetDateTime.parse(
+                                "2026-08-01T10:00:00-06:00"
+                        )
+                );
+                historyAppointment.setMedicalObservationRecordedBy(
+                        "doctor.previous"
+                );
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.DOCTOR
+                )).thenReturn(doctorContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndRecordStatus(
+                                referenceAppointment.getId(),
+                                doctorContext.clinicId(),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(
+                                Optional.of(referenceAppointment)
+                        );
+
+                when(appointmentRepository
+                        .findPatientMedicalHistory(
+                                doctorContext.clinicId(),
+                                patient.getId(),
+                                AppointmentStatusCode.ATENDIDA.name(),
+                                referenceAgendaBlock.getAppointmentDate(),
+                                referenceAgendaBlock.getStartTime(),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(
+                                List.of(historyAppointment)
+                        );
+
+                List<PatientMedicalHistoryResponse> response =
+                        appointmentService.findPatientMedicalHistory(
+                                referenceAppointment.getId()
+                        );
+
+                assertThat(response).hasSize(1);
+
+                PatientMedicalHistoryResponse result =
+                        response.getFirst();
+
+                assertThat(result.appointmentId())
+                        .isEqualTo(19L);
+
+                assertThat(result.appointmentDate())
+                        .isEqualTo(historyDate);
+
+                assertThat(result.startTime())
+                        .isEqualTo(
+                                historyAgendaBlock.getStartTime()
+                        );
+
+                assertThat(result.doctorId())
+                        .isEqualTo(doctor.getId());
+
+                assertThat(result.doctorFirstName())
+                        .isEqualTo(doctor.getFirstName());
+
+                assertThat(result.doctorLastName())
+                        .isEqualTo(doctor.getLastName());
+
+                assertThat(result.specialtyId())
+                        .isEqualTo(
+                                doctor.getSpecialty().getId()
+                        );
+
+                assertThat(result.specialtyName())
+                        .isEqualTo(
+                                doctor.getSpecialty().getName()
+                        );
+
+                assertThat(result.medicalObservation())
+                        .isEqualTo(
+                                "Paciente con evolución favorable."
+                        );
+
+                assertThat(result.recordedAt())
+                        .isEqualTo(
+                                OffsetDateTime.parse(
+                                        "2026-08-01T10:00:00-06:00"
+                                )
+                        );
+
+                assertThat(result.recordedBy())
+                        .isEqualTo("doctor.previous");
+
+                verify(authenticatedUserAuthorization)
+                        .requireRole(SecurityRoleCode.DOCTOR);
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                doctorContext,
+                                referenceAppointment
+                        );
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireAssignedDoctor(
+                                doctorContext,
+                                referenceAppointment
+                        );
+
+                verify(appointmentRepository)
+                        .findPatientMedicalHistory(
+                                doctorContext.clinicId(),
+                                patient.getId(),
+                                AppointmentStatusCode.ATENDIDA.name(),
+                                referenceAgendaBlock.getAppointmentDate(),
+                                referenceAgendaBlock.getStartTime(),
+                                RecordStatus.ACTIVE
+                        );
+        }
+
+        @Test
+        void shouldReturnEmptyPatientMedicalHistory() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor =
+                        createDoctorWithSpecialty(clinic);
+
+                AgendaBlockEntity referenceAgendaBlock =
+                        createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 10)
+                        );
+
+                AppointmentStatusEntity confirmedStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.CONFIRMADA,
+                                "Confirmada"
+                        );
+
+                AppointmentEntity referenceAppointment =
+                        createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                referenceAgendaBlock,
+                                confirmedStatus
+                        );
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.DOCTOR
+                )).thenReturn(doctorContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndRecordStatus(
+                                referenceAppointment.getId(),
+                                doctorContext.clinicId(),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(
+                                Optional.of(referenceAppointment)
+                        );
+
+                when(appointmentRepository
+                        .findPatientMedicalHistory(
+                                doctorContext.clinicId(),
+                                patient.getId(),
+                                AppointmentStatusCode.ATENDIDA.name(),
+                                referenceAgendaBlock.getAppointmentDate(),
+                                referenceAgendaBlock.getStartTime(),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(List.of());
+
+                List<PatientMedicalHistoryResponse> response =
+                        appointmentService.findPatientMedicalHistory(
+                                referenceAppointment.getId()
+                        );
+
+                assertThat(response).isEmpty();
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                doctorContext,
+                                referenceAppointment
+                        );
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireAssignedDoctor(
+                                doctorContext,
+                                referenceAppointment
+                        );
+        }
+
+        @Test
+        void shouldRejectPatientMedicalHistoryWhenAppointmentDoesNotExist() {
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.DOCTOR
+                )).thenReturn(doctorContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndRecordStatus(
+                                99L,
+                                doctorContext.clinicId(),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(Optional.empty());
+
+                assertThatThrownBy(() ->
+                        appointmentService
+                                .findPatientMedicalHistory(99L)
+                )
+                        .isInstanceOf(
+                                ResourceNotFoundException.class
+                        )
+                        .hasMessage(
+                                "La cita seleccionada no está disponible."
+                        );
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requireSameClinic(
+                                any(),
+                                any()
+                        );
+
+                verify(appointmentAuthorizationPolicy, never())
+                        .requireAssignedDoctor(
+                                any(),
+                                any()
+                        );
+
+                verify(appointmentRepository, never())
+                        .findPatientMedicalHistory(
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any()
+                        );
+        }
+
+        @Test
+        void shouldRejectPatientMedicalHistoryWhenAppointmentIsNotAssignedToDoctor() {
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor =
+                        createDoctorWithSpecialty(clinic);
+
+                AgendaBlockEntity referenceAgendaBlock =
+                        createAgendaBlock(
+                                clinic,
+                                doctor,
+                                LocalDate.of(2026, 8, 10)
+                        );
+
+                AppointmentStatusEntity confirmedStatus =
+                        createAppointmentStatus(
+                                AppointmentStatusCode.CONFIRMADA,
+                                "Confirmada"
+                        );
+
+                AppointmentEntity referenceAppointment =
+                        createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                referenceAgendaBlock,
+                                confirmedStatus
+                        );
+
+                when(authenticatedUserAuthorization.requireRole(
+                        SecurityRoleCode.DOCTOR
+                )).thenReturn(doctorContext);
+
+                when(appointmentRepository
+                        .findByIdAndClinicIdAndRecordStatus(
+                                referenceAppointment.getId(),
+                                doctorContext.clinicId(),
+                                RecordStatus.ACTIVE
+                        ))
+                        .thenReturn(
+                                Optional.of(referenceAppointment)
+                        );
+
+                org.mockito.Mockito.doThrow(
+                        new ResourceNotFoundException(
+                                "La cita seleccionada no está disponible."
+                        )
+                )
+                        .when(appointmentAuthorizationPolicy)
+                        .requireAssignedDoctor(
+                                doctorContext,
+                                referenceAppointment
+                        );
+
+                assertThatThrownBy(() ->
+                        appointmentService
+                                .findPatientMedicalHistory(
+                                        referenceAppointment.getId()
+                                )
+                )
+                        .isInstanceOf(
+                                ResourceNotFoundException.class
+                        )
+                        .hasMessage(
+                                "La cita seleccionada no está disponible."
+                        );
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireSameClinic(
+                                doctorContext,
+                                referenceAppointment
+                        );
+
+                verify(appointmentAuthorizationPolicy)
+                        .requireAssignedDoctor(
+                                doctorContext,
+                                referenceAppointment
+                        );
+
+                verify(appointmentRepository, never())
+                        .findPatientMedicalHistory(
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any(),
+                                any()
+                        );
+        }
+
+
 
         @Test
         void shouldFindExistingMedicalObservationForAssignedDoctor() {

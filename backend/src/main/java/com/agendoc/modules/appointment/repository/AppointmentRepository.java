@@ -157,6 +157,47 @@ public interface AppointmentRepository
         );
 
 
+        /**
+         * Retrieves previous attended appointments containing a medical
+         * observation for a patient within the authenticated clinic.
+         *
+         * Results are ordered from the most recent attention to the oldest.
+         */
+        @Query("""
+                SELECT DISTINCT appointment
+                FROM AppointmentEntity appointment
+                JOIN FETCH appointment.doctor doctor
+                JOIN FETCH doctor.specialty specialty
+                JOIN FETCH appointment.agendaBlock agendaBlock
+                JOIN FETCH appointment.status appointmentStatus
+                WHERE appointment.clinic.id = :clinicId
+                AND appointment.patient.id = :patientId
+                AND appointment.recordStatus = :recordStatus
+                AND appointmentStatus.code = :statusCode
+                AND appointment.medicalObservation IS NOT NULL
+                AND TRIM(appointment.medicalObservation) <> ''
+                AND (
+                    agendaBlock.appointmentDate < :referenceDate
+                    OR (
+                        agendaBlock.appointmentDate = :referenceDate
+                        AND agendaBlock.startTime < :referenceStartTime
+                    )
+                )
+                ORDER BY
+                    agendaBlock.appointmentDate DESC,
+                    agendaBlock.startTime DESC
+                """)
+        List<AppointmentEntity> findPatientMedicalHistory(
+                Long clinicId,
+                Long patientId,
+                String statusCode,
+                LocalDate referenceDate,
+                LocalTime referenceStartTime,
+                RecordStatus recordStatus
+        );
+
+
+
         @Query("""
                 SELECT COUNT(appointment) > 0
                 FROM AppointmentEntity appointment

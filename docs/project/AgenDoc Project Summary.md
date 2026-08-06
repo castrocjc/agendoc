@@ -9,7 +9,7 @@
   ----------- -----------------------------------------
   Proyecto    AgenDoc
   Documento   Project Summary
-  Versión     v1.7
+  Versión     v1.8
   Estado      Vigente
   Ubicación   docs/project/AgenDoc Project Summary.md
 
@@ -60,6 +60,11 @@
                                             Marcar cita como atendida y
                                             actualización del Portal del
                                             Médico.
+
+  v1.8                   Agosto 2026        Incorporación de la HU-19 ---
+                                            Consultar historial básico del
+                                            paciente, cierre del Sprint 5
+                                            del Portal del Médico.
   -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -85,9 +90,9 @@ individualmente en:
   Indicador                                         Valor
   ----------------------------------- -------------------
   Foundation                                ✅ Completada
-  Sprint actual                                  Sprint 5
-  Sprints completados                                   3
-  Historias funcionales completadas               18 / 21
+  Sprint actual                              Sprint 5 completado
+  Sprints completados                                   5
+  Historias funcionales completadas               19 / 21
   Habilitadores técnicos                            5 / 5
   Estado general                        Desarrollo activo
 
@@ -105,7 +110,7 @@ Estado
 
 ## Próxima historia
 
-**HU-18 --- Marcar cita como atendida**
+La siguiente historia será definida durante la planificación del próximo Sprint.
 
 Estado
 
@@ -194,7 +199,7 @@ Usuario.
   HU-16 --- Consultar agenda del médico               ✅
   HU-17 --- Registrar observación médica básica       ✅
   HU-18 --- Marcar cita como atendida                 ✅
-  HU-19 --- Consultar historial básico del paciente   ⏳
+  HU-19 --- Consultar historial básico del paciente   ✅
 
 ------------------------------------------------------------------------
 
@@ -231,7 +236,7 @@ Usuario.
   Sprint 2     ✅
   Sprint 3     ✅
   Sprint 4     ✅
-  Sprint 5     🚧 En ejecución
+  Sprint 5     ✅
 
 ------------------------------------------------------------------------
 
@@ -366,17 +371,21 @@ Pendiente:
 
 Estado
 
-🚧 Parcialmente implementado
+✅ Flujo básico de atención completado
 
 Historias implementadas:
 
 -   HU-16
 -   HU-17
 -   HU-18
-
-Historias pendientes:
-
 -   HU-19
+
+Capacidades disponibles:
+
+- Consulta de agenda médica.
+- Registro y edición de observaciones.
+- Marcar cita como atendida.
+- Consulta del historial básico del paciente.
 
 ------------------------------------------------------------------------
 
@@ -488,7 +497,7 @@ Estado
 
 ✅ Estable
 
--   163 pruebas automáticas.
+-   167 pruebas automáticas.
 -   BUILD SUCCESS.
 -   Sin errores.
 -   Seguridad endurecida.
@@ -626,9 +635,31 @@ La historia HU-18 incorporó el cierre del ciclo básico de atención médica de
 - Actualización automática de la agenda.
 - Experiencia responsive reutilizando componentes existentes.
 
+
 ------------------------------------------------------------------------
 
-# 16. Organización documental
+# 16. Funcionalidades incorporadas durante HU-19
+
+La historia HU-19 incorporó la consulta del historial básico del paciente.
+
+## Backend
+
+- Nuevo endpoint para consultar antecedentes desde una cita asignada.
+- Consulta de atenciones anteriores en estado ATENDIDA.
+- Orden descendente por fecha y hora.
+- Reutilización de Domain Authorization.
+- Sin cambios de base de datos.
+
+## Frontend
+
+- Nuevo componente PatientHistoryDialog.
+- Acción Ver historial.
+- Timeline clínica compacta.
+- Header y footer fijos.
+- Scroll independiente del contenido.
+- Diseño responsive.
+
+# 17. Organización documental
 
 
 La documentación oficial del proyecto está compuesta por:
@@ -656,17 +687,15 @@ trazabilidad histórica del proyecto.
 
 ------------------------------------------------------------------------
 
-# 17. Próximos pasos
+# 18. Próximos pasos
 
 La siguiente historia planificada es:
 
-## HU-19
-
-Consultar historial básico del paciente.
+El Sprint 5 quedó completado. La siguiente historia será definida durante la planificación del siguiente Sprint.
 
 ------------------------------------------------------------------------
 
-# 18. Estado final
+# 19. Estado final
 
 El proyecto mantiene un alto nivel de consistencia arquitectónica entre
 backend y frontend.

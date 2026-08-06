@@ -18,6 +18,7 @@ import type {
   RegisterAppointmentNoShowRequest,
   RegisterMedicalObservationRequest,
   MedicalObservationResponse,
+  PatientMedicalHistoryResponse,
   RescheduleAppointmentRequest,
 } from "../types/appointment.types";
 
@@ -48,6 +49,7 @@ type AppointmentOperation =
   | "confirmArrival"
   | "registerNoShow"
   | "reschedule"
+  | "findPatientMedicalHistory"
   | "findMedicalObservation"
   | "registerMedicalObservation"
   | "markAsAttended";
@@ -238,6 +240,23 @@ function getUserMessage(
         return "No fue posible reprogramar la cita médica. Inténtalo nuevamente.";
     }
   }
+
+  if (operation === "findPatientMedicalHistory") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 403:
+        return "Tu cuenta no tiene autorización para consultar el historial médico de este paciente.";
+
+      case 404:
+        return "La cita seleccionada ya no se encuentra disponible.";
+
+      default:
+        return "No fue posible consultar el historial médico del paciente. Inténtalo nuevamente.";
+    }
+  }
+
 
   if (operation === "findMedicalObservation") {
     switch (status) {
@@ -586,3 +605,21 @@ export async function findPatientAppointments(): Promise<
     throw mapServiceError(error, "findPatient");
   }
 }
+
+export async function findPatientMedicalHistory(
+  appointmentId: number,
+): Promise<PatientMedicalHistoryResponse[]> {
+  try {
+    return await apiGet<
+      PatientMedicalHistoryResponse[]
+    >(
+      `/api/v1/appointments/${appointmentId}/patient-history`,
+    );
+  } catch (error) {
+    throw mapServiceError(
+      error,
+      "findPatientMedicalHistory",
+    );
+  }
+}
+

@@ -36,6 +36,25 @@ export interface MedicalObservationResponse {
   recordedBy: string | null;
 }
 
+
+export interface PatientMedicalHistoryResponse {
+  appointmentId: number;
+  appointmentDate: string;
+  startTime: string;
+
+  doctorId: number;
+  doctorFirstName: string;
+  doctorLastName: string;
+
+  specialtyId: number;
+  specialtyName: string;
+
+  medicalObservation: string;
+  recordedAt: string | null;
+  recordedBy: string | null;
+}
+
+
 export interface AppointmentResponse {
   id: number;
   clinicId: number;

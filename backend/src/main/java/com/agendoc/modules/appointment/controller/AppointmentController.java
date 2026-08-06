@@ -7,6 +7,7 @@ import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
+import com.agendoc.modules.appointment.dto.PatientMedicalHistoryResponse;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
 import com.agendoc.modules.appointment.dto.RegisterMedicalObservationRequest;
 import com.agendoc.modules.appointment.dto.MedicalObservationResponse;
@@ -121,6 +122,22 @@ public class AppointmentController {
 
                 return ResponseEntity.ok(response);
         }
+
+        @PreAuthorize("hasRole('DOCTOR')")
+        @GetMapping("/{appointmentId}/patient-history")
+        public ResponseEntity<List<PatientMedicalHistoryResponse>>
+                findPatientMedicalHistory(
+                        @PathVariable Long appointmentId) {
+
+                List<PatientMedicalHistoryResponse> response =
+                        appointmentService.findPatientMedicalHistory(
+                                appointmentId
+                        );
+
+                return ResponseEntity.ok(response);
+        }
+
+
 
         @PreAuthorize("hasRole('DOCTOR')")
         @GetMapping("/{appointmentId}/medical-observation")

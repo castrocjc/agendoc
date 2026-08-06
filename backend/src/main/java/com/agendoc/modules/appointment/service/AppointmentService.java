@@ -7,6 +7,7 @@ import com.agendoc.modules.appointment.dto.CreateAppointmentRequest;
 import com.agendoc.modules.appointment.dto.CreatePatientAppointmentRequest;
 import com.agendoc.modules.appointment.dto.MedicalObservationResponse;
 import com.agendoc.modules.appointment.dto.PatientAppointmentResponse;
+import com.agendoc.modules.appointment.dto.PatientMedicalHistoryResponse;
 import com.agendoc.modules.appointment.dto.RegisterAppointmentNoShowRequest;
 import com.agendoc.modules.appointment.dto.RegisterMedicalObservationRequest;
 import com.agendoc.modules.appointment.dto.RescheduleAppointmentRequest;
@@ -50,6 +51,10 @@ public interface AppointmentService {
         List<AppointmentAgendaResponse> findDoctorAppointments(
                 LocalDate appointmentDate,
                 String statusCode);
+
+        List<PatientMedicalHistoryResponse> findPatientMedicalHistory(
+                Long appointmentId);
+
 
         MedicalObservationResponse findMedicalObservation(
                 Long appointmentId);
