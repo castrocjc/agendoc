@@ -84,6 +84,11 @@ export interface AppointmentAgendaFilters {
   doctorId?: number;
   status?: string;
 }
+
+export interface DoctorAppointmentAgendaFilters {
+  date: string;
+  status?: string;
+}
 export type AppointmentStatusCode =
   | "PROGRAMADA"
   | "CONFIRMADA"

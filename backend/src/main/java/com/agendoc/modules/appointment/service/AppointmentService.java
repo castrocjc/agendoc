@@ -45,4 +45,8 @@ public interface AppointmentService {
                         LocalDate appointmentDate,
                         Long doctorId,
                         String statusCode);
+
+        List<AppointmentAgendaResponse> findDoctorAppointments(
+                        LocalDate appointmentDate,
+                        String statusCode);
 }

@@ -8,6 +8,7 @@ import {
 import type {
   AppointmentAgendaFilters,
   AppointmentAgendaResponse,
+  DoctorAppointmentAgendaFilters,
   AppointmentResponse,
 
   PatientAppointmentResponse,
@@ -38,6 +39,7 @@ type AppointmentOperation =
   | "create"
   | "createPatient"
   | "find"
+  | "findDoctor"
   | "findPatient"
   | "cancel"
   | "cancelPatient"
@@ -68,6 +70,25 @@ function getUserMessage(
 
       default:
         return "No fue posible reservar tu cita. Inténtalo nuevamente.";
+    }
+  }
+
+  if (operation === "findDoctor") {
+    switch (status) {
+      case 0:
+        return "No fue posible conectarse con AgenDoc. Verifica tu conexión e inténtalo nuevamente.";
+
+      case 400:
+        return "La fecha seleccionada no es válida.";
+
+      case 403:
+        return "Tu cuenta no tiene autorización para consultar la agenda médica.";
+
+      case 404:
+        return "No fue posible encontrar el perfil médico asociado con tu cuenta.";
+
+      default:
+        return "No fue posible consultar tu agenda médica. Inténtalo nuevamente.";
     }
   }
 
@@ -410,6 +431,31 @@ export async function findAppointments(
     throw mapServiceError(error, "find");
   }
 }
+export async function findDoctorAppointments(
+  filters: DoctorAppointmentAgendaFilters,
+): Promise<AppointmentAgendaResponse[]> {
+  const searchParameters = new URLSearchParams();
+
+  searchParameters.set("date", filters.date);
+
+  const normalizedStatus = filters.status?.trim();
+
+  if (normalizedStatus) {
+    searchParameters.set(
+      "status",
+      normalizedStatus,
+    );
+  }
+
+  try {
+    return await apiGet<AppointmentAgendaResponse[]>(
+      `/api/v1/appointments/doctor?${searchParameters.toString()}`,
+    );
+  } catch (error) {
+    throw mapServiceError(error, "findDoctor");
+  }
+}
+
 export async function findPatientAppointments(): Promise<
   PatientAppointmentResponse[]
 > {

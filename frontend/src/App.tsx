@@ -14,6 +14,7 @@ import RoleHomeRedirect from "./features/auth/components/RoleHomeRedirect";
 import LoginPage from "./features/auth/pages/LoginPage";
 import DashboardPage from "./features/dashboard/pages/DashboardPage";
 import RegisterDoctorPage from "./features/doctor/pages/RegisterDoctorPage";
+import DoctorAgendaPage from "./features/doctorAgenda/pages/DoctorAgendaPage";
 import RegisterPatientPage from "./features/patient/pages/RegisterPatientPage";
 import SearchPatientPage from "./features/patient/pages/SearchPatientPage";
 import PatientAppointmentPage from "./features/patientAppointment/pages/PatientAppointmentPage";
@@ -70,6 +71,17 @@ function App() {
               allowedRoles={["PATIENT"]}
             >
               <PatientAppointmentPage />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/account/agenda"
+          element={
+            <ProtectedRoute
+              allowedRoles={["DOCTOR"]}
+            >
+              <DoctorAgendaPage />
             </ProtectedRoute>
           }
         />

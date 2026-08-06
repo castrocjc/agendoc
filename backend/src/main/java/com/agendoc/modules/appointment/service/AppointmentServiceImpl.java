@@ -492,6 +492,39 @@ public class AppointmentServiceImpl implements AppointmentService {
                         .toList();
         }
 
+        @Override
+        @Transactional(readOnly = true)
+        public List<AppointmentAgendaResponse> findDoctorAppointments(
+                LocalDate appointmentDate,
+                String statusCode) {
+
+                AuthenticatedUserContext context =
+                        authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR
+                        );
+
+                if (context.doctorId() == null) {
+                        throw new ResourceNotFoundException(
+                                DOCTOR_NOT_AVAILABLE
+                        );
+                }
+
+                String normalizedStatusCode =
+                        normalizeStatusCode(statusCode);
+
+                return appointmentRepository
+                        .findClinicAppointments(
+                                context.clinicId(),
+                                appointmentDate,
+                                context.doctorId(),
+                                normalizedStatusCode,
+                                RecordStatus.ACTIVE
+                        )
+                        .stream()
+                        .map(this::toAppointmentAgendaResponse)
+                        .toList();
+        }
+
         private AppointmentEntity findAppointmentForCancellation(
                 Long appointmentId,
                 AuthenticatedUserContext context,

@@ -31,6 +31,7 @@ function AccountHomePage() {
   }
 
   const isPatient = user?.role === "PATIENT";
+  const isDoctor = user?.role === "DOCTOR";
 
   return (
     <main className="account-home-page">
@@ -68,7 +69,9 @@ function AccountHomePage() {
             <p className="account-home-page__eyebrow">
               {isPatient
                 ? "Portal del paciente"
-                : "Cuenta de AgenDoc"}
+                : isDoctor
+                  ? "Portal del médico"
+                  : "Cuenta de AgenDoc"}
             </p>
 
             <h1>
@@ -151,13 +154,17 @@ function AccountHomePage() {
               <h2>
                 {isPatient
                   ? "Reservar una cita"
-                  : "Tu espacio de trabajo"}
+                  : isDoctor
+                    ? "Mi agenda médica"
+                    : "Tu espacio de trabajo"}
               </h2>
 
               <p>
                 {isPatient
                   ? "Consulta médicos, revisa horarios disponibles y reserva una nueva cita."
-                  : "El portal específico para tu rol estará disponible en una próxima historia."}
+                  : isDoctor
+                    ? "Consulta las citas asignadas a tu agenda y revisa la atención planificada para cada fecha."
+                    : "El portal específico para tu rol estará disponible en una próxima historia."}
               </p>
 
               {isPatient && (
@@ -169,6 +176,18 @@ function AccountHomePage() {
                   }}
                 >
                   Reservar cita
+                </AppButton>
+              )}
+
+              {isDoctor && (
+                <AppButton
+                  type="button"
+                  fullWidth={false}
+                  onClick={() => {
+                    navigate("/account/agenda");
+                  }}
+                >
+                  Consultar agenda
                 </AppButton>
               )}
             </div>

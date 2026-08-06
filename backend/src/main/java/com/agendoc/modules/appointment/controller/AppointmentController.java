@@ -120,6 +120,26 @@ public class AppointmentController {
                 return ResponseEntity.ok(response);
         }
 
+        @PreAuthorize("hasRole('DOCTOR')")
+        @GetMapping("/doctor")
+        public ResponseEntity<List<AppointmentAgendaResponse>>
+                findDoctorAppointments(
+                        @RequestParam
+                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                        LocalDate date,
+
+                        @RequestParam(required = false)
+                        String status) {
+
+                List<AppointmentAgendaResponse> response =
+                        appointmentService.findDoctorAppointments(
+                                date,
+                                status
+                        );
+
+                return ResponseEntity.ok(response);
+        }
+
         @PreAuthorize("hasRole('RECEPTIONIST')")
         @GetMapping
         public ResponseEntity<List<AppointmentAgendaResponse>> findAppointments(

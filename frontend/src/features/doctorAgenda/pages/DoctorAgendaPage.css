@@ -1,0 +1,404 @@
+.doctor-agenda-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: var(--space-6);
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(37, 99, 235, 0.09),
+      transparent 34%
+    ),
+    var(--color-background);
+}
+
+.doctor-agenda-page__header {
+  width: min(100%, 1120px);
+  min-height: var(--layout-navbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin: 0 auto var(--space-8);
+}
+
+.doctor-agenda-page__logo {
+  width: auto;
+  height: 44px;
+  object-fit: contain;
+}
+
+.doctor-agenda-page__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.doctor-agenda-page__content {
+  width: min(100%, 1120px);
+  margin: 0 auto;
+}
+
+.doctor-agenda-page__heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+.doctor-agenda-page__heading-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+}
+
+.doctor-agenda-page__eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--color-primary-700);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.doctor-agenda-page__heading h1 {
+  margin: 0 0 var(--space-2);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+}
+
+.doctor-agenda-page__heading p:last-child {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.doctor-agenda-page__filters,
+.doctor-agenda-page__results {
+  box-sizing: border-box;
+  padding: var(--space-6);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.doctor-agenda-page__filters {
+  display: grid;
+  grid-template-columns:
+    minmax(180px, 0.8fr)
+    minmax(220px, 1fr)
+    auto;
+  align-items: start;
+  gap: var(--space-5);
+}
+
+.doctor-agenda-page__filter-action {
+  padding-top: 28px;
+}
+
+.doctor-agenda-page__results {
+  margin-top: var(--space-6);
+}
+
+.doctor-agenda-page__results-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.doctor-agenda-page__results-heading h2 {
+  margin: 0 0 var(--space-1);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+}
+
+.doctor-agenda-page__results-heading p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.doctor-agenda-page__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+}
+
+.doctor-agenda-page__state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  box-sizing: border-box;
+  padding: var(--space-7);
+  border: 1px dashed var(--color-gray-300);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  background: var(--color-gray-50);
+  text-align: center;
+}
+
+.doctor-agenda-page__state h3 {
+  margin: var(--space-3) 0 var(--space-2);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h4);
+}
+
+.doctor-agenda-page__state p {
+  max-width: 520px;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.doctor-agenda-page__state--error {
+  border-color: rgba(239, 68, 68, 0.35);
+  color: var(--color-danger-600);
+  background: rgba(239, 68, 68, 0.05);
+}
+
+.doctor-agenda-page__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-gray-200);
+  border-top-color: var(--color-primary-600);
+  border-radius: 50%;
+  animation: doctor-agenda-spin 800ms linear infinite;
+}
+
+.doctor-agenda-page__table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-md);
+}
+
+.doctor-agenda-page__table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: collapse;
+}
+
+.doctor-agenda-page__table th,
+.doctor-agenda-page__table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--color-gray-200);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.doctor-agenda-page__table th {
+  color: var(--color-text-muted);
+  background: var(--color-gray-50);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.doctor-agenda-page__table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.doctor-agenda-page__table tbody tr:hover {
+  background: rgba(37, 99, 235, 0.025);
+}
+
+.doctor-agenda-page__time,
+.doctor-agenda-page__person {
+  color: var(--color-gray-900);
+  font-weight: var(--font-weight-semibold);
+}
+
+.doctor-agenda-page__status {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  color: var(--color-text-secondary);
+  background: var(--color-gray-100);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-bold);
+  white-space: nowrap;
+}
+
+.doctor-agenda-page__status--programada {
+  color: #1d4ed8;
+  background: rgba(37, 99, 235, 0.1);
+}
+
+.doctor-agenda-page__status--confirmada {
+  color: #0369a1;
+  background: rgba(14, 165, 233, 0.12);
+}
+
+.doctor-agenda-page__status--atendida {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.doctor-agenda-page__status--cancelada {
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.doctor-agenda-page__status--no-asistio {
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.doctor-agenda-page__cards {
+  display: none;
+}
+
+.doctor-agenda-page__appointment-card {
+  padding: var(--space-5);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.doctor-agenda-page__appointment-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-gray-200);
+}
+
+.doctor-agenda-page__appointment-date {
+  margin: 0 0 var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+}
+
+.doctor-agenda-page__appointment-time {
+  margin: 0;
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h4);
+  font-weight: var(--font-weight-bold);
+}
+
+.doctor-agenda-page__appointment-detail {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  color: var(--color-primary-600);
+}
+
+.doctor-agenda-page__appointment-detail div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.doctor-agenda-page__appointment-detail span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+}
+
+.doctor-agenda-page__appointment-detail strong {
+  color: var(--color-gray-900);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+@keyframes doctor-agenda-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 760px) {
+  .doctor-agenda-page {
+    padding: var(--space-4);
+  }
+
+  .doctor-agenda-page__header {
+    align-items: flex-start;
+    margin-bottom: var(--space-6);
+  }
+
+  .doctor-agenda-page__header-actions {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .doctor-agenda-page__filters {
+    grid-template-columns: 1fr;
+  }
+
+  .doctor-agenda-page__filter-action {
+    padding-top: 0;
+  }
+
+  .doctor-agenda-page__filter-action .app-button {
+    width: 100%;
+  }
+
+  .doctor-agenda-page__table-wrapper {
+    display: none;
+  }
+
+  .doctor-agenda-page__cards {
+    display: grid;
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 520px) {
+  .doctor-agenda-page__logo {
+    height: 38px;
+  }
+
+  .doctor-agenda-page__heading {
+    gap: var(--space-4);
+  }
+
+  .doctor-agenda-page__heading-icon {
+    width: 48px;
+    height: 48px;
+  }
+
+  .doctor-agenda-page__heading h1 {
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+  }
+
+  .doctor-agenda-page__filters,
+  .doctor-agenda-page__results {
+    padding: var(--space-5);
+  }
+
+  .doctor-agenda-page__results-heading {
+    align-items: center;
+  }
+}

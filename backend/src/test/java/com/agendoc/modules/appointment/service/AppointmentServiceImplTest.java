@@ -86,6 +86,8 @@ class AppointmentServiceImplTest {
 
         private AuthenticatedUserContext patientContext;
 
+        private AuthenticatedUserContext doctorContext;
+
         private AppointmentServiceImpl appointmentService;
 
         @BeforeEach
@@ -117,6 +119,15 @@ class AppointmentServiceImplTest {
                         SecurityRoleCode.PATIENT.name(),
                         1L,
                         null
+                );
+
+                doctorContext = new AuthenticatedUserContext(
+                        300L,
+                        "doctor.user",
+                        1L,
+                        SecurityRoleCode.DOCTOR.name(),
+                        null,
+                        2L
                 );
         }
 
@@ -956,6 +967,167 @@ class AppointmentServiceImplTest {
                                                 null,
                                                 RecordStatus.ACTIVE);
 
+        }
+
+        @Test
+        void shouldFindAuthenticatedDoctorAppointmentsByDate() {
+                LocalDate appointmentDate = LocalDate.of(2026, 8, 6);
+
+                ClinicEntity clinic = createClinic();
+                PatientEntity patient = createPatient(clinic);
+                DoctorEntity doctor = createDoctorWithSpecialty(clinic);
+
+                AgendaBlockEntity agendaBlock = createAgendaBlock(
+                                clinic,
+                                doctor,
+                                appointmentDate);
+
+                AppointmentStatusEntity appointmentStatus =
+                                createAppointmentStatus();
+
+                AppointmentEntity appointment = createAppointment(
+                                clinic,
+                                patient,
+                                doctor,
+                                agendaBlock,
+                                appointmentStatus);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository.findClinicAppointments(
+                                doctorContext.clinicId(),
+                                appointmentDate,
+                                doctorContext.doctorId(),
+                                null,
+                                RecordStatus.ACTIVE))
+                                .thenReturn(List.of(appointment));
+
+                List<AppointmentAgendaResponse> response =
+                                appointmentService.findDoctorAppointments(
+                                                appointmentDate,
+                                                null);
+
+                assertThat(response).hasSize(1);
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.DOCTOR);
+
+                verify(appointmentRepository)
+                                .findClinicAppointments(
+                                                doctorContext.clinicId(),
+                                                appointmentDate,
+                                                doctorContext.doctorId(),
+                                                null,
+                                                RecordStatus.ACTIVE);
+        }
+
+        @Test
+        void shouldFindAuthenticatedDoctorAppointmentsUsingStatusFilter() {
+                LocalDate appointmentDate = LocalDate.of(2026, 8, 6);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository.findClinicAppointments(
+                                doctorContext.clinicId(),
+                                appointmentDate,
+                                doctorContext.doctorId(),
+                                "CONFIRMADA",
+                                RecordStatus.ACTIVE))
+                                .thenReturn(List.of());
+
+                List<AppointmentAgendaResponse> response =
+                                appointmentService.findDoctorAppointments(
+                                                appointmentDate,
+                                                " confirmada ");
+
+                assertThat(response).isEmpty();
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.DOCTOR);
+
+                verify(appointmentRepository)
+                                .findClinicAppointments(
+                                                doctorContext.clinicId(),
+                                                appointmentDate,
+                                                doctorContext.doctorId(),
+                                                "CONFIRMADA",
+                                                RecordStatus.ACTIVE);
+        }
+
+        @Test
+        void shouldReturnEmptyListWhenAuthenticatedDoctorHasNoAppointments() {
+                LocalDate appointmentDate = LocalDate.of(2026, 8, 7);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContext);
+
+                when(appointmentRepository.findClinicAppointments(
+                                doctorContext.clinicId(),
+                                appointmentDate,
+                                doctorContext.doctorId(),
+                                null,
+                                RecordStatus.ACTIVE))
+                                .thenReturn(List.of());
+
+                List<AppointmentAgendaResponse> response =
+                                appointmentService.findDoctorAppointments(
+                                                appointmentDate,
+                                                null);
+
+                assertThat(response).isEmpty();
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.DOCTOR);
+
+                verify(appointmentRepository)
+                                .findClinicAppointments(
+                                                doctorContext.clinicId(),
+                                                appointmentDate,
+                                                doctorContext.doctorId(),
+                                                null,
+                                                RecordStatus.ACTIVE);
+        }
+
+        @Test
+        void shouldRejectDoctorAgendaWhenContextHasNoDoctorProfile() {
+                LocalDate appointmentDate = LocalDate.of(2026, 8, 6);
+
+                AuthenticatedUserContext doctorContextWithoutProfile =
+                                new AuthenticatedUserContext(
+                                                300L,
+                                                "doctor.user",
+                                                1L,
+                                                SecurityRoleCode.DOCTOR.name(),
+                                                null,
+                                                null);
+
+                when(authenticatedUserAuthorization.requireRole(
+                                SecurityRoleCode.DOCTOR))
+                                .thenReturn(doctorContextWithoutProfile);
+
+                assertThatThrownBy(() ->
+                                appointmentService.findDoctorAppointments(
+                                                appointmentDate,
+                                                null))
+                                .isInstanceOf(ResourceNotFoundException.class)
+                                .hasMessage(
+                                                "El médico seleccionado no está disponible.");
+
+                verify(authenticatedUserAuthorization)
+                                .requireRole(SecurityRoleCode.DOCTOR);
+
+                verify(appointmentRepository, never())
+                                .findClinicAppointments(
+                                                any(),
+                                                any(),
+                                                any(),
+                                                any(),
+                                                any());
         }
 
         @Test

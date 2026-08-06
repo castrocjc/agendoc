@@ -9,7 +9,7 @@
   ----------- -----------------------------------------
   Proyecto    AgenDoc
   Documento   Project Summary
-  Versión     v1.4
+  Versión     v1.5
   Estado      Vigente
   Ubicación   docs/project/AgenDoc Project Summary.md
 
@@ -47,6 +47,10 @@
                                             Cancelar cita desde el Portal
                                             del Paciente y actualización
                                             del Portal del Paciente.
+
+  v1.5                   Agosto 2026        Incorporación de la HU-16 ---
+                                            Consultar agenda del médico e
+                                            inicio oficial del Sprint 5.
   -----------------------------------------------------------------------
 
 ------------------------------------------------------------------------
@@ -72,9 +76,9 @@ individualmente en:
   Indicador                                         Valor
   ----------------------------------- -------------------
   Foundation                                ✅ Completada
-  Sprint actual                                  Sprint 4
+  Sprint actual                                  Sprint 5
   Sprints completados                                   3
-  Historias funcionales completadas               16 / 21
+  Historias funcionales completadas               17 / 21
   Habilitadores técnicos                            5 / 5
   Estado general                        Desarrollo activo
 
@@ -82,7 +86,7 @@ individualmente en:
 
 ## Última historia completada
 
-**HU-21 --- Cancelar cita desde el Portal del Paciente**
+**HU-16 --- Consultar agenda del médico**
 
 Estado
 
@@ -92,7 +96,7 @@ Estado
 
 ## Próxima historia
 
-**HU-16 --- Consultar agenda del médico**
+**HU-17 --- Registrar observación médica básica**
 
 Estado
 
@@ -178,7 +182,7 @@ Usuario.
 
   Historia                                            Estado
   --------------------------------------------------- --------
-  HU-16 --- Consultar agenda del médico               ⏳
+  HU-16 --- Consultar agenda del médico               ✅
   HU-17 --- Registrar observación médica básica       ⏳
   HU-18 --- Marcar cita como atendida                 ⏳
   HU-19 --- Consultar historial básico del paciente   ⏳
@@ -217,8 +221,8 @@ Usuario.
   Sprint 1     ✅
   Sprint 2     ✅
   Sprint 3     ✅
-  Sprint 4     🚧 En ejecución
-  Sprint 5     ⏳ Planificado
+  Sprint 4     ✅
+  Sprint 5     🚧 En ejecución
 
 ------------------------------------------------------------------------
 
@@ -331,13 +335,17 @@ Capacidades disponibles:
 -   Navegación propia del paciente.
 -   Experiencia visual consistente con la Recepción Digital.
 
-Pendiente:
+Capacidades disponibles:
 
--   Cancelación de citas futuras desde el Portal del Paciente.
--   Validación para permitir únicamente cancelar citas PROGRAMADA antes
-    de su inicio.
--   Motivo opcional de cancelación.
--   Actualización automática del historial después de cancelar una cita.
+-   Inicio de sesión.
+-   Acceso mediante JWT.
+-   Contexto autenticado.
+-   Consulta de médicos.
+-   Consulta de disponibilidad.
+-   Reserva de nuevas citas.
+-   Consulta del historial de citas.
+-   Cancelación de citas futuras.
+-   Actualización automática del historial.
 
 Pendiente:
 
@@ -349,7 +357,7 @@ Pendiente:
 
 Estado
 
-⏳ No iniciado
+🚧 Parcialmente implementado
 
 Historias planificadas:
 
@@ -406,7 +414,14 @@ Actualmente permite:
 
 ## Médico
 
-Reservado para Sprint 5.
+Actualmente permite:
+
+- iniciar sesión con rol DOCTOR.
+- consultar únicamente la agenda del médico autenticado.
+- filtrar por fecha.
+- filtrar por estado.
+- aislamiento por consultorio y por médico.
+
 
 ------------------------------------------------------------------------
 
@@ -456,7 +471,7 @@ Estado
 
 ✅ Estable
 
--   143 pruebas automáticas.
+-   148 pruebas automáticas.
 -   BUILD SUCCESS.
 -   Sin errores.
 -   Seguridad endurecida.
@@ -529,7 +544,30 @@ Frontend:
 
 ------------------------------------------------------------------------
 
-# 13. Organización documental
+
+------------------------------------------------------------------------
+
+# 13. Funcionalidades incorporadas durante HU-16
+
+La historia HU-16 incorporó el primer módulo funcional del Portal del Médico.
+
+Backend:
+
+- Nuevo endpoint para consultar la agenda del médico autenticado.
+- Reutilización del AuthenticatedUserContext con doctorId.
+- Aislamiento por consultorio y médico autenticado.
+- Cobertura total mediante pruebas unitarias.
+
+Frontend:
+
+- Nuevo módulo features/doctorAgenda.
+- Nueva página Mi agenda médica.
+- Integración con el Portal del Médico.
+- Consulta automática de agenda.
+- Filtros por fecha y estado.
+- Navegación protegida para el rol DOCTOR.
+
+# 14. Organización documental
 
 La documentación oficial del proyecto está compuesta por:
 
@@ -556,7 +594,7 @@ trazabilidad histórica del proyecto.
 
 ------------------------------------------------------------------------
 
-# 14. Próximos pasos
+# 15. Próximos pasos
 
 La siguiente historia planificada es:
 
@@ -566,16 +604,17 @@ Consultar agenda del médico.
 
 ------------------------------------------------------------------------
 
-# 15. Estado final
+# 16. Estado final
 
 El proyecto mantiene un alto nivel de consistencia arquitectónica entre
 backend y frontend.
 
-Actualmente se dispone de tres experiencias funcionales:
+Actualmente se dispone de cuatro experiencias funcionales:
 
 -   Recepción Digital pública.
 -   Portal de Recepción.
 -   Portal del Paciente.
+-   Portal del Médico.
 
 La seguridad se basa en autenticación JWT, autorización por rol y
 aislamiento por dominio de consultorio.
