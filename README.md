@@ -26,7 +26,7 @@ AgenDoc es una plataforma Web y Mobile para la gestión de consultorios médicos
 
 ```text
 backend/
-frontend-web/
+frontend/
 mobile/
 database/
 docker/

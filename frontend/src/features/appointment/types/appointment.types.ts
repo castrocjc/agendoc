@@ -1,0 +1,149 @@
+export interface CreateAppointmentRequest {
+  patientId: number;
+  doctorId: number;
+  agendaBlockId: number;
+  reason: string | null;
+  notes: string | null;
+}
+
+export interface CreatePatientAppointmentRequest {
+  doctorId: number;
+  agendaBlockId: number;
+  reason: string | null;
+  notes: string | null;
+}
+
+export interface CancelAppointmentRequest {
+  reason: string | null;
+}
+
+export interface RegisterAppointmentNoShowRequest {
+  comment: string | null;
+}
+
+export interface RescheduleAppointmentRequest {
+  agendaBlockId: number;
+}
+
+export interface RegisterMedicalObservationRequest {
+  observation: string;
+}
+
+export interface MedicalObservationResponse {
+  appointmentId: number;
+  observation: string | null;
+  recordedAt: string | null;
+  recordedBy: string | null;
+}
+
+
+export interface PatientMedicalHistoryResponse {
+  appointmentId: number;
+  appointmentDate: string;
+  startTime: string;
+
+  doctorId: number;
+  doctorFirstName: string;
+  doctorLastName: string;
+
+  specialtyId: number;
+  specialtyName: string;
+
+  medicalObservation: string;
+  recordedAt: string | null;
+  recordedBy: string | null;
+}
+
+
+export interface AppointmentResponse {
+  id: number;
+  clinicId: number;
+
+  patientId: number;
+  patientFirstName: string;
+  patientLastName: string;
+
+  doctorId: number;
+  doctorFirstName: string;
+  doctorLastName: string;
+
+  agendaBlockId: number;
+  appointmentDate: string;
+  startTime: string;
+  endTime: string;
+
+  statusCode: string;
+  statusName: string;
+
+  reason: string | null;
+  notes: string | null;
+
+  cancellationReason: string | null;
+  cancelledAt: string | null;
+
+  recordStatus: string;
+}
+
+export interface AppointmentAgendaResponse {
+  id: number;
+
+  patientId: number;
+  patientFirstName: string;
+  patientLastName: string;
+
+  doctorId: number;
+  doctorFirstName: string;
+  doctorLastName: string;
+
+  specialtyId: number;
+  specialtyName: string;
+
+  agendaBlockId: number;
+  appointmentDate: string;
+  startTime: string;
+  endTime: string;
+
+  statusCode: string;
+  statusName: string;
+
+  reason: string | null;
+}
+
+export interface AppointmentAgendaFilters {
+  date: string;
+  doctorId?: number;
+  status?: string;
+}
+
+export interface DoctorAppointmentAgendaFilters {
+  date: string;
+  status?: string;
+}
+export type AppointmentStatusCode =
+  | "PROGRAMADA"
+  | "CONFIRMADA"
+  | "ATENDIDA"
+  | "CANCELADA"
+  | "NO_ASISTIO";
+
+export interface PatientAppointmentResponse {
+  id: number;
+
+  doctorId: number;
+  doctorFirstName: string;
+  doctorLastName: string;
+
+  specialtyId: number;
+  specialtyName: string;
+
+  agendaBlockId: number;
+  appointmentDate: string;
+  startTime: string;
+  endTime: string;
+
+  statusCode: AppointmentStatusCode;
+  statusName: string;
+
+  reason: string | null;
+  cancellationReason: string | null;
+}

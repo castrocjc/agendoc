@@ -1,0 +1,219 @@
+.search-patient-page {
+    min-height: 100vh;
+    background: var(--color-neutral-50, #f8fafc);
+}
+
+.search-patient-page__header {
+    min-height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 24px;
+    border-bottom: 1px solid var(--color-neutral-200, #e2e8f0);
+    background: #ffffff;
+}
+
+.search-patient-page__logo {
+    display: block;
+    width: 140px;
+    height: auto;
+}
+
+.search-patient-page__content {
+    width: min(1000px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 48px 0 64px;
+}
+
+.search-patient-page__heading {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.search-patient-page__heading h1 {
+    margin: 0 0 8px;
+    color: var(--color-neutral-900, #0f172a);
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 40px;
+}
+
+.search-patient-page__heading p {
+    margin: 0;
+    color: var(--color-neutral-600, #475569);
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.search-patient-page__icon {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--color-primary-600, #2563eb);
+}
+
+.search-patient-page__card,
+.search-patient-page__results {
+    padding: 32px;
+    border: 1px solid var(--color-neutral-200, #e2e8f0);
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+.search-patient-page__results {
+    margin-top: 24px;
+}
+
+.search-patient-page__section-heading,
+.search-patient-page__results-heading {
+    margin-bottom: 24px;
+}
+
+.search-patient-page__section-heading h2,
+.search-patient-page__results-heading h2 {
+    margin: 0 0 4px;
+    color: var(--color-neutral-900, #0f172a);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 28px;
+}
+
+.search-patient-page__section-heading p {
+    margin: 0;
+    color: var(--color-neutral-600, #475569);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.search-patient-page__form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 16px;
+}
+
+.search-patient-page__results-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.search-patient-page__results-heading p {
+    margin: 4px 0 0;
+    color: var(--color-neutral-600, #475569);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.search-patient-page__state {
+    display: grid;
+    justify-items: center;
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--color-neutral-500, #64748b);
+}
+
+.search-patient-page__state svg {
+    margin-bottom: 16px;
+    color: var(--color-primary-600, #2563eb);
+}
+
+.search-patient-page__state h3 {
+    margin: 0 0 8px;
+    color: var(--color-neutral-900, #0f172a);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+}
+
+.search-patient-page__state p {
+    max-width: 480px;
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.search-patient-page__state--error svg {
+    color: var(--color-danger, #ef4444);
+}
+
+.search-patient-page__state--error h3 {
+    color: #b91c1c;
+}
+
+.search-patient-page__result-list {
+    display: grid;
+    gap: 16px;
+}
+
+.search-patient-page__spinner {
+    width: 32px;
+    height: 32px;
+    margin-bottom: 16px;
+    border: 3px solid var(--color-neutral-200, #e2e8f0);
+    border-top-color: var(--color-primary-600, #2563eb);
+    border-radius: 999px;
+    animation: search-patient-spin 700ms linear infinite;
+}
+
+@keyframes search-patient-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 767px) {
+    .search-patient-page__header {
+        padding: 12px 16px;
+    }
+
+    .search-patient-page__logo {
+        width: 120px;
+    }
+
+    .search-patient-page__content {
+        width: min(100% - 24px, 1000px);
+        padding: 32px 0 48px;
+    }
+
+    .search-patient-page__heading {
+        gap: 12px;
+    }
+
+    .search-patient-page__heading h1 {
+        font-size: 24px;
+        line-height: 32px;
+    }
+
+    .search-patient-page__icon {
+        width: 44px;
+        height: 44px;
+    }
+
+    .search-patient-page__card,
+    .search-patient-page__results {
+        padding: 24px 16px;
+    }
+
+    .search-patient-page__form {
+        grid-template-columns: 1fr;
+        align-items: stretch;
+    }
+
+    .search-patient-page__form .app-button {
+        width: 100%;
+    }
+
+    .search-patient-page__state {
+    padding: 40px 16px;
+    }
+}

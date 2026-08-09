@@ -1,0 +1,253 @@
+.patient-appointments-page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  padding: var(--space-6);
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(37, 99, 235, 0.09),
+      transparent 34%
+    ),
+    var(--color-background);
+}
+
+.patient-appointments-page__header {
+  width: min(100%, 1120px);
+  min-height: var(--layout-navbar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  margin: 0 auto var(--space-8);
+}
+
+.patient-appointments-page__logo {
+  width: auto;
+  height: 44px;
+  object-fit: contain;
+}
+
+.patient-appointments-page__content {
+  width: min(100%, 900px);
+  margin: 0 auto;
+}
+
+.patient-appointments-page__intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.patient-appointments-page__eyebrow {
+  margin: 0 0 var(--space-1);
+  color: var(--color-primary-700);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.patient-appointments-page__intro h1 {
+  margin: 0 0 var(--space-2);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+}
+
+.patient-appointments-page__intro p:last-child {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.patient-appointments-page__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  overflow-x: auto;
+  box-sizing: border-box;
+  padding: var(--space-2);
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+}
+
+.patient-appointments-page__filter {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  flex: 1 0 auto;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  background: transparent;
+  font: inherit;
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-semibold);
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.patient-appointments-page__filter:hover {
+  color: var(--color-primary-700);
+  background: var(--color-primary-50);
+}
+
+.patient-appointments-page__filter--active {
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+  box-shadow: var(--shadow-sm);
+}
+
+.patient-appointments-page__filter-count {
+  min-width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 0 var(--space-2);
+  border-radius: 999px;
+  color: inherit;
+  background: rgba(255, 255, 255, 0.72);
+  font-size: var(--font-size-caption);
+}
+
+.patient-appointments-page__list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.patient-appointments-page__feedback,
+.patient-appointments-page__empty {
+  box-sizing: border-box;
+  padding: var(--space-7);
+}
+
+.patient-appointments-page__feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.patient-appointments-page__feedback-icon,
+.patient-appointments-page__empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: var(--radius-md);
+}
+
+.patient-appointments-page__feedback-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.patient-appointments-page__feedback-icon--loading {
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+}
+
+.patient-appointments-page__feedback-icon--loading svg {
+  animation: patient-appointments-spin 1s linear infinite;
+}
+
+.patient-appointments-page__feedback-icon--error {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.patient-appointments-page__feedback-content {
+  flex: 1;
+}
+
+.patient-appointments-page__feedback h2,
+.patient-appointments-page__empty h2 {
+  margin: 0 0 var(--space-2);
+  color: var(--color-gray-900);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+}
+
+.patient-appointments-page__feedback p,
+.patient-appointments-page__empty p {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.patient-appointments-page__feedback .app-button,
+.patient-appointments-page__empty .app-button {
+  margin-top: var(--space-4);
+}
+
+.patient-appointments-page__empty {
+  text-align: center;
+}
+
+.patient-appointments-page__empty-icon {
+  width: 58px;
+  height: 58px;
+  margin-bottom: var(--space-4);
+  color: var(--color-primary-700);
+  background: var(--color-primary-100);
+}
+
+@keyframes patient-appointments-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 720px) {
+  .patient-appointments-page {
+    padding: var(--space-4);
+  }
+
+  .patient-appointments-page__header {
+    margin-bottom: var(--space-6);
+  }
+
+  .patient-appointments-page__intro {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .patient-appointments-page__intro .app-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .patient-appointments-page__header {
+    align-items: flex-start;
+  }
+
+  .patient-appointments-page__logo {
+    height: 38px;
+  }
+
+  .patient-appointments-page__intro h1 {
+    font-size: var(--font-size-h2);
+    line-height: var(--line-height-h2);
+  }
+
+  .patient-appointments-page__feedback {
+    padding: var(--space-5);
+  }
+}
