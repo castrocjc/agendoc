@@ -7,6 +7,7 @@ import type {
 } from "react";
 import {
   useNavigate,
+  useSearchParams,
 } from "react-router-dom";
 import {
   CalendarDays,
@@ -32,6 +33,9 @@ import "./LoginPage.css";
 
 function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const clinicSlug = searchParams.get("clinic")?.trim() ?? "";
+  const hasClinicContext = clinicSlug.length > 0;
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -231,15 +235,29 @@ function LoginPage() {
               </AppButton>
             </form>
 
-            <p className="login-footer">
-              ¿No tienes una cuenta?{" "}
-              <button
-                type="button"
-                disabled={isSubmitting}
-              >
-                Contacta al administrador
-              </button>
-            </p>
+            <div className="login-footer">
+              {hasClinicContext ? (
+                <>
+                  <span>¿Aún no tienes una cuenta?</span>
+
+                  <button
+                    type="button"
+                    disabled={isSubmitting}
+                    onClick={() => {
+                      navigate(
+                        `/c/${encodeURIComponent(clinicSlug)}`,
+                      );
+                    }}
+                  >
+                    Reserva tu primera cita
+                  </button>
+                </>
+              ) : (
+                <span>
+                  Si aún no tienes una cuenta, accede desde la Recepción Digital de tu consultorio.
+                </span>
+              )}
+            </div>
           </AppCard>
         </section>
       </section>
