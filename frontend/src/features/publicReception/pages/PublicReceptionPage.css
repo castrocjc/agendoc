@@ -1101,6 +1101,20 @@
   line-height: var(--line-height-small);
 }
 
+.public-reception__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.public-reception__booking-success-actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
 @keyframes public-reception-spin {
   to {
     transform: rotate(360deg);
@@ -1194,6 +1208,20 @@
 }
 
 @media (max-width: 560px) {
+  .public-reception__header-actions {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .public-reception__booking-success-actions {
+    flex-direction: column;
+  }
+
+  .public-reception__booking-success-actions .app-button {
+    width: 100%;
+  }
+
   .public-reception {
     padding: var(--space-4);
   }
