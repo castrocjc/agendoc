@@ -30,6 +30,7 @@ import {
   UserRound,
 } from "lucide-react";
 import {
+  useNavigate,
   useParams,
 } from "react-router-dom";
 
@@ -389,6 +390,8 @@ function PublicReceptionPage() {
     () => clinicSlug?.trim() ?? "",
     [clinicSlug],
   );
+
+  const navigate = useNavigate();
 
   const handleClinicError = useCallback((error: unknown) => {
     setClinic(null);
@@ -914,9 +917,25 @@ function PublicReceptionPage() {
             </div>
           </div>
 
-          <span className="public-reception__brand">
-            AgenDoc
-          </span>
+          <div className="public-reception__header-actions">
+            <span className="public-reception__brand">
+              AgenDoc
+            </span>
+
+            <AppButton
+              type="button"
+              variant="outline"
+              size="sm"
+              fullWidth={false}
+              onClick={() => {
+                navigate(
+                  `/login?clinic=${encodeURIComponent(normalizedClinicSlug)}`,
+                );
+              }}
+            >
+              Iniciar sesión
+            </AppButton>
+          </div>
         </header>
 
         {currentStep === "welcome" ? (
@@ -1813,7 +1832,7 @@ function PublicReceptionPage() {
                                 Tu primera cita fue registrada correctamente
                               </h2>
                               <p>
-                                Enviamos la reserva para{" "}
+                                La reserva quedó registrada para{" "}
                                 <strong>
                                   {bookingResult.firstName}{" "}
                                   {bookingResult.lastName}
@@ -1878,6 +1897,32 @@ function PublicReceptionPage() {
                                 y la contraseña que acabas de crear para acceder a AgenDoc.
                               </p>
                             </div>
+
+                            <div className="public-reception__booking-success-actions">
+                              <AppButton
+                                type="button"
+                                fullWidth={false}
+                                onClick={() => {
+                                  navigate(
+                                    `/login?clinic=${encodeURIComponent(normalizedClinicSlug)}`,
+                                  );
+                                }}
+                              >
+                                Iniciar sesión y ver mis citas
+                              </AppButton>
+
+                              <AppButton
+                                type="button"
+                                variant="outline"
+                                fullWidth={false}
+                                onClick={() => {
+                                  navigate(`/c/${normalizedClinicSlug}`);
+                                }}
+                              >
+                                Volver a la recepción
+                              </AppButton>
+                            </div>
+
                           </div>
                         )}
                     </>
