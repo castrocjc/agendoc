@@ -524,6 +524,15 @@
   text-align: left;
 }
 
+.patient-appointment-page__character-counter {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  text-align: right;
+}
+
 @keyframes patient-appointment-spin {
   to {
     transform: rotate(360deg);

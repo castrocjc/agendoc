@@ -106,3 +106,23 @@
 .app-input__error {
   color: var(--color-danger);
 }
+
+.app-input__icon-button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.app-input__icon-button:hover {
+  color: var(--color-text-secondary);
+}
+
+.app-input__icon-button:focus-visible {
+  outline: 2px solid var(--color-primary-600);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
