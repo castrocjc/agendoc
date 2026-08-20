@@ -771,6 +771,34 @@ function PublicReceptionPage() {
     setCurrentStep("welcome");
   }, [bookingStatus, currentStep]);
 
+  const resetBookingFlow = useCallback(() => {
+    setSelectedSpecialty(null);
+
+    setSelectedDoctor(null);
+    setDoctors([]);
+    setDoctorsStatus("idle");
+    setDoctorsError("");
+
+    setSelectedDate("");
+
+    setAvailability([]);
+    setAvailabilityStatus("idle");
+    setAvailabilityError("");
+    setSelectedAvailability(null);
+
+    setPatientForm(INITIAL_PATIENT_FORM);
+    setPatientFormErrors({});
+
+    setShowPassword(false);
+    setShowPasswordConfirmation(false);
+
+    setBookingStatus("idle");
+    setBookingError("");
+    setBookingResult(null);
+
+    setCurrentStep("welcome");
+  }, []);
+
   useEffect(() => {
     if (!normalizedClinicSlug) {
       return;
@@ -1570,6 +1598,14 @@ function PublicReceptionPage() {
                                 ? <EyeOff size={18} />
                                 : <Eye size={18} />
                             }
+                            onRightIconClick={() => {
+                              setShowPassword((current) => !current);
+                            }}
+                            rightIconAriaLabel={
+                              showPassword
+                                ? "Ocultar contraseña"
+                                : "Mostrar contraseña"
+                            }
                             onChange={(event) => {
                               updatePatientField(
                                 "password",
@@ -1597,6 +1633,16 @@ function PublicReceptionPage() {
                                 showPasswordConfirmation
                                   ? <EyeOff size={18} />
                                   : <Eye size={18} />
+                              }
+                              onRightIconClick={() => {
+                                setShowPasswordConfirmation(
+                                  (current) => !current,
+                                );
+                              }}
+                              rightIconAriaLabel={
+                                showPasswordConfirmation
+                                  ? "Ocultar confirmación de contraseña"
+                                  : "Mostrar confirmación de contraseña"
                               }
                               onChange={(event) => {
                                 updatePatientField(
@@ -1915,9 +1961,7 @@ function PublicReceptionPage() {
                                 type="button"
                                 variant="outline"
                                 fullWidth={false}
-                                onClick={() => {
-                                  navigate(`/c/${normalizedClinicSlug}`);
-                                }}
+                                onClick={resetBookingFlow}
                               >
                                 Volver a la recepción
                               </AppButton>

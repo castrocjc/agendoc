@@ -15,20 +15,24 @@ interface AppInputProps
   helperText?: string;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
+  onRightIconClick?: () => void;
+  rightIconAriaLabel?: string;
 }
 
 const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
   function AppInput(
-    {
-      id,
-      label,
-      error,
-      helperText,
-      leftIcon,
-      rightIcon,
-      className = "",
-      ...props
-    },
+  {
+    id,
+    label,
+    error,
+    helperText,
+    leftIcon,
+    rightIcon,
+    onRightIconClick,
+    rightIconAriaLabel,
+    className = "",
+    ...props
+  },
     ref,
   ) {
     const helperId = helperText ? `${id}-helper` : undefined;
@@ -88,12 +92,23 @@ const AppInput = forwardRef<HTMLInputElement, AppInputProps>(
           />
 
           {rightIcon && (
-            <span
-              className="app-input__icon app-input__icon--right"
-              aria-hidden="true"
-            >
-              {rightIcon}
-            </span>
+            onRightIconClick ? (
+              <button
+                type="button"
+                className="app-input__icon app-input__icon--right app-input__icon-button"
+                onClick={onRightIconClick}
+                aria-label={rightIconAriaLabel}
+              >
+                {rightIcon}
+              </button>
+            ) : (
+              <span
+                className="app-input__icon app-input__icon--right"
+                aria-hidden="true"
+              >
+                {rightIcon}
+              </span>
+            )
           )}
         </div>
 

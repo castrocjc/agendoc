@@ -1098,11 +1098,13 @@ function PatientAppointmentPage() {
                             rows={3}
                             maxLength={500}
                             value={form.reason}
-                            aria-invalid={
-                              Boolean(formErrors.reason)
-                            }
+                            aria-invalid={Boolean(formErrors.reason)}
                             onChange={updateField}
                           />
+
+                          <small className="patient-appointment-page__character-counter">
+                            {form.reason.length}/500 caracteres
+                          </small>
 
                           {formErrors.reason && (
                             <small className="patient-appointment-page__field-error">
@@ -1122,11 +1124,13 @@ function PatientAppointmentPage() {
                             rows={4}
                             maxLength={1000}
                             value={form.notes}
-                            aria-invalid={
-                              Boolean(formErrors.notes)
-                            }
+                            aria-invalid={Boolean(formErrors.notes)}
                             onChange={updateField}
                           />
+
+                          <small className="patient-appointment-page__character-counter">
+                            {form.notes.length}/1000 caracteres
+                          </small>
 
                           {formErrors.notes && (
                             <small className="patient-appointment-page__field-error">
