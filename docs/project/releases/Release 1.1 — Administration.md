@@ -8,7 +8,7 @@
 |---|---|
 | Proyecto | AgenDoc |
 | Documento | Release 1.1 — Administration |
-| Versión | v1.1 |
+| Versión | v1.2 |
 | Estado | ✅ Backlog refinado |
 | Release | 1.1 |
 | Release anterior | Release 1.0 — MVP |
@@ -25,6 +25,7 @@
 |---|---|---|---|
 | v1.0 | Agosto 2026 | Equipo AgenDoc | Creación de la planificación inicial. |
 | v1.1 | Agosto 2026 | Equipo AgenDoc | Refinamiento de épicas, Product Backlog, habilitadores técnicos y planificación preliminar de Sprints 6 a 10. |
+| v1.2 | Agosto 2026 | Equipo AgenDoc | Refinamiento del modelo funcional de identidad del paciente, registro progresivo, prevención de duplicados y vinculación posterior entre perfiles de dominio e identidad digital. |
 
 ---
 
@@ -738,14 +739,16 @@ Como usuario autorizado, quiero vincular perfiles de médico, paciente o recepci
 3. Se evita crear un perfil duplicado de la misma clase dentro del consultorio.
 4. Un médico puede mantener también un perfil de paciente.
 5. Una recepcionista puede mantener también un perfil de paciente.
-6. Retirar un rol no elimina automáticamente el perfil histórico.
-7. La vinculación se limita al consultorio autenticado.
-8. La operación queda auditada.
+6. Un perfil de dominio existente sin identidad asociada puede vincularse posteriormente a una identidad válida del mismo consultorio sin crear un segundo perfil ni perder su historia.
+7. Retirar un rol no elimina automáticamente el perfil histórico.
+8. La vinculación se limita al consultorio autenticado.
+9. La operación queda auditada.
 
 ### Reglas de negocio
 
 - User, Role y perfiles de dominio son conceptos independientes.
 - La existencia de un perfil no sustituye la autorización.
+- La vinculación de una identidad a un perfil existente no crea, reemplaza ni elimina el perfil de dominio original.
 - No se elimina físicamente un perfil con historia.
 - La identidad global entre distintos consultorios queda fuera del alcance.
 
@@ -804,20 +807,36 @@ Como usuario autorizado, quiero consultar, crear y actualizar pacientes para man
 
 ### Criterios de aceptación
 
-1. Se buscan pacientes dentro del consultorio.
-2. Se puede crear un paciente vinculado a una identidad nueva o existente.
-3. Se pueden actualizar datos administrativos permitidos.
-4. Se detectan posibles duplicados por correo y otros identificadores vigentes.
-5. Los registros con citas no se eliminan físicamente.
-6. La información clínica avanzada no forma parte del formulario.
-7. Las modificaciones relevantes quedan auditadas.
+1. Se buscan pacientes exclusivamente dentro del consultorio autenticado.
+2. La búsqueda permite localizar pacientes por nombre, apellido, documento, teléfono y correo.
+3. Se puede crear un paciente sin una identidad User asociada.
+4. Para el registro inicial son obligatorios nombre, apellido y teléfono.
+5. Documento, fecha de nacimiento, correo y dirección pueden completarse progresivamente.
+6. Cuando se informa un documento, tipo y número deben proporcionarse conjuntamente.
+7. La identidad documental se valida mediante consultorio, tipo de documento y número de documento.
+8. Si el mismo documento ya corresponde a otro paciente del mismo consultorio, se bloquea la creación de un nuevo perfil y se permite revisar el paciente existente.
+9. Una coincidencia exclusivamente por teléfono se presenta como posible duplicado, pero no bloquea por sí sola la creación.
+10. Una coincidencia exclusivamente por correo se presenta como posible duplicado, pero no constituye por sí sola prueba de identidad.
+11. Se pueden actualizar posteriormente los datos administrativos permitidos del paciente.
+12. Los registros con citas no se eliminan físicamente.
+13. No se fusionan pacientes automáticamente.
+14. La información clínica avanzada no forma parte del formulario.
+15. Las modificaciones relevantes quedan auditadas.
 
 ### Reglas de negocio
 
+- Patient representa el perfil de dominio del paciente y User representa su identidad digital.
 - Un paciente pertenece al contexto del consultorio en esta Release.
+- Un Patient puede existir sin una identidad User asociada.
+- Una cita requiere un Patient, pero no requiere que ese Patient tenga una identidad User asociada.
 - La cuenta y el perfil de paciente pueden existir en estados diferentes.
+- Cuando está disponible, el documento constituye un identificador fuerte del paciente dentro del consultorio y su unicidad considera conjuntamente tipo y número de documento.
+- Tipo y número de documento deben informarse conjuntamente o permanecer ambos ausentes durante un registro progresivo.
+- Teléfono y correo del Patient son datos de contacto y una coincidencia aislada en estos campos no constituye por sí sola prueba suficiente de identidad.
+- La ausencia de documento, fecha de nacimiento, correo o dirección no impide el registro inicial del Patient.
+- Los datos administrativos opcionales pueden completarse posteriormente.
 - No se fusionan pacientes automáticamente.
-- Historia clínica, diagnósticos y documentos están fuera del alcance.
+- Historia clínica, diagnósticos, archivos clínicos y documentación médica están fuera del alcance.
 
 ---
 

@@ -33,7 +33,7 @@
 | Release | Estado | Documento |
 |----------|--------|-----------|
 | Release 1.0 — MVP | ✅ Cerrada | `docs/project/releases/Release 1.0 - MVP.md` |
-| Release 1.1 — Administration | 🚧 Planning | `docs/project/releases/Release 1.1 - Administration.md` |
+| Release 1.1 — Administration | ✅ Backlog refinado | `docs/project/releases/Release 1.1 — Administration.md` |
 
 ---
 
@@ -129,7 +129,7 @@ AgenDoc Project Summary.md
 releases/
 
 Release 1.0 - MVP.md
-Release 1.1 - Administration.md
+Release 1.1 — Administration.md
 
 history/
 
@@ -167,14 +167,14 @@ Toda Historia de Usuario deberá pertenecer explícitamente a una Release antes 
 
 # Próximos Pasos
 
-La siguiente actividad oficial del proyecto corresponde al refinamiento del Product Backlog de la Release 1.1 y la planificación del Sprint 6.
+El Product Backlog de la Release 1.1 se encuentra refinado. La siguiente actividad oficial del proyecto corresponde a la planificación detallada del Sprint 6.
 
 El objetivo inmediato consiste en:
 
-- aprobar las épicas de la Release;
-- aprobar el Product Backlog;
-- planificar el Sprint 6;
-- iniciar la implementación de las primeras capacidades administrativas.
+- confirmar el alcance comprometido del Sprint 6;
+- validar las dependencias y habilitadores técnicos requeridos;
+- establecer el objetivo y criterios de aceptación del Sprint;
+- iniciar la implementación de las primeras capacidades administrativas de la Release 1.1.
 
 ---
 
