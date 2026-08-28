@@ -43,6 +43,9 @@ export function getUserRole(): UserRole | null {
 
 export function getDefaultRouteForRole(role: UserRole): string {
   switch (role) {
+    case "ADMIN":
+      return "/admin";
+
     case "RECEPTIONIST":
       return "/dashboard";
 

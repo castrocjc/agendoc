@@ -8,12 +8,12 @@
 |---|---|
 | Proyecto | AgenDoc |
 | Documento | Release 1.1 — Administration |
-| Versión | v1.2 |
-| Estado | ✅ Backlog refinado |
+| Versión | v1.3 |
+| Estado | 🚧 Sprint 6 en ejecución |
 | Release | 1.1 |
 | Release anterior | Release 1.0 — MVP |
 | Sprints previstos | Sprint 6 a Sprint 10 |
-| Próximo incremento | Sprint 6 |
+| Próximo incremento | HU-22 — Acceder al Workspace de Administración |
 | Primera historia recomendada | HU-22 — Acceder al Workspace de Administración |
 | Primer habilitador recomendado | TS-07 — Incorporar soporte para ADMIN y capacidades administrativas |
 
@@ -26,6 +26,7 @@
 | v1.0 | Agosto 2026 | Equipo AgenDoc | Creación de la planificación inicial. |
 | v1.1 | Agosto 2026 | Equipo AgenDoc | Refinamiento de épicas, Product Backlog, habilitadores técnicos y planificación preliminar de Sprints 6 a 10. |
 | v1.2 | Agosto 2026 | Equipo AgenDoc | Refinamiento del modelo funcional de identidad del paciente, registro progresivo, prevención de duplicados y vinculación posterior entre perfiles de dominio e identidad digital. |
+| v1.3 | Agosto 2026 | Equipo AgenDoc | Inicio de ejecución del Sprint 6 y cierre técnico de TS-07 con soporte seguro para ADMIN, contexto autenticado y navegación administrativa protegida. |
 
 ---
 
@@ -33,9 +34,9 @@
 
 ## Estado
 
-✅ **PRODUCT BACKLOG REFINADO**
+🚧 **SPRINT 6 EN EJECUCIÓN**
 
-La Release se encuentra lista para iniciar la planificación detallada y ejecución del Sprint 6.
+La Release 1.1 se encuentra en ejecución. TS-07 quedó implementado y validado como primera fundación técnica del Sprint 6. La siguiente unidad de trabajo es HU-22 — Acceder al Workspace de Administración.
 
 ## Objetivo estratégico
 
@@ -1053,6 +1054,12 @@ Como usuario autorizado, quiero consultar y ajustar la disponibilidad futura par
 
 ## TS-07 — Incorporar soporte para ADMIN y capacidades administrativas
 
+### Estado
+
+✅ **COMPLETADO Y VALIDADO**
+
+TS-07 incorpora la fundación técnica del rol ADMIN, su contexto autenticado y el acceso protegido inicial a `/admin`. Las capacidades administrativas delegables no forman parte de este cierre y permanecen bajo TS-09.
+
 ### Propósito
 
 Habilitar el rol ADMIN y el acceso inicial al Workspace de Administración manteniendo los controles actuales.
@@ -1299,7 +1306,7 @@ Habilitar la experiencia administrativa inicial y establecer el modelo de autori
 
 ### Alcance
 
-- TS-07 — Soporte para ADMIN y capacidades administrativas iniciales.
+- ✅ TS-07 — Soporte para ADMIN y capacidades administrativas iniciales. Completado y validado.
 - HU-22 — Acceder al Workspace de Administración.
 - TS-09 — Primera versión de capacidades delegables.
 - TS-12 — Componentes base del Workspace.
@@ -1555,4 +1562,4 @@ No se recomienda iniciar Sprint 6 con TS-08, porque sería una modificación est
 
 ## Próximo paso
 
-Iniciar una nueva sesión dedicada exclusivamente al Sprint 6, comenzando por el refinamiento de implementación de TS-07 y HU-22, sin reabrir la estrategia de la Release.
+Continuar la ejecución del Sprint 6 con HU-22 — Acceder al Workspace de Administración, tomando como baseline técnico el soporte ADMIN completado en TS-07 y sin reabrir la estrategia de la Release.

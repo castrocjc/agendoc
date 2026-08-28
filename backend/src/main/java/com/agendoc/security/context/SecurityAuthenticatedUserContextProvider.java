@@ -50,8 +50,8 @@ public class SecurityAuthenticatedUserContextProvider
                             clinicId
                     );
 
-            case RECEPTIONIST -> {
-                // Receptionists currently use the authenticated user
+            case RECEPTIONIST, ADMIN -> {
+                // Administrative identities currently use the authenticated user
                 // and clinic context without a separate business profile.
             }
         }

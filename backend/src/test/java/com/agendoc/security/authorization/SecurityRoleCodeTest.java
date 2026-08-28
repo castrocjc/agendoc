@@ -50,11 +50,25 @@ class SecurityRoleCodeTest {
     }
 
     @Test
+    void shouldConvertAdminRoleCode() {
+
+        SecurityRoleCode role =
+                SecurityRoleCode.from("ADMIN");
+
+        assertEquals(
+                SecurityRoleCode.ADMIN,
+                role
+        );
+
+    }
+
+    @Test
+
     void shouldRejectUnsupportedRoleCode() {
 
         assertThrows(
                 IllegalStateException.class,
-                () -> SecurityRoleCode.from("ADMIN")
+                () -> SecurityRoleCode.from("UNSUPPORTED_ROLE")
         );
     }
 }

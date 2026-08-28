@@ -94,7 +94,7 @@ class AuthenticatedUserAuthorizationTest {
     void shouldRejectUnsupportedContextRole() {
 
         AuthenticatedUserContext context =
-                createContext("ADMIN");
+                createContext("UNSUPPORTED_ROLE");
 
         when(contextProvider.getCurrentContext())
                 .thenReturn(context);

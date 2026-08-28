@@ -1,0 +1,136 @@
+.admin-workspace-page {
+  min-height: 100vh;
+  padding: var(--space-7);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.admin-workspace-page__shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.admin-workspace-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  margin-bottom: var(--space-7);
+}
+
+.admin-workspace-page__header h1 {
+  margin:
+    var(--space-2)
+    0
+    var(--space-3);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+}
+
+.admin-workspace-page__header p {
+  max-width: 680px;
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.admin-workspace-page__eyebrow {
+  color: var(--color-primary-700);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-workspace-page__grid {
+  display: grid;
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.admin-workspace-page__card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-6);
+}
+
+.admin-workspace-page__card h2 {
+  margin:
+    0
+    0
+    var(--space-2);
+  font-size: var(--font-size-h3);
+  line-height: var(--line-height-h3);
+}
+
+.admin-workspace-page__card p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.admin-workspace-page__card-icon {
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.admin-workspace-page__clinic {
+  display: inline-block;
+  margin-top: var(--space-3);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  font-weight: var(--font-weight-semibold);
+}
+
+.admin-workspace-page__status {
+  margin-top: var(--space-7);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-workspace-page__status span {
+  display: block;
+  margin-bottom: var(--space-1);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+}
+
+.admin-workspace-page__status strong {
+  display: block;
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+.admin-workspace-page__status p {
+  margin:
+    var(--space-3)
+    0
+    0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+}
+
+@media (max-width: 760px) {
+  .admin-workspace-page {
+    padding: var(--space-5);
+  }
+
+  .admin-workspace-page__header {
+    flex-direction: column;
+  }
+
+  .admin-workspace-page__grid {
+    grid-template-columns: 1fr;
+  }
+}

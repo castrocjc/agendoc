@@ -9,7 +9,8 @@ public enum SecurityRoleCode {
 
     PATIENT,
     RECEPTIONIST,
-    DOCTOR;
+    DOCTOR,
+    ADMIN;
 
     /**
      * Converts a persisted role code into its supported typed representation.

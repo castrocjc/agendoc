@@ -357,12 +357,48 @@ class SecurityAuthenticatedUserContextProviderTest {
     }
 
     @Test
+    void shouldReturnAdminContextWithoutBusinessProfile() {
+        UserEntity user = createUser(
+                40L,
+                1L,
+                "ADMIN"
+        );
+
+        authenticate(user);
+
+        AuthenticatedUserContext context =
+                contextProvider.getCurrentContext();
+
+        assertThat(context.userId()).isEqualTo(40L);
+        assertThat(context.username())
+                .isEqualTo("authenticated.user");
+        assertThat(context.clinicId()).isEqualTo(1L);
+        assertThat(context.roleCode()).isEqualTo("ADMIN");
+        assertThat(context.patientId()).isNull();
+        assertThat(context.doctorId()).isNull();
+
+        verify(patientRepository, never())
+                .findByUserIdAndClinicIdAndRecordStatus(
+                        40L,
+                        1L,
+                        RecordStatus.ACTIVE
+                );
+
+        verify(doctorRepository, never())
+                .findByUserIdAndClinicIdAndRecordStatus(
+                        40L,
+                        1L,
+                        RecordStatus.ACTIVE
+                );
+    }
+
+    @Test
     void shouldRejectUnsupportedRole() {
 
         UserEntity user = createUser(
                 10L,
                 1L,
-                "ADMIN"
+                "UNSUPPORTED_ROLE"
         );
 
         authenticate(user);

@@ -6,6 +6,8 @@ import {
 } from "react-router-dom";
 
 import AccountHomePage from "./features/account/pages/AccountHomePage";
+
+import AdminWorkspacePage from "./features/admin/pages/AdminWorkspacePage";
 import MedicalAgendaPage from "./features/agenda/pages/MedicalAgendaPage";
 import AppointmentAgendaPage from "./features/appointment/pages/AppointmentAgendaPage";
 import AppointmentPage from "./features/appointment/pages/AppointmentPage";
@@ -85,6 +87,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute
+              allowedRoles={["ADMIN"]}
+            >
+              <AdminWorkspacePage />
+            </ProtectedRoute>
+          }
+        />
+
+
 
         <Route
           path="/dashboard"
