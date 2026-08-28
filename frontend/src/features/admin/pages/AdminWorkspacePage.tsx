@@ -1,17 +1,20 @@
 import {
   Building2,
   LogOut,
-  ShieldCheck,
+  Stethoscope,
+  UserRound,
+  Users,
 } from "lucide-react";
 import {
   useNavigate,
 } from "react-router-dom";
+
 import AppButton from "../../../components/AppButton";
-import AppCard from "../../../components/AppCard";
 import {
   clearSession,
   getAuthenticatedUser,
 } from "../../auth/services/sessionService";
+import AdministrativeModuleCard from "../components/AdministrativeModuleCard";
 import "./AdminWorkspacePage.css";
 
 function AdminWorkspacePage() {
@@ -38,7 +41,7 @@ function AdminWorkspacePage() {
             <h1>Workspace administrativo</h1>
 
             <p>
-              Accede a las funciones administrativas habilitadas
+              Gestiona las funciones administrativas habilitadas
               para tu consultorio.
             </p>
           </div>
@@ -54,63 +57,72 @@ function AdminWorkspacePage() {
           </AppButton>
         </header>
 
-        <section className="admin-workspace-page__grid">
-          <AppCard
-            className="admin-workspace-page__card"
-            elevation="low"
-          >
-            <div className="admin-workspace-page__card-icon">
-              <ShieldCheck size={28} />
-            </div>
+        <section
+          className="admin-workspace-page__context"
+          aria-label="Contexto administrativo"
+        >
+          <div className="admin-workspace-page__context-icon">
+            <Building2 size={22} />
+          </div>
 
-            <div>
-              <h2>Acceso administrativo habilitado</h2>
+          <div>
+            <span>Contexto administrativo</span>
 
-              <p>
-                Tu identidad tiene acceso al Workspace de
-                Administración del consultorio autenticado.
-              </p>
-            </div>
-          </AppCard>
+            <strong>
+              {user
+                ? `Consultorio #${user.clinicId}`
+                : "Consultorio autenticado"}
+            </strong>
+          </div>
+        </section>
 
-          <AppCard
-            className="admin-workspace-page__card"
-            elevation="low"
-          >
-            <div className="admin-workspace-page__card-icon">
-              <Building2 size={28} />
-            </div>
+        <section className="admin-workspace-page__modules">
+          <div className="admin-workspace-page__section-heading">
+            <h2>Módulos administrativos</h2>
 
-            <div>
-              <h2>Consultorio actual</h2>
+            <p>
+              Las funciones disponibles evolucionarán
+              progresivamente durante Release 1.1.
+            </p>
+          </div>
 
-              <p>
-                Las operaciones administrativas se ejecutarán
-                dentro del contexto del consultorio autenticado.
-              </p>
+          <div className="admin-workspace-page__grid">
+            <AdministrativeModuleCard
+              title="Especialidades médicas"
+              description="Gestiona las especialidades disponibles en el consultorio."
+              icon={Stethoscope}
+              status="coming-soon"
+            />
 
-              {user && (
-                <span className="admin-workspace-page__clinic">
-                  Consultorio #{user.clinicId}
-                </span>
-              )}
-            </div>
-          </AppCard>
+            <AdministrativeModuleCard
+              title="Usuarios"
+              description="Gestiona identidades, roles y acceso al consultorio."
+              icon={Users}
+              status="coming-soon"
+            />
+
+            <AdministrativeModuleCard
+              title="Médicos"
+              description="Gestiona los médicos registrados en el consultorio."
+              icon={UserRound}
+              status="coming-soon"
+            />
+
+            <AdministrativeModuleCard
+              title="Pacientes"
+              description="Gestiona los pacientes registrados en el consultorio."
+              icon={Users}
+              status="coming-soon"
+            />
+          </div>
         </section>
 
         <section className="admin-workspace-page__status">
-          <span>
-            Sesión administrativa
-          </span>
+          <span>Sesión administrativa</span>
 
           <strong>
             {user?.email ?? "Usuario autenticado"}
           </strong>
-
-          <p>
-            Las funciones administrativas se incorporarán
-            progresivamente durante Release 1.1.
-          </p>
         </section>
       </section>
     </main>

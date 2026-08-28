@@ -1,0 +1,56 @@
+.admin-access-denied {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-6);
+  background: var(--color-background);
+  color: var(--color-text-primary);
+}
+
+.admin-access-denied__card {
+  width: min(520px, 100%);
+  padding: var(--space-7);
+  text-align: center;
+}
+
+.admin-access-denied__icon {
+  width: 56px;
+  height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-gray-100);
+  color: var(--color-danger);
+}
+
+.admin-access-denied__eyebrow {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-primary-700);
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  font-weight: var(--font-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-access-denied h1 {
+  margin:
+    0
+    0
+    var(--space-3);
+  font-size: var(--font-size-h1);
+  line-height: var(--line-height-h1);
+}
+
+.admin-access-denied p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.admin-access-denied__action {
+  margin-top: var(--space-6);
+}

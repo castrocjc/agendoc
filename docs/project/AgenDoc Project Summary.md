@@ -168,14 +168,14 @@ Toda Historia de Usuario deberá pertenecer explícitamente a una Release antes 
 
 # Próximos Pasos
 
-El Product Backlog de la Release 1.1 se encuentra refinado y el Sprint 6 está oficialmente en ejecución. TS-07 quedó implementado y validado como primera fundación administrativa de la Release.
+El Product Backlog de la Release 1.1 se encuentra refinado y el Sprint 6 está oficialmente en ejecución. TS-07 y HU-22 quedaron implementados y validados como fundación técnica y funcional de la experiencia administrativa inicial.
 
 El objetivo inmediato consiste en:
 
-- continuar con HU-22 — Acceder al Workspace de Administración;
+- continuar con HU-24 — Gestionar especialidades médicas como primer vertical slice administrativo de negocio;
 - preservar el aislamiento entre ADMIN y los roles existentes;
-- evolucionar el Workspace de forma incremental sin adelantar TS-08 ni TS-09;
-- preparar HU-24 como primer vertical slice administrativo de negocio.
+- continuar evolucionando los componentes administrativos de TS-12 de forma incremental;
+- mantener las capacidades administrativas delegables dentro del alcance de TS-09 sin adelantar TS-08.
 
 ---
 
@@ -183,4 +183,4 @@ El objetivo inmediato consiste en:
 
 AgenDoc ha concluido exitosamente la Release 1.0, correspondiente al Producto Mínimo Viable (MVP).
 
-El proyecto se encuentra ejecutando su primera etapa evolutiva mediante la Release 1.1 — Administration. El Sprint 6 está en curso y TS-07 estableció la fundación inicial para acceso ADMIN seguro, preservando los principios arquitectónicos establecidos durante el MVP.
+El proyecto se encuentra ejecutando su primera etapa evolutiva mediante la Release 1.1 — Administration. El Sprint 6 está en curso. TS-07 estableció la fundación inicial para acceso ADMIN seguro y HU-22 convirtió esa base en un Workspace administrativo funcional, manteniendo autenticación, autorización, Clinic Isolation y los principios arquitectónicos establecidos durante el MVP.

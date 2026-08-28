@@ -21,11 +21,13 @@ import type {
 interface ProtectedRouteProps {
   children: ReactNode;
   allowedRoles?: UserRole[];
+  unauthorizedElement?: ReactNode;
 }
 
 function ProtectedRoute({
   children,
   allowedRoles,
+  unauthorizedElement,
 }: ProtectedRouteProps) {
   const [session, setSession] = useState(getSession);
 
@@ -43,6 +45,10 @@ function ProtectedRoute({
     allowedRoles &&
     !allowedRoles.includes(session.user.role)
   ) {
+    if (unauthorizedElement) {
+      return <>{unauthorizedElement}</>;
+    }
+
     return (
       <Navigate
         to={getDefaultRouteForRole(session.user.role)}

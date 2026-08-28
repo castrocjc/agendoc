@@ -7,6 +7,7 @@ import {
 
 import AccountHomePage from "./features/account/pages/AccountHomePage";
 
+import AdminAccessDenied from "./features/admin/pages/AdminAccessDenied";
 import AdminWorkspacePage from "./features/admin/pages/AdminWorkspacePage";
 import MedicalAgendaPage from "./features/agenda/pages/MedicalAgendaPage";
 import AppointmentAgendaPage from "./features/appointment/pages/AppointmentAgendaPage";
@@ -92,6 +93,7 @@ function App() {
           element={
             <ProtectedRoute
               allowedRoles={["ADMIN"]}
+              unauthorizedElement={<AdminAccessDenied />}
             >
               <AdminWorkspacePage />
             </ProtectedRoute>

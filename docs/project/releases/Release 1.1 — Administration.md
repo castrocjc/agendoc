@@ -8,12 +8,12 @@
 |---|---|
 | Proyecto | AgenDoc |
 | Documento | Release 1.1 — Administration |
-| Versión | v1.3 |
+| Versión | v1.4 |
 | Estado | 🚧 Sprint 6 en ejecución |
 | Release | 1.1 |
 | Release anterior | Release 1.0 — MVP |
 | Sprints previstos | Sprint 6 a Sprint 10 |
-| Próximo incremento | HU-22 — Acceder al Workspace de Administración |
+| Próximo incremento | HU-24 — Gestionar especialidades médicas |
 | Primera historia recomendada | HU-22 — Acceder al Workspace de Administración |
 | Primer habilitador recomendado | TS-07 — Incorporar soporte para ADMIN y capacidades administrativas |
 
@@ -27,6 +27,7 @@
 | v1.1 | Agosto 2026 | Equipo AgenDoc | Refinamiento de épicas, Product Backlog, habilitadores técnicos y planificación preliminar de Sprints 6 a 10. |
 | v1.2 | Agosto 2026 | Equipo AgenDoc | Refinamiento del modelo funcional de identidad del paciente, registro progresivo, prevención de duplicados y vinculación posterior entre perfiles de dominio e identidad digital. |
 | v1.3 | Agosto 2026 | Equipo AgenDoc | Inicio de ejecución del Sprint 6 y cierre técnico de TS-07 con soporte seguro para ADMIN, contexto autenticado y navegación administrativa protegida. |
+| v1.4 | Agosto 2026 | Equipo AgenDoc | Cierre funcional de HU-22 con Workspace administrativo, experiencia explícita de acceso restringido, Clinic Isolation y primer incremento reutilizable de TS-12. |
 
 ---
 
@@ -36,7 +37,7 @@
 
 🚧 **SPRINT 6 EN EJECUCIÓN**
 
-La Release 1.1 se encuentra en ejecución. TS-07 quedó implementado y validado como primera fundación técnica del Sprint 6. La siguiente unidad de trabajo es HU-22 — Acceder al Workspace de Administración.
+La Release 1.1 se encuentra en ejecución. TS-07 y HU-22 quedaron implementados y validados como fundación técnica y funcional del Workspace de Administración. Las capacidades administrativas delegables permanecen pendientes de TS-09. La siguiente unidad funcional es HU-24 — Gestionar especialidades médicas.
 
 ## Objetivo estratégico
 
@@ -1307,9 +1308,9 @@ Habilitar la experiencia administrativa inicial y establecer el modelo de autori
 ### Alcance
 
 - ✅ TS-07 — Soporte para ADMIN y capacidades administrativas iniciales. Completado y validado.
-- HU-22 — Acceder al Workspace de Administración.
+- ✅ HU-22 — Acceder al Workspace de Administración. Completada y validada para el modelo de roles actual.
 - TS-09 — Primera versión de capacidades delegables.
-- TS-12 — Componentes base del Workspace.
+- 🚧 TS-12 — Primer componente reutilizable incorporado desde HU-22. Evolución incremental.
 - HU-24 — Gestionar especialidades médicas.
 - TS-13 — Matriz inicial de pruebas de autorización.
 
@@ -1562,4 +1563,4 @@ No se recomienda iniciar Sprint 6 con TS-08, porque sería una modificación est
 
 ## Próximo paso
 
-Continuar la ejecución del Sprint 6 con HU-22 — Acceder al Workspace de Administración, tomando como baseline técnico el soporte ADMIN completado en TS-07 y sin reabrir la estrategia de la Release.
+Continuar la ejecución del Sprint 6 con HU-24 — Gestionar especialidades médicas como primer vertical slice administrativo de negocio, tomando como baseline TS-07 y HU-22. Las capacidades delegables permanecen bajo TS-09 y no deben adelantarse fuera de su alcance.
