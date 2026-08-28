@@ -82,11 +82,14 @@ class PatientServiceImplTest {
                 RecordStatus.ACTIVE
         )).thenReturn(Optional.of(clinic));
 
-        when(patientRepository.existsByDocumentNumberIgnoreCase(
+        when(patientRepository.existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                1L,
+                "DNI",
                 "87654321"
         )).thenReturn(false);
 
-        when(patientRepository.existsByEmailIgnoreCase(
+        when(patientRepository.existsByClinicIdAndEmail(
+                1L,
                 "maria.gonzalez@agendoc.com"
         )).thenReturn(false);
 
@@ -167,11 +170,14 @@ class PatientServiceImplTest {
                 RecordStatus.ACTIVE
         )).thenReturn(Optional.of(clinic));
 
-        when(patientRepository.existsByDocumentNumberIgnoreCase(
+        when(patientRepository.existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                1L,
+                "DNI",
                 "ABC123"
         )).thenReturn(false);
 
-        when(patientRepository.existsByEmailIgnoreCase(
+        when(patientRepository.existsByClinicIdAndEmail(
+                1L,
                 "maria.gonzalez@agendoc.com"
         )).thenReturn(false);
 
@@ -215,7 +221,9 @@ class PatientServiceImplTest {
                 RecordStatus.ACTIVE
         )).thenReturn(Optional.of(createClinic()));
 
-        when(patientRepository.existsByDocumentNumberIgnoreCase(
+        when(patientRepository.existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                1L,
+                "DNI",
                 "87654321"
         )).thenReturn(true);
 
@@ -243,11 +251,14 @@ class PatientServiceImplTest {
                 RecordStatus.ACTIVE
         )).thenReturn(Optional.of(createClinic()));
 
-        when(patientRepository.existsByDocumentNumberIgnoreCase(
+        when(patientRepository.existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                1L,
+                "DNI",
                 "87654321"
         )).thenReturn(false);
 
-        when(patientRepository.existsByEmailIgnoreCase(
+        when(patientRepository.existsByClinicIdAndEmail(
+                1L,
                 "maria.gonzalez@agendoc.com"
         )).thenReturn(true);
 
@@ -284,7 +295,11 @@ class PatientServiceImplTest {
                 );
 
         verify(patientRepository, never())
-                .existsByDocumentNumberIgnoreCase(any());
+                .existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                        any(),
+                        any(),
+                        any()
+                );
 
         verify(patientRepository, never())
                 .save(any(PatientEntity.class));

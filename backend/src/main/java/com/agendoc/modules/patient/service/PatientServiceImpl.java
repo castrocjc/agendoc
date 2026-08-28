@@ -58,7 +58,7 @@ public class PatientServiceImpl implements PatientService {
 
                 NormalizedPatientData data = normalize(request);
 
-                validateDuplicates(data);
+                validateDuplicates(clinic.getId(), data);
 
                 PatientEntity patient = createEntity(
                                 data,
@@ -131,14 +131,18 @@ public class PatientServiceImpl implements PatientService {
         }
 
         private void validateDuplicates(
+                        Long clinicId,
                         NormalizedPatientData data) {
-                if (patientRepository.existsByDocumentNumberIgnoreCase(
+                if (patientRepository.existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                                clinicId,
+                                data.documentType(),
                                 data.documentNumber())) {
                         throw new ConflictException(DUPLICATED_DOCUMENT);
                 }
 
                 if (data.email() != null
-                                && patientRepository.existsByEmailIgnoreCase(
+                                && patientRepository.existsByClinicIdAndEmail(
+                                                clinicId,
                                                 data.email())) {
                         throw new ConflictException(DUPLICATED_EMAIL);
                 }

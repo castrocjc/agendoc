@@ -13,22 +13,16 @@ import org.springframework.data.repository.query.Param;
  * Repository for patient persistence operations.
  */
 public interface PatientRepository
-              extends JpaRepository<PatientEntity, Long> {
+        extends JpaRepository<PatientEntity, Long> {
 
-       boolean existsByDocumentNumberIgnoreCase(
-                     String documentNumber);
+        boolean existsByClinicIdAndDocumentTypeAndDocumentNumber(
+                Long clinicId,
+                String documentType,
+                String documentNumber);
 
-       boolean existsByEmailIgnoreCase(
-                     String email);
-
-       boolean existsByClinicIdAndDocumentTypeAndDocumentNumber(
-                     Long clinicId,
-                     String documentType,
-                     String documentNumber);
-
-       boolean existsByClinicIdAndEmail(
-                     Long clinicId,
-                     String email);
+        boolean existsByClinicIdAndEmail(
+                Long clinicId,
+                String email);
 
        Optional<PatientEntity> findByClinicIdAndEmailAndRecordStatus(
                      Long clinicId,
